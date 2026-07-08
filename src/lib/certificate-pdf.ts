@@ -45,13 +45,15 @@ export async function generateCertificatePdf(input: CertificateInput): Promise<U
     borderColor: rgb(0.43, 0.16, 0.85), borderWidth: 0.5,
   });
 
-  const uf = input.uf.toLowerCase();
-  const [brasao, bandeira, watermark] = await Promise.all([
-    fetchPng(`/estados/brasoes/${uf}.png`),
-    fetchPng(`/estados/bandeiras/${uf}.png`),
-    fetchPng(`/estados/watermarks/${uf}.png`),
-  ]);
+ const uf = input.uf.toLowerCase();
+const user = "mggomess";
+const repo = "emblem-beam";
 
+const [brasao, bandeira, watermark] = await Promise.all([
+  fetchPng("https://raw.githubusercontent.com/" + user + "/" + repo + "/main/public/estados/brasoes/" + uf + ".png"),
+  fetchPng("https://raw.githubusercontent.com/" + user + "/" + repo + "/main/public/estados/bandeiras/" + uf + ".png"),
+  fetchPng(`/estados/watermarks/${uf}.png`),
+]);
   // Watermark (central, low opacity)
   if (watermark) {
     try {

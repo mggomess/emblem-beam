@@ -15,6 +15,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app/index'
 import { Route as AuthenticatedAppDocentesRouteImport } from './routes/_authenticated/app/docentes'
 import { Route as AuthenticatedAppCursosRouteImport } from './routes/_authenticated/app/cursos'
+import { Route as AuthenticatedAppCertificadosRouteImport } from './routes/_authenticated/app/certificados'
 import { Route as AuthenticatedAppAlunosRouteImport } from './routes/_authenticated/app/alunos'
 
 const AuthRoute = AuthRouteImport.update({
@@ -47,6 +48,12 @@ const AuthenticatedAppCursosRoute = AuthenticatedAppCursosRouteImport.update({
   path: '/app/cursos',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAppCertificadosRoute =
+  AuthenticatedAppCertificadosRouteImport.update({
+    id: '/app/certificados',
+    path: '/app/certificados',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAppAlunosRoute = AuthenticatedAppAlunosRouteImport.update({
   id: '/app/alunos',
   path: '/app/alunos',
@@ -57,6 +64,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/app/alunos': typeof AuthenticatedAppAlunosRoute
+  '/app/certificados': typeof AuthenticatedAppCertificadosRoute
   '/app/cursos': typeof AuthenticatedAppCursosRoute
   '/app/docentes': typeof AuthenticatedAppDocentesRoute
   '/app/': typeof AuthenticatedAppIndexRoute
@@ -65,6 +73,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/app/alunos': typeof AuthenticatedAppAlunosRoute
+  '/app/certificados': typeof AuthenticatedAppCertificadosRoute
   '/app/cursos': typeof AuthenticatedAppCursosRoute
   '/app/docentes': typeof AuthenticatedAppDocentesRoute
   '/app': typeof AuthenticatedAppIndexRoute
@@ -75,6 +84,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/app/alunos': typeof AuthenticatedAppAlunosRoute
+  '/_authenticated/app/certificados': typeof AuthenticatedAppCertificadosRoute
   '/_authenticated/app/cursos': typeof AuthenticatedAppCursosRoute
   '/_authenticated/app/docentes': typeof AuthenticatedAppDocentesRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
@@ -85,17 +95,26 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/app/alunos'
+    | '/app/certificados'
     | '/app/cursos'
     | '/app/docentes'
     | '/app/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/app/alunos' | '/app/cursos' | '/app/docentes' | '/app'
+  to:
+    | '/'
+    | '/auth'
+    | '/app/alunos'
+    | '/app/certificados'
+    | '/app/cursos'
+    | '/app/docentes'
+    | '/app'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/app/alunos'
+    | '/_authenticated/app/certificados'
     | '/_authenticated/app/cursos'
     | '/_authenticated/app/docentes'
     | '/_authenticated/app/'
@@ -151,6 +170,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppCursosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/app/certificados': {
+      id: '/_authenticated/app/certificados'
+      path: '/app/certificados'
+      fullPath: '/app/certificados'
+      preLoaderRoute: typeof AuthenticatedAppCertificadosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/app/alunos': {
       id: '/_authenticated/app/alunos'
       path: '/app/alunos'
@@ -163,6 +189,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAppAlunosRoute: typeof AuthenticatedAppAlunosRoute
+  AuthenticatedAppCertificadosRoute: typeof AuthenticatedAppCertificadosRoute
   AuthenticatedAppCursosRoute: typeof AuthenticatedAppCursosRoute
   AuthenticatedAppDocentesRoute: typeof AuthenticatedAppDocentesRoute
   AuthenticatedAppIndexRoute: typeof AuthenticatedAppIndexRoute
@@ -170,6 +197,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAppAlunosRoute: AuthenticatedAppAlunosRoute,
+  AuthenticatedAppCertificadosRoute: AuthenticatedAppCertificadosRoute,
   AuthenticatedAppCursosRoute: AuthenticatedAppCursosRoute,
   AuthenticatedAppDocentesRoute: AuthenticatedAppDocentesRoute,
   AuthenticatedAppIndexRoute: AuthenticatedAppIndexRoute,

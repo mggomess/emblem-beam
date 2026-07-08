@@ -9,38 +9,236 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as VerificarCodeRouteImport } from './routes/verificar.$code'
+import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app/index'
+import { Route as AuthenticatedAppUsuariosRouteImport } from './routes/_authenticated/app/usuarios'
+import { Route as AuthenticatedAppLogsRouteImport } from './routes/_authenticated/app/logs'
+import { Route as AuthenticatedAppFaturamentoRouteImport } from './routes/_authenticated/app/faturamento'
+import { Route as AuthenticatedAppDocentesRouteImport } from './routes/_authenticated/app/docentes'
+import { Route as AuthenticatedAppCursosRouteImport } from './routes/_authenticated/app/cursos'
+import { Route as AuthenticatedAppConfiguracoesRouteImport } from './routes/_authenticated/app/configuracoes'
+import { Route as AuthenticatedAppCertificadosRouteImport } from './routes/_authenticated/app/certificados'
+import { Route as AuthenticatedAppCarteirinhasRouteImport } from './routes/_authenticated/app/carteirinhas'
+import { Route as AuthenticatedAppAlunosRouteImport } from './routes/_authenticated/app/alunos'
 
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VerificarCodeRoute = VerificarCodeRouteImport.update({
+  id: '/verificar/$code',
+  path: '/verificar/$code',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAppIndexRoute = AuthenticatedAppIndexRouteImport.update({
+  id: '/app/',
+  path: '/app/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAppUsuariosRoute =
+  AuthenticatedAppUsuariosRouteImport.update({
+    id: '/app/usuarios',
+    path: '/app/usuarios',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAppLogsRoute = AuthenticatedAppLogsRouteImport.update({
+  id: '/app/logs',
+  path: '/app/logs',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAppFaturamentoRoute =
+  AuthenticatedAppFaturamentoRouteImport.update({
+    id: '/app/faturamento',
+    path: '/app/faturamento',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAppDocentesRoute =
+  AuthenticatedAppDocentesRouteImport.update({
+    id: '/app/docentes',
+    path: '/app/docentes',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAppCursosRoute = AuthenticatedAppCursosRouteImport.update({
+  id: '/app/cursos',
+  path: '/app/cursos',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAppConfiguracoesRoute =
+  AuthenticatedAppConfiguracoesRouteImport.update({
+    id: '/app/configuracoes',
+    path: '/app/configuracoes',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAppCertificadosRoute =
+  AuthenticatedAppCertificadosRouteImport.update({
+    id: '/app/certificados',
+    path: '/app/certificados',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAppCarteirinhasRoute =
+  AuthenticatedAppCarteirinhasRouteImport.update({
+    id: '/app/carteirinhas',
+    path: '/app/carteirinhas',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAppAlunosRoute = AuthenticatedAppAlunosRouteImport.update({
+  id: '/app/alunos',
+  path: '/app/alunos',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/verificar/$code': typeof VerificarCodeRoute
+  '/app/alunos': typeof AuthenticatedAppAlunosRoute
+  '/app/carteirinhas': typeof AuthenticatedAppCarteirinhasRoute
+  '/app/certificados': typeof AuthenticatedAppCertificadosRoute
+  '/app/configuracoes': typeof AuthenticatedAppConfiguracoesRoute
+  '/app/cursos': typeof AuthenticatedAppCursosRoute
+  '/app/docentes': typeof AuthenticatedAppDocentesRoute
+  '/app/faturamento': typeof AuthenticatedAppFaturamentoRoute
+  '/app/logs': typeof AuthenticatedAppLogsRoute
+  '/app/usuarios': typeof AuthenticatedAppUsuariosRoute
+  '/app/': typeof AuthenticatedAppIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/verificar/$code': typeof VerificarCodeRoute
+  '/app/alunos': typeof AuthenticatedAppAlunosRoute
+  '/app/carteirinhas': typeof AuthenticatedAppCarteirinhasRoute
+  '/app/certificados': typeof AuthenticatedAppCertificadosRoute
+  '/app/configuracoes': typeof AuthenticatedAppConfiguracoesRoute
+  '/app/cursos': typeof AuthenticatedAppCursosRoute
+  '/app/docentes': typeof AuthenticatedAppDocentesRoute
+  '/app/faturamento': typeof AuthenticatedAppFaturamentoRoute
+  '/app/logs': typeof AuthenticatedAppLogsRoute
+  '/app/usuarios': typeof AuthenticatedAppUsuariosRoute
+  '/app': typeof AuthenticatedAppIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/verificar/$code': typeof VerificarCodeRoute
+  '/_authenticated/app/alunos': typeof AuthenticatedAppAlunosRoute
+  '/_authenticated/app/carteirinhas': typeof AuthenticatedAppCarteirinhasRoute
+  '/_authenticated/app/certificados': typeof AuthenticatedAppCertificadosRoute
+  '/_authenticated/app/configuracoes': typeof AuthenticatedAppConfiguracoesRoute
+  '/_authenticated/app/cursos': typeof AuthenticatedAppCursosRoute
+  '/_authenticated/app/docentes': typeof AuthenticatedAppDocentesRoute
+  '/_authenticated/app/faturamento': typeof AuthenticatedAppFaturamentoRoute
+  '/_authenticated/app/logs': typeof AuthenticatedAppLogsRoute
+  '/_authenticated/app/usuarios': typeof AuthenticatedAppUsuariosRoute
+  '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/sitemap.xml'
+    | '/verificar/$code'
+    | '/app/alunos'
+    | '/app/carteirinhas'
+    | '/app/certificados'
+    | '/app/configuracoes'
+    | '/app/cursos'
+    | '/app/docentes'
+    | '/app/faturamento'
+    | '/app/logs'
+    | '/app/usuarios'
+    | '/app/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/auth'
+    | '/sitemap.xml'
+    | '/verificar/$code'
+    | '/app/alunos'
+    | '/app/carteirinhas'
+    | '/app/certificados'
+    | '/app/configuracoes'
+    | '/app/cursos'
+    | '/app/docentes'
+    | '/app/faturamento'
+    | '/app/logs'
+    | '/app/usuarios'
+    | '/app'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/sitemap.xml'
+    | '/verificar/$code'
+    | '/_authenticated/app/alunos'
+    | '/_authenticated/app/carteirinhas'
+    | '/_authenticated/app/certificados'
+    | '/_authenticated/app/configuracoes'
+    | '/_authenticated/app/cursos'
+    | '/_authenticated/app/docentes'
+    | '/_authenticated/app/faturamento'
+    | '/_authenticated/app/logs'
+    | '/_authenticated/app/usuarios'
+    | '/_authenticated/app/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  VerificarCodeRoute: typeof VerificarCodeRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +246,121 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/verificar/$code': {
+      id: '/verificar/$code'
+      path: '/verificar/$code'
+      fullPath: '/verificar/$code'
+      preLoaderRoute: typeof VerificarCodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/app/': {
+      id: '/_authenticated/app/'
+      path: '/app'
+      fullPath: '/app/'
+      preLoaderRoute: typeof AuthenticatedAppIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/app/usuarios': {
+      id: '/_authenticated/app/usuarios'
+      path: '/app/usuarios'
+      fullPath: '/app/usuarios'
+      preLoaderRoute: typeof AuthenticatedAppUsuariosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/app/logs': {
+      id: '/_authenticated/app/logs'
+      path: '/app/logs'
+      fullPath: '/app/logs'
+      preLoaderRoute: typeof AuthenticatedAppLogsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/app/faturamento': {
+      id: '/_authenticated/app/faturamento'
+      path: '/app/faturamento'
+      fullPath: '/app/faturamento'
+      preLoaderRoute: typeof AuthenticatedAppFaturamentoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/app/docentes': {
+      id: '/_authenticated/app/docentes'
+      path: '/app/docentes'
+      fullPath: '/app/docentes'
+      preLoaderRoute: typeof AuthenticatedAppDocentesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/app/cursos': {
+      id: '/_authenticated/app/cursos'
+      path: '/app/cursos'
+      fullPath: '/app/cursos'
+      preLoaderRoute: typeof AuthenticatedAppCursosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/app/configuracoes': {
+      id: '/_authenticated/app/configuracoes'
+      path: '/app/configuracoes'
+      fullPath: '/app/configuracoes'
+      preLoaderRoute: typeof AuthenticatedAppConfiguracoesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/app/certificados': {
+      id: '/_authenticated/app/certificados'
+      path: '/app/certificados'
+      fullPath: '/app/certificados'
+      preLoaderRoute: typeof AuthenticatedAppCertificadosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/app/carteirinhas': {
+      id: '/_authenticated/app/carteirinhas'
+      path: '/app/carteirinhas'
+      fullPath: '/app/carteirinhas'
+      preLoaderRoute: typeof AuthenticatedAppCarteirinhasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/app/alunos': {
+      id: '/_authenticated/app/alunos'
+      path: '/app/alunos'
+      fullPath: '/app/alunos'
+      preLoaderRoute: typeof AuthenticatedAppAlunosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAppAlunosRoute: typeof AuthenticatedAppAlunosRoute
+  AuthenticatedAppCarteirinhasRoute: typeof AuthenticatedAppCarteirinhasRoute
+  AuthenticatedAppCertificadosRoute: typeof AuthenticatedAppCertificadosRoute
+  AuthenticatedAppConfiguracoesRoute: typeof AuthenticatedAppConfiguracoesRoute
+  AuthenticatedAppCursosRoute: typeof AuthenticatedAppCursosRoute
+  AuthenticatedAppDocentesRoute: typeof AuthenticatedAppDocentesRoute
+  AuthenticatedAppFaturamentoRoute: typeof AuthenticatedAppFaturamentoRoute
+  AuthenticatedAppLogsRoute: typeof AuthenticatedAppLogsRoute
+  AuthenticatedAppUsuariosRoute: typeof AuthenticatedAppUsuariosRoute
+  AuthenticatedAppIndexRoute: typeof AuthenticatedAppIndexRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAppAlunosRoute: AuthenticatedAppAlunosRoute,
+  AuthenticatedAppCarteirinhasRoute: AuthenticatedAppCarteirinhasRoute,
+  AuthenticatedAppCertificadosRoute: AuthenticatedAppCertificadosRoute,
+  AuthenticatedAppConfiguracoesRoute: AuthenticatedAppConfiguracoesRoute,
+  AuthenticatedAppCursosRoute: AuthenticatedAppCursosRoute,
+  AuthenticatedAppDocentesRoute: AuthenticatedAppDocentesRoute,
+  AuthenticatedAppFaturamentoRoute: AuthenticatedAppFaturamentoRoute,
+  AuthenticatedAppLogsRoute: AuthenticatedAppLogsRoute,
+  AuthenticatedAppUsuariosRoute: AuthenticatedAppUsuariosRoute,
+  AuthenticatedAppIndexRoute: AuthenticatedAppIndexRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
+  VerificarCodeRoute: VerificarCodeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -82,15 +82,19 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         name: "description",
         content:
-          "Plataforma SaaS completa para gestão acadêmica, emissão de certificados digitais e carteirinhas com validação por QR Code.",
+          "SaaS moderno para instituições emitirem certificados e carteirinhas digitais com validação por QR Code.",
       },
-      { property: "og:title", content: "Certifica — Gestão Acadêmica" },
+      { property: "og:title", content: "Certifica — Gestão Acadêmica e Certificados Digitais" },
       {
         property: "og:description",
-        content: "Gestão acadêmica moderna com certificados e carteirinhas digitais.",
+        content: "SaaS moderno para instituições emitirem certificados e carteirinhas digitais com validação por QR Code.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Certifica — Gestão Acadêmica e Certificados Digitais" },
+      { name: "twitter:description", content: "SaaS moderno para instituições emitirem certificados e carteirinhas digitais com validação por QR Code." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/234a4a05-eaf8-4c17-9144-e82df4c2c402/id-preview-ba24dc9d--8aef82c5-5229-4d36-9c61-19d32a996aa9.lovable.app-1783525649413.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/234a4a05-eaf8-4c17-9144-e82df4c2c402/id-preview-ba24dc9d--8aef82c5-5229-4d36-9c61-19d32a996aa9.lovable.app-1783525649413.png" },
     ],
     links: [
       {

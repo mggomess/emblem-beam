@@ -50,9 +50,9 @@ const user = "mggomess";
 const repo = "emblem-beam";
 
 const [brasao, bandeira, watermark] = await Promise.all([
-  fetchPng("https://raw.githubusercontent.com/" + user + "/" + repo + "/main/public/estados/brasoes/" + uf + ".png"),
-  fetchPng("https://raw.githubusercontent.com/" + user + "/" + repo + "/main/public/estados/bandeiras/" + uf + ".png"),
-  fetchPng(`/estados/watermarks/${uf}.png`),
+  fetchPng(`${window.location.origin}/estados/brasoes/${uf}.png`),
+  fetchPng(`${window.location.origin}/estados/bandeiras/${uf}.png`),
+  fetchPng(`${window.location.origin}/estados/watermarks/${uf}.png`),
 ]);
   // Watermark (central, low opacity)
   if (watermark) {

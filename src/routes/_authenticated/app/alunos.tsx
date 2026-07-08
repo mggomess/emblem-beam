@@ -51,7 +51,7 @@ const schema = z.object({
   email: z.string().email().optional().or(z.literal("")),
   phone: z.string().optional(),
   course_id: z.string().optional(),
-  status: z.enum(["ativo", "inativo", "concluido"]).default("ativo"),
+  status: z.enum(["ativo", "inativo", "concluido"]),
 });
 type FormValues = z.infer<typeof schema>;
 

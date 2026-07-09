@@ -57,19 +57,16 @@ export async function generateCertificatePdf(input: CertificateInput): Promise<U
     borderColor: rgb(0.43, 0.16, 0.85), borderWidth: 0.5,
   });
 
- const uf = input.uf.toLowerCase();
-const [brasao, bandeira, watermark] = await Promise.all([
-  fetchPng(`/estados/brasoes/${uf}.png`),
-  fetchPng(`/estados/bandeiras/${uf}.png`),
-  fetchPng(`/estados/watermarks/${uf}.png`),
-]);
+  const uf = input.uf.toLowerCase();
+  const [brasao, bandeira] = await Promise.all([
+    fetchPng(`/estados/brasoes/${uf}.png`),
+    fetchPng(`/estados/bandeiras/${uf}.png`),
+  ]);
 
-
-
-  // Watermark (central, low opacity)
-  if (watermark) {
+  // Marca d'água central usando o próprio brasão do estado
+  if (brasao) {
     try {
-      const img = await pdfDoc.embedPng(watermark);
+      const img = await pdfDoc.embedPng(brasao);
       const size = 400;
       page.drawImage(img, {
         x: (width - size) / 2,
@@ -81,17 +78,17 @@ const [brasao, bandeira, watermark] = await Promise.all([
     } catch { /* fallback silently */ }
   }
 
-  // Header: brasao (left) + logo (center) + bandeira (right)
-  if (brasao) {
-    try {
-      const img = await pdfDoc.embedPng(brasao);
-      page.drawImage(img, { x: 60, y: height - 110, width: 70, height: 70 });
-    } catch { /* skip */ }
-  }
+  // Header: bandeira (esquerda) + logo (centro) + brasão (direita)
   if (bandeira) {
     try {
       const img = await pdfDoc.embedPng(bandeira);
-      page.drawImage(img, { x: width - 130, y: height - 100, width: 70, height: 50 });
+      page.drawImage(img, { x: 60, y: height - 100, width: 70, height: 50 });
+    } catch { /* skip */ }
+  }
+  if (brasao) {
+    try {
+      const img = await pdfDoc.embedPng(brasao);
+      page.drawImage(img, { x: width - 130, y: height - 110, width: 70, height: 70 });
     } catch { /* skip */ }
   }
   if (input.institutionLogoUrl) {

@@ -51,16 +51,15 @@ export async function generateHistoricoPdf(input: HistoricoInput): Promise<Uint8
   });
 
   const uf = input.uf.toLowerCase();
-  const [brasao, bandeira, watermark] = await Promise.all([
+  const [brasao, bandeira] = await Promise.all([
     fetchPng(`/estados/brasoes/${uf}.png`),
     fetchPng(`/estados/bandeiras/${uf}.png`),
-    fetchPng(`/estados/watermarks/${uf}.png`),
   ]);
 
-  // Marca d'água central
-  if (watermark) {
+  // Marca d'água central usando o próprio brasão do estado
+  if (brasao) {
     try {
-      const img = await pdfDoc.embedPng(watermark);
+      const img = await pdfDoc.embedPng(brasao);
       const size = 380;
       page.drawImage(img, {
         x: (width - size) / 2,
@@ -70,17 +69,17 @@ export async function generateHistoricoPdf(input: HistoricoInput): Promise<Uint8
     } catch { /* ignore */ }
   }
 
-  // Cabeçalho: brasão, logo, bandeira
-  if (brasao) {
-    try {
-      const img = await pdfDoc.embedPng(brasao);
-      page.drawImage(img, { x: 45, y: height - 100, width: 55, height: 55 });
-    } catch { /* skip */ }
-  }
+  // Cabeçalho: bandeira (esquerda), logo (centro), brasão (direita)
   if (bandeira) {
     try {
       const img = await pdfDoc.embedPng(bandeira);
-      page.drawImage(img, { x: width - 100, y: height - 90, width: 55, height: 40 });
+      page.drawImage(img, { x: 45, y: height - 90, width: 55, height: 40 });
+    } catch { /* skip */ }
+  }
+  if (brasao) {
+    try {
+      const img = await pdfDoc.embedPng(brasao);
+      page.drawImage(img, { x: width - 100, y: height - 100, width: 55, height: 55 });
     } catch { /* skip */ }
   }
   if (input.institutionLogoUrl) {

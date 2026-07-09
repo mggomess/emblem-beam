@@ -119,6 +119,7 @@ function CertificadosPage() {
         teacherNames: teacherRecords.map((t) => `${t.full_name}${t.titulation ? " — " + t.titulation : ""}`),
         code,
         issuedAt: new Date(),
+        verifyBaseUrl: (institution as { verification_base_url?: string | null } | null)?.verification_base_url,
       });
 
       const path = `${user.id}/${code}.pdf`;

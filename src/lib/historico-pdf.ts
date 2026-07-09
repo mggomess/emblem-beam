@@ -143,8 +143,7 @@ export async function generateHistoricoPdf(input: HistoricoInput): Promise<Uint8
   for (const row of input.rows) {
     if (y < 140) {
       // nova página
-      const newPage = pdfDoc.addPage([595, 842]);
-      Object.assign(page, newPage);
+      page = pdfDoc.addPage([595, 842]);
       y = height - 60;
     }
     totalWorkload += row.workload;

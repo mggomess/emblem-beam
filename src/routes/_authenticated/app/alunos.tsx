@@ -39,6 +39,7 @@ import {
 import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { generateHistoricoPdf } from "@/lib/historico-pdf";
 
 export const Route = createFileRoute("/_authenticated/app/alunos")({
   head: () => ({ meta: [{ title: "Alunos — Certifica" }] }),

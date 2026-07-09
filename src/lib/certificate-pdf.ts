@@ -191,8 +191,8 @@ const [brasao, bandeira, watermark] = await Promise.all([
     });
   }
 
-  // QR Code with verification URL
-  const verifyUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/verificar/${input.code}`;
+  // QR Code with verification URL (external SEDU URL or internal fallback)
+  const verifyUrl = buildVerifyUrl(input.code, input.verifyBaseUrl);
   const qrDataUrl = await QRCode.toDataURL(verifyUrl, { margin: 0, width: 180 });
   const qrPng = await fetch(qrDataUrl).then((r) => r.arrayBuffer());
   const qrImg = await pdfDoc.embedPng(qrPng);

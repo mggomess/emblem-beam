@@ -23,7 +23,19 @@ export type CertificateInput = {
   teacherNames: string[];
   code: string;
   issuedAt: Date;
+  verifyBaseUrl?: string | null;
 };
+
+export function buildVerifyUrl(code: string, baseUrl?: string | null): string {
+  const trimmed = (baseUrl ?? "").trim();
+  if (trimmed) {
+    // Substitui {code} se existir; caso contrário concatena
+    if (trimmed.includes("{code}")) return trimmed.replace("{code}", encodeURIComponent(code));
+    return `${trimmed.replace(/\/$/, "")}/${encodeURIComponent(code)}`;
+  }
+  const origin = typeof window !== "undefined" ? window.location.origin : "";
+  return `${origin}/verificar/${code}`;
+}
 
 export async function generateCertificatePdf(input: CertificateInput): Promise<Uint8Array> {
   const pdfDoc = await PDFDocument.create();

@@ -51,7 +51,6 @@ const repo = "emblem-beam";
 
 const [brasao, bandeira, watermark] = await Promise.all([
   fetchPng(`${window.location.origin}/estados/brasoes/${uf}.png`),
-  fetchPng(`${window.location.origin}/estados/bandeiras/${uf}.png`),
   fetchPng(`${window.location.origin}/estados/watermarks/${uf}.png`),
 ]);
   // Watermark (central, low opacity)
@@ -73,13 +72,7 @@ const [brasao, bandeira, watermark] = await Promise.all([
   if (brasao) {
     try {
       const img = await pdfDoc.embedPng(brasao);
-      page.drawImage(img, { x: 60, y: height - 110, width: 70, height: 70 });
-    } catch { /* skip */ }
-  }
-  if (bandeira) {
-    try {
-      const img = await pdfDoc.embedPng(bandeira);
-      page.drawImage(img, { x: width - 130, y: height - 100, width: 70, height: 50 });
+      page.drawImage(img,  { x: width - 130, y: height - 100, width: 70, height: 50 });
     } catch { /* skip */ }
   }
   if (input.institutionLogoUrl) {

@@ -28,10 +28,12 @@ function Page() {
 
   const [form, setForm] = useState({
     name: "", cnpj: "", email: "", phone: "", address: "", city: "", state: "",
+    verification_base_url: "",
   });
 
   useEffect(() => {
     if (institution) {
+      const inst = institution as typeof institution & { verification_base_url?: string | null };
       setForm({
         name: institution.name ?? "",
         cnpj: institution.cnpj ?? "",
@@ -40,6 +42,7 @@ function Page() {
         address: institution.address ?? "",
         city: institution.city ?? "",
         state: institution.state ?? "",
+        verification_base_url: inst.verification_base_url ?? "",
       });
     }
   }, [institution]);

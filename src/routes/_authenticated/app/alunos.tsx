@@ -303,6 +303,9 @@ function AlunosPage() {
                       {new Date(s.created_at).toLocaleDateString("pt-BR")}
                     </TableCell>
                     <TableCell className="text-right">
+                      <Button variant="ghost" size="icon" className="rounded-lg" title="Emitir histórico" onClick={() => emitHistorico(s)}>
+                        <FileText className="size-4" />
+                      </Button>
                       <Button variant="ghost" size="icon" className="rounded-lg"><Pencil className="size-4" /></Button>
                       <Button variant="ghost" size="icon" className="rounded-lg text-destructive" onClick={() => remove(s.id)}>
                         <Trash2 className="size-4" />

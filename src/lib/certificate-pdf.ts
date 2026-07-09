@@ -46,40 +46,40 @@ export async function generateCertificatePdf(input: CertificateInput): Promise<U
   });
 
  const uf = input.uf.toLowerCase();
-const user = "mggomess";
-const repo = "emblem-beam";
-
-const resultados = await Promise.allSettled([
-  fetchPng(`${window.location.origin}/estados/brasoes/${uf}.png`),
-  fetchPng(`${window.location.origin}/estados/watermarks/${uf}.png`) // confirme se a pasta é no plural
+const [brasao, bandeira, watermark] = await Promise.all([
+  fetchPng(`/estados/brasoes/${uf}.png`),
+  fetchPng(`/estados/bandeiras/${uf}.png`),
+  fetchPng(`/estados/watermarks/${uf}.png`),
 ]);
 
-const brasao = resultados[0].status === 'fulfilled' ? resultados[0].value : null;
-const watermark = resultados[1].status === 'fulfilled' ? resultados[1].value : null;
+
 
   // Watermark (central, low opacity)
   if (watermark) {
-  try {
-    const img = await pdfDoc.embedPng(watermark);
-    const size = 400;
+    try {
+      const img = await pdfDoc.embedPng(watermark);
+      const size = 400;
+      page.drawImage(img, {
+        x: (width - size) / 2,
+        y: (height - size) / 2,
+        width: size,
+        height: size,
+        opacity: 0.06,
+      });
+    } catch { /* fallback silently */ }
+  }
 
-    // Obtém as dimensões reais da página
-    const { width, height } = page.getSize();
-
-    page.drawImage(img, {
-      x: (width - size) / 2,
-      y: (height - size) / 2,
-      width: size,
-      height: size,
-      opacity: 0.06,
-    });
-  } catch (e) { /* fallback silently */ }
-}
   // Header: brasao (left) + logo (center) + bandeira (right)
   if (brasao) {
     try {
       const img = await pdfDoc.embedPng(brasao);
-      page.drawImage(img,  { x: width - 130, y: height - 100, width: 70, height: 50 });
+      page.drawImage(img, { x: 60, y: height - 110, width: 70, height: 70 });
+    } catch { /* skip */ }
+  }
+  if (bandeira) {
+    try {
+      const img = await pdfDoc.embedPng(bandeira);
+      page.drawImage(img, { x: width - 130, y: height - 100, width: 70, height: 50 });
     } catch { /* skip */ }
   }
   if (input.institutionLogoUrl) {

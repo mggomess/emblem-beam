@@ -49,7 +49,7 @@ export async function generateCertificatePdf(input: CertificateInput): Promise<U
 const user = "mggomess";
 const repo = "emblem-beam";
 
-const [brasao, bandeira, watermark] = await Promise.all([
+const [brasao, watermark] = await Promise.all([
   fetchPng(`${window.location.origin}/estados/brasoes/${uf}.png`),
   fetchPng(`${window.location.origin}/estados/watermarks/${uf}.png`),
 ]);
@@ -66,8 +66,6 @@ const [brasao, bandeira, watermark] = await Promise.all([
         opacity: 0.06,
       });
     } catch { /* fallback silently */ }
-  }
-
   // Header: brasao (left) + logo (center) + bandeira (right)
   if (brasao) {
     try {

@@ -99,6 +99,20 @@ function Page() {
               <div className="grid gap-1.5"><Label>Logo</Label>
                 <Input type="file" accept="image/png,image/jpeg" onChange={(e) => e.target.files?.[0] && uploadLogo(e.target.files[0])} className="rounded-xl" />
               </div>
+              <div className="grid gap-1.5 md:col-span-2">
+                <Label>URL base de validação (QR Code)</Label>
+                <Input
+                  value={form.verification_base_url}
+                  onChange={(e) => setForm({ ...form, verification_base_url: e.target.value })}
+                  placeholder="https://sedu.es.gov.br/validar/{code}"
+                  className="rounded-xl font-mono text-sm"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Site externo para onde o QR Code de certificados e históricos apontará.
+                  Use <code className="rounded bg-muted px-1">{"{code}"}</code> para posicionar o código no meio da URL,
+                  ou apenas informe a base — o código será anexado ao final. Em branco, usa a página interna do sistema.
+                </p>
+              </div>
               <div className="md:col-span-2 flex justify-end">
                 <Button onClick={save} className="rounded-xl">Salvar</Button>
               </div>

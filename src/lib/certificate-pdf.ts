@@ -49,10 +49,14 @@ export async function generateCertificatePdf(input: CertificateInput): Promise<U
 const user = "mggomess";
 const repo = "emblem-beam";
 
-const [brasao, watermark] = await Promise.all([
+const resultados = await Promise.allSettled([
   fetchPng(`${window.location.origin}/estados/brasoes/${uf}.png`),
-  fetchPng(`${window.location.origin}/estados/watermarks/${uf}.png`),
+  fetchPng(`${window.location.origin}/estados/watermarks/${uf}.png`) // confirme se a pasta é no plural
 ]);
+
+const brasao = resultados[0].status === 'fulfilled' ? resultados[0].value : null;
+const watermark = resultados[1].status === 'fulfilled' ? resultados[1].value : null;
+
   // Watermark (central, low opacity)
   if (watermark) {
   try {

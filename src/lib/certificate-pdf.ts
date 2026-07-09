@@ -55,17 +55,22 @@ const [brasao, watermark] = await Promise.all([
 ]);
   // Watermark (central, low opacity)
   if (watermark) {
-    try {
-      const img = await pdfDoc.embedPng(watermark);
-      const size = 400;
-      page.drawImage(img, {
-        x: (width - size) / 2,
-        y: (height - size) / 2,
-        width: size,
-        height: size,
-        opacity: 0.06,
-      });
-    } catch { /* fallback silently */ }
+  try {
+    const img = await pdfDoc.embedPng(watermark);
+    const size = 400;
+
+    // Obtém as dimensões reais da página
+    const { width, height } = page.getSize();
+
+    page.drawImage(img, {
+      x: (width - size) / 2,
+      y: (height - size) / 2,
+      width: size,
+      height: size,
+      opacity: 0.06,
+    });
+  } catch (e) { /* fallback silently */ }
+}
   // Header: brasao (left) + logo (center) + bandeira (right)
   if (brasao) {
     try {

@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Plus, Search, Trash2, Pencil, GraduationCap } from "lucide-react";
+import { Plus, Search, Trash2, Pencil, GraduationCap, FileText } from "lucide-react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -39,6 +39,7 @@ import {
 import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { generateHistoricoPdf } from "@/lib/historico-pdf";
 
 export const Route = createFileRoute("/_authenticated/app/alunos")({
   head: () => ({ meta: [{ title: "Alunos — Certifica" }] }),
@@ -113,6 +114,64 @@ function AlunosPage() {
     if (error) return toast.error(error.message);
     toast.success("Aluno excluído");
     qc.invalidateQueries({ queryKey: ["students"] });
+  };
+
+  const emitHistorico = async (student: { id: string; full_name: string; cpf: string | null; email: string | null }) => {
+    if (!user) return;
+    const toastId = toast.loading("Gerando histórico...");
+    try {
+      const [{ data: institution }, { data: certs }] = await Promise.all([
+        supabase.from("institutions").select("*").limit(1).maybeSingle(),
+        supabase.from("certificates")
+          .select("code, estado, issued_at, courses(name, workload)")
+          .eq("student_id", student.id)
+          .eq("status", "emitido")
+          .order("issued_at", { ascending: true }),
+      ]);
+
+      if (!certs || certs.length === 0) {
+        toast.error("Aluno não possui certificados emitidos", { id: toastId });
+        return;
+      }
+
+      const inst = institution as (typeof institution & { verification_base_url?: string | null }) | null;
+      let logoUrl: string | null = null;
+      if (inst?.logo_url) {
+        const { data } = await supabase.storage.from("institution-assets").createSignedUrl(inst.logo_url, 300);
+        logoUrl = data?.signedUrl ?? null;
+      }
+
+      const code = `HIST-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
+      const rows = certs.map((c) => ({
+        courseName: (c.courses as { name: string } | null)?.name ?? "—",
+        workload: (c.courses as { workload: number } | null)?.workload ?? 0,
+        issuedAt: new Date(c.issued_at),
+        certificateCode: c.code,
+        uf: c.estado,
+      }));
+
+      const pdfBytes = await generateHistoricoPdf({
+        studentName: student.full_name,
+        studentCpf: student.cpf,
+        studentEmail: student.email,
+        institutionName: inst?.name ?? "Sua Instituição",
+        institutionLogoUrl: logoUrl,
+        uf: inst?.state || rows[0].uf,
+        rows,
+        code,
+        issuedAt: new Date(),
+        verifyBaseUrl: inst?.verification_base_url,
+      });
+
+      const blob = new Blob([new Uint8Array(pdfBytes)], { type: "application/pdf" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url; a.download = `historico-${student.full_name.replace(/\s+/g, "_")}.pdf`; a.click();
+      URL.revokeObjectURL(url);
+      toast.success("Histórico gerado!", { id: toastId });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erro ao gerar histórico", { id: toastId });
+    }
   };
 
   return (
@@ -244,6 +303,9 @@ function AlunosPage() {
                       {new Date(s.created_at).toLocaleDateString("pt-BR")}
                     </TableCell>
                     <TableCell className="text-right">
+                      <Button variant="ghost" size="icon" className="rounded-lg" title="Emitir histórico" onClick={() => emitHistorico(s)}>
+                        <FileText className="size-4" />
+                      </Button>
                       <Button variant="ghost" size="icon" className="rounded-lg"><Pencil className="size-4" /></Button>
                       <Button variant="ghost" size="icon" className="rounded-lg text-destructive" onClick={() => remove(s.id)}>
                         <Trash2 className="size-4" />

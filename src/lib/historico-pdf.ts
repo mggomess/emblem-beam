@@ -37,7 +37,7 @@ export type HistoricoInput = {
 export async function generateHistoricoPdf(input: HistoricoInput): Promise<Uint8Array> {
   const pdfDoc = await PDFDocument.create();
   // A4 retrato
-  const page = pdfDoc.addPage([595, 842]);
+  let page = pdfDoc.addPage([595, 842]);
   const { width, height } = page.getSize();
 
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);

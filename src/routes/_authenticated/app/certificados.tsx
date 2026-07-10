@@ -27,7 +27,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { generateCertificatePdf, isValidUF } from "@/lib/certificate-pdf";
+import { generateSuperiorCertificatePdf } from "@/lib/certificate-superior-pdf";
+import { UNIVERSITIES, findUniversity } from "@/lib/universities";
 import { ufNome } from "@/lib/uf";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export const Route = createFileRoute("/_authenticated/app/certificados")({
   head: () => ({ meta: [{ title: "Certificados — Certifica" }] }),

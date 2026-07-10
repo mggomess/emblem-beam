@@ -116,7 +116,7 @@ async function drawWatermark(page: PDFPage, pdfDoc: PDFDocument, brasao: ArrayBu
       y: (height - size) / 2,
       width: size,
       height: size,
-      opacity: 0.05,
+      opacity: 0.12,
     });
   } catch { /* ignore */ }
 }

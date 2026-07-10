@@ -53,6 +53,30 @@ function CertificadosPage() {
   const [directorName, setDirectorName] = useState<string>("");
   const [generating, setGenerating] = useState(false);
 
+  // ==== Superior ====
+  const [openSup, setOpenSup] = useState(false);
+  const [supUniId, setSupUniId] = useState<string>("");
+  const [supStudentId, setSupStudentId] = useState<string>("");
+  const [supCourseId, setSupCourseId] = useState<string>("");
+  const [supMatricula, setSupMatricula] = useState("");
+  const [supNascimento, setSupNascimento] = useState("");
+  const [supCidadeAluno, setSupCidadeAluno] = useState("");
+  const [supPortaria, setSupPortaria] = useState("913, de 28/12/2018");
+  const [supResolucao, setSupResolucao] = useState("1, de 15 de maio de 2006");
+  const [supDataColacao, setSupDataColacao] = useState("");
+  const [supTitulo, setSupTitulo] = useState("BACHAREL");
+  const [supPeriodoInicio, setSupPeriodoInicio] = useState("");
+  const [supPeriodoFim, setSupPeriodoFim] = useState("");
+  const [supCidadeExp, setSupCidadeExp] = useState("");
+  const [supUfExp, setSupUfExp] = useState("");
+  const [supDataExp, setSupDataExp] = useState(
+    new Date().toLocaleDateString("pt-BR"),
+  );
+  const [supPoloEndereco, setSupPoloEndereco] = useState("");
+  const [supPoloCep, setSupPoloCep] = useState("");
+  const [supPoloTelefone, setSupPoloTelefone] = useState("");
+  const [generatingSup, setGeneratingSup] = useState(false);
+
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("todos");
 

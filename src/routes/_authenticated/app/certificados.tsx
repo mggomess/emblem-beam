@@ -43,6 +43,11 @@ function CertificadosPage() {
   const [courseIdSel, setCourseIdSel] = useState<string>("");
   const [uf, setUf] = useState<string>("");
   const [selectedTeachers, setSelectedTeachers] = useState<string[]>([]);
+  const [nomeColegio, setNomeColegio] = useState<string>("");
+  const [dataEmissao, setDataEmissao] = useState<string>(
+    new Date().toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" }),
+  );
+  const [directorName, setDirectorName] = useState<string>("");
   const [generating, setGenerating] = useState(false);
 
   const [search, setSearch] = useState("");
@@ -89,6 +94,7 @@ function CertificadosPage() {
 
   const reset = () => {
     setStudentId(""); setCourseIdSel(""); setUf(""); setSelectedTeachers([]);
+    setNomeColegio(""); setDirectorName("");
   };
 
   const handleGenerate = async () => {
@@ -120,6 +126,9 @@ function CertificadosPage() {
         code,
         issuedAt: new Date(),
         verifyBaseUrl: (institution as { verification_base_url?: string | null } | null)?.verification_base_url,
+        nomeColegio: nomeColegio.trim() || institution?.name || "Instituição de Ensino",
+        dataEmissao,
+        directorName: directorName.trim() || undefined,
       });
 
       const path = `${user.id}/${code}.pdf`;
@@ -220,6 +229,37 @@ function CertificadosPage() {
                       Brasão, bandeira e marca d'água de <b>{ufNome(uf)}</b> serão aplicados automaticamente.
                     </p>
                   )}
+                </div>
+
+                <div className="grid gap-1.5">
+                  <Label>Nome do Colégio *</Label>
+                  <Input
+                    className="rounded-xl"
+                    value={nomeColegio}
+                    onChange={(e) => setNomeColegio(e.target.value)}
+                    placeholder="Ex: E.E.E.F.M. Prof. João da Silva"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <div className="grid gap-1.5">
+                    <Label>Data de Emissão *</Label>
+                    <Input
+                      className="rounded-xl"
+                      value={dataEmissao}
+                      onChange={(e) => setDataEmissao(e.target.value)}
+                      placeholder="10 de julho de 2026"
+                    />
+                  </div>
+                  <div className="grid gap-1.5">
+                    <Label>Diretor Escolar</Label>
+                    <Input
+                      className="rounded-xl"
+                      value={directorName}
+                      onChange={(e) => setDirectorName(e.target.value)}
+                      placeholder="Nome do diretor"
+                    />
+                  </div>
                 </div>
 
                 <div className="grid gap-1.5">

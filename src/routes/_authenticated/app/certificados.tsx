@@ -43,6 +43,11 @@ function CertificadosPage() {
   const [courseIdSel, setCourseIdSel] = useState<string>("");
   const [uf, setUf] = useState<string>("");
   const [selectedTeachers, setSelectedTeachers] = useState<string[]>([]);
+  const [nomeColegio, setNomeColegio] = useState<string>("");
+  const [dataEmissao, setDataEmissao] = useState<string>(
+    new Date().toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" }),
+  );
+  const [directorName, setDirectorName] = useState<string>("");
   const [generating, setGenerating] = useState(false);
 
   const [search, setSearch] = useState("");
@@ -89,6 +94,7 @@ function CertificadosPage() {
 
   const reset = () => {
     setStudentId(""); setCourseIdSel(""); setUf(""); setSelectedTeachers([]);
+    setNomeColegio(""); setDirectorName("");
   };
 
   const handleGenerate = async () => {
@@ -120,6 +126,9 @@ function CertificadosPage() {
         code,
         issuedAt: new Date(),
         verifyBaseUrl: (institution as { verification_base_url?: string | null } | null)?.verification_base_url,
+        nomeColegio: nomeColegio.trim() || institution?.name || "Instituição de Ensino",
+        dataEmissao,
+        directorName: directorName.trim() || undefined,
       });
 
       const path = `${user.id}/${code}.pdf`;

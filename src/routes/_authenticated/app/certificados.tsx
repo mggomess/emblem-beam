@@ -27,7 +27,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { generateCertificatePdf, isValidUF } from "@/lib/certificate-pdf";
+import { generateSuperiorCertificatePdf } from "@/lib/certificate-superior-pdf";
+import { UNIVERSITIES, findUniversity } from "@/lib/universities";
 import { ufNome } from "@/lib/uf";
+
 
 export const Route = createFileRoute("/_authenticated/app/certificados")({
   head: () => ({ meta: [{ title: "Certificados — Certifica" }] }),
@@ -49,6 +52,30 @@ function CertificadosPage() {
   );
   const [directorName, setDirectorName] = useState<string>("");
   const [generating, setGenerating] = useState(false);
+
+  // ==== Superior ====
+  const [openSup, setOpenSup] = useState(false);
+  const [supUniId, setSupUniId] = useState<string>("");
+  const [supStudentId, setSupStudentId] = useState<string>("");
+  const [supCourseId, setSupCourseId] = useState<string>("");
+  const [supMatricula, setSupMatricula] = useState("");
+  const [supNascimento, setSupNascimento] = useState("");
+  const [supCidadeAluno, setSupCidadeAluno] = useState("");
+  const [supPortaria, setSupPortaria] = useState("913, de 28/12/2018");
+  const [supResolucao, setSupResolucao] = useState("1, de 15 de maio de 2006");
+  const [supDataColacao, setSupDataColacao] = useState("");
+  const [supTitulo, setSupTitulo] = useState("BACHAREL");
+  const [supPeriodoInicio, setSupPeriodoInicio] = useState("");
+  const [supPeriodoFim, setSupPeriodoFim] = useState("");
+  const [supCidadeExp, setSupCidadeExp] = useState("");
+  const [supUfExp, setSupUfExp] = useState("");
+  const [supDataExp, setSupDataExp] = useState(
+    new Date().toLocaleDateString("pt-BR"),
+  );
+  const [supPoloEndereco, setSupPoloEndereco] = useState("");
+  const [supPoloCep, setSupPoloCep] = useState("");
+  const [supPoloTelefone, setSupPoloTelefone] = useState("");
+  const [generatingSup, setGeneratingSup] = useState(false);
 
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("todos");
@@ -168,6 +195,88 @@ function CertificadosPage() {
     }
   };
 
+  const resetSup = () => {
+    setSupUniId(""); setSupStudentId(""); setSupCourseId("");
+    setSupMatricula(""); setSupNascimento(""); setSupCidadeAluno("");
+    setSupDataColacao(""); setSupTitulo("BACHAREL");
+    setSupPeriodoInicio(""); setSupPeriodoFim("");
+    setSupCidadeExp(""); setSupUfExp("");
+    setSupPoloEndereco(""); setSupPoloCep(""); setSupPoloTelefone("");
+  };
+
+  const canGenerateSup = !!supUniId && !!supStudentId && !!supCourseId && !!supCidadeExp && !!supUfExp;
+
+  const handleGenerateSuperior = async () => {
+    if (!user || !canGenerateSup) return;
+    const uni = findUniversity(supUniId);
+    const student = students.find((s) => s.id === supStudentId);
+    const course = courses.find((c) => c.id === supCourseId);
+    if (!uni || !student || !course) return toast.error("Dados incompletos");
+
+    setGeneratingSup(true);
+    try {
+      const code = `CERTSUP-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
+      const pdfBytes = await generateSuperiorCertificatePdf({
+        studentName: student.full_name,
+        studentCpf: student.cpf,
+        studentMatricula: supMatricula || undefined,
+        studentBirthDate: supNascimento || undefined,
+        studentCity: supCidadeAluno || undefined,
+        courseName: course.name,
+        portariaMec: supPortaria,
+        resolucao: supResolucao,
+        dataColacao: supDataColacao,
+        titulo: supTitulo,
+        periodoInicio: supPeriodoInicio,
+        periodoFim: supPeriodoFim,
+        cidadeExpedicao: supCidadeExp,
+        ufExpedicao: supUfExp,
+        dataExpedicao: supDataExp,
+        universityName: uni.nome,
+        universitySigla: uni.sigla,
+        poloEndereco: supPoloEndereco || undefined,
+        poloCep: supPoloCep || undefined,
+        poloTelefone: supPoloTelefone || undefined,
+        code,
+        verifyBaseUrl: (institution as { verification_base_url?: string | null } | null)?.verification_base_url,
+      });
+
+      const path = `${user.id}/${code}.pdf`;
+      const blob = new Blob([new Uint8Array(pdfBytes)], { type: "application/pdf" });
+      const up = await supabase.storage.from("certificates").upload(path, blob, {
+        contentType: "application/pdf", upsert: true,
+      });
+      if (up.error) throw up.error;
+
+      const { error } = await supabase.from("certificates").insert({
+        owner_id: user.id,
+        student_id: student.id,
+        course_id: course.id,
+        institution_id: institution?.id ?? null,
+        teacher_ids: [],
+        code,
+        estado: supUfExp.toUpperCase(),
+        pdf_url: path,
+        type: "certificado",
+      });
+      if (error) throw error;
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url; a.download = `${code}.pdf`; a.click();
+      URL.revokeObjectURL(url);
+
+      toast.success(`Certificado superior ${code} gerado!`);
+      setOpenSup(false);
+      resetSup();
+      qc.invalidateQueries({ queryKey: ["certificates"] });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erro ao gerar PDF");
+    } finally {
+      setGeneratingSup(false);
+    }
+  };
+
   const download = async (path: string, code: string) => {
     const { data, error } = await supabase.storage.from("certificates").createSignedUrl(path, 60);
     if (error || !data) return toast.error("Não foi possível baixar");
@@ -187,11 +296,12 @@ function CertificadosPage() {
         title="Certificados"
         description="Emita e gerencie certificados digitais com validação por QR Code."
         action={
+          <div className="flex gap-2">
           <Dialog open={open} onOpenChange={(o) => { setOpen(o); if (!o) reset(); }}>
-            <DialogTrigger asChild><Button className="rounded-xl"><Plus className="mr-1 size-4" /> Nova emissão</Button></DialogTrigger>
+            <DialogTrigger asChild><Button variant="outline" className="rounded-xl"><Plus className="mr-1 size-4" /> Ensino Médio</Button></DialogTrigger>
             <DialogContent className="rounded-2xl sm:max-w-xl">
               <DialogHeader>
-                <DialogTitle>Nova emissão de certificado</DialogTitle>
+                <DialogTitle>Nova emissão — Ensino Médio</DialogTitle>
                 <DialogDescription>
                   Preencha os dados. O <b>Estado (UF)</b> é obrigatório para carregar brasão,
                   bandeira e marca d'água do certificado.
@@ -289,6 +399,139 @@ function CertificadosPage() {
               </DialogFooter>
             </DialogContent>
           </Dialog>
+
+          <Dialog open={openSup} onOpenChange={(o) => { setOpenSup(o); if (!o) resetSup(); }}>
+            <DialogTrigger asChild><Button className="rounded-xl"><Plus className="mr-1 size-4" /> Ensino Superior</Button></DialogTrigger>
+            <DialogContent className="rounded-2xl sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Nova emissão — Ensino Superior</DialogTitle>
+                <DialogDescription>
+                  Modelo A4 fiel ao padrão universitário (UNIP, Anhanguera, Estácio etc.).
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="grid gap-4 py-2">
+                <div className="grid gap-1.5">
+                  <Label>Faculdade / Universidade *</Label>
+                  <Select value={supUniId} onValueChange={setSupUniId}>
+                    <SelectTrigger className="rounded-xl"><SelectValue placeholder="Selecione a faculdade" /></SelectTrigger>
+                    <SelectContent>
+                      {UNIVERSITIES.map((u) => (
+                        <SelectItem key={u.id} value={u.id}>{u.sigla} — {u.nome}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <div className="grid gap-1.5">
+                    <Label>Aluno *</Label>
+                    <Select value={supStudentId} onValueChange={setSupStudentId}>
+                      <SelectTrigger className="rounded-xl"><SelectValue placeholder="Selecione o aluno" /></SelectTrigger>
+                      <SelectContent>
+                        {students.map((s) => <SelectItem key={s.id} value={s.id}>{s.full_name}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="grid gap-1.5">
+                    <Label>Curso Superior *</Label>
+                    <Select value={supCourseId} onValueChange={setSupCourseId}>
+                      <SelectTrigger className="rounded-xl"><SelectValue placeholder="Selecione o curso" /></SelectTrigger>
+                      <SelectContent>
+                        {courses.map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                  <div className="grid gap-1.5">
+                    <Label>Matrícula</Label>
+                    <Input className="rounded-xl" value={supMatricula} onChange={(e) => setSupMatricula(e.target.value)} />
+                  </div>
+                  <div className="grid gap-1.5">
+                    <Label>Nascimento</Label>
+                    <Input className="rounded-xl" value={supNascimento} onChange={(e) => setSupNascimento(e.target.value)} placeholder="DD/MM/AAAA" />
+                  </div>
+                  <div className="grid gap-1.5">
+                    <Label>Cidade do aluno</Label>
+                    <Input className="rounded-xl" value={supCidadeAluno} onChange={(e) => setSupCidadeAluno(e.target.value)} placeholder="Ex: CABO DE SANTO AGOSTINHO - PE" />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <div className="grid gap-1.5">
+                    <Label>Portaria MEC</Label>
+                    <Input className="rounded-xl" value={supPortaria} onChange={(e) => setSupPortaria(e.target.value)} />
+                  </div>
+                  <div className="grid gap-1.5">
+                    <Label>Resolução CNE/CP</Label>
+                    <Input className="rounded-xl" value={supResolucao} onChange={(e) => setSupResolucao(e.target.value)} />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <div className="grid gap-1.5">
+                    <Label>Data da colação de grau</Label>
+                    <Input className="rounded-xl" value={supDataColacao} onChange={(e) => setSupDataColacao(e.target.value)} placeholder="21/12/2012" />
+                  </div>
+                  <div className="grid gap-1.5">
+                    <Label>Título recebido</Label>
+                    <Input className="rounded-xl" value={supTitulo} onChange={(e) => setSupTitulo(e.target.value)} placeholder="BACHAREL / LICENCIADO / TECNÓLOGO" />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <div className="grid gap-1.5">
+                    <Label>Período — início</Label>
+                    <Input className="rounded-xl" value={supPeriodoInicio} onChange={(e) => setSupPeriodoInicio(e.target.value)} placeholder="Janeiro de 2009" />
+                  </div>
+                  <div className="grid gap-1.5">
+                    <Label>Período — fim</Label>
+                    <Input className="rounded-xl" value={supPeriodoFim} onChange={(e) => setSupPeriodoFim(e.target.value)} placeholder="Dezembro de 2012" />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                  <div className="grid gap-1.5">
+                    <Label>Cidade de expedição *</Label>
+                    <Input className="rounded-xl" value={supCidadeExp} onChange={(e) => setSupCidadeExp(e.target.value)} placeholder="Recife" />
+                  </div>
+                  <div className="grid gap-1.5">
+                    <Label>UF *</Label>
+                    <UFSelect value={supUfExp} onChange={setSupUfExp} />
+                  </div>
+                  <div className="grid gap-1.5">
+                    <Label>Data expedição</Label>
+                    <Input className="rounded-xl" value={supDataExp} onChange={(e) => setSupDataExp(e.target.value)} placeholder="19 de janeiro de 2022" />
+                  </div>
+                </div>
+
+                <div className="grid gap-1.5">
+                  <Label>Endereço do polo (rodapé)</Label>
+                  <Input className="rounded-xl" value={supPoloEndereco} onChange={(e) => setSupPoloEndereco(e.target.value)} placeholder="POLO RECIFE VI - RUA ARLINDO CISNEIROS, 189" />
+                </div>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <div className="grid gap-1.5">
+                    <Label>CEP</Label>
+                    <Input className="rounded-xl" value={supPoloCep} onChange={(e) => setSupPoloCep(e.target.value)} placeholder="52111-175" />
+                  </div>
+                  <div className="grid gap-1.5">
+                    <Label>Telefone</Label>
+                    <Input className="rounded-xl" value={supPoloTelefone} onChange={(e) => setSupPoloTelefone(e.target.value)} placeholder="81 3299-7696" />
+                  </div>
+                </div>
+              </div>
+
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setOpenSup(false)}>Cancelar</Button>
+                <Button disabled={!canGenerateSup || generatingSup} onClick={handleGenerateSuperior}>
+                  {generatingSup ? "Gerando..." : "Gerar PDF"}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+          </div>
         }
       />
 

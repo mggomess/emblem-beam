@@ -232,6 +232,37 @@ function CertificadosPage() {
                 </div>
 
                 <div className="grid gap-1.5">
+                  <Label>Nome do Colégio *</Label>
+                  <Input
+                    className="rounded-xl"
+                    value={nomeColegio}
+                    onChange={(e) => setNomeColegio(e.target.value)}
+                    placeholder="Ex: E.E.E.F.M. Prof. João da Silva"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <div className="grid gap-1.5">
+                    <Label>Data de Emissão *</Label>
+                    <Input
+                      className="rounded-xl"
+                      value={dataEmissao}
+                      onChange={(e) => setDataEmissao(e.target.value)}
+                      placeholder="10 de julho de 2026"
+                    />
+                  </div>
+                  <div className="grid gap-1.5">
+                    <Label>Diretor Escolar</Label>
+                    <Input
+                      className="rounded-xl"
+                      value={directorName}
+                      onChange={(e) => setDirectorName(e.target.value)}
+                      placeholder="Nome do diretor"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid gap-1.5">
                   <Label>Assinaturas (docentes)</Label>
                   <div className="max-h-40 overflow-y-auto rounded-xl border border-border/60 p-2">
                     {teachers.length === 0 && <p className="p-2 text-xs text-muted-foreground">Cadastre docentes primeiro.</p>}

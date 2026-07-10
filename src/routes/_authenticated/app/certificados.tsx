@@ -195,6 +195,88 @@ function CertificadosPage() {
     }
   };
 
+  const resetSup = () => {
+    setSupUniId(""); setSupStudentId(""); setSupCourseId("");
+    setSupMatricula(""); setSupNascimento(""); setSupCidadeAluno("");
+    setSupDataColacao(""); setSupTitulo("BACHAREL");
+    setSupPeriodoInicio(""); setSupPeriodoFim("");
+    setSupCidadeExp(""); setSupUfExp("");
+    setSupPoloEndereco(""); setSupPoloCep(""); setSupPoloTelefone("");
+  };
+
+  const canGenerateSup = !!supUniId && !!supStudentId && !!supCourseId && !!supCidadeExp && !!supUfExp;
+
+  const handleGenerateSuperior = async () => {
+    if (!user || !canGenerateSup) return;
+    const uni = findUniversity(supUniId);
+    const student = students.find((s) => s.id === supStudentId);
+    const course = courses.find((c) => c.id === supCourseId);
+    if (!uni || !student || !course) return toast.error("Dados incompletos");
+
+    setGeneratingSup(true);
+    try {
+      const code = `CERTSUP-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
+      const pdfBytes = await generateSuperiorCertificatePdf({
+        studentName: student.full_name,
+        studentCpf: student.cpf,
+        studentMatricula: supMatricula || undefined,
+        studentBirthDate: supNascimento || undefined,
+        studentCity: supCidadeAluno || undefined,
+        courseName: course.name,
+        portariaMec: supPortaria,
+        resolucao: supResolucao,
+        dataColacao: supDataColacao,
+        titulo: supTitulo,
+        periodoInicio: supPeriodoInicio,
+        periodoFim: supPeriodoFim,
+        cidadeExpedicao: supCidadeExp,
+        ufExpedicao: supUfExp,
+        dataExpedicao: supDataExp,
+        universityName: uni.nome,
+        universitySigla: uni.sigla,
+        poloEndereco: supPoloEndereco || undefined,
+        poloCep: supPoloCep || undefined,
+        poloTelefone: supPoloTelefone || undefined,
+        code,
+        verifyBaseUrl: (institution as { verification_base_url?: string | null } | null)?.verification_base_url,
+      });
+
+      const path = `${user.id}/${code}.pdf`;
+      const blob = new Blob([new Uint8Array(pdfBytes)], { type: "application/pdf" });
+      const up = await supabase.storage.from("certificates").upload(path, blob, {
+        contentType: "application/pdf", upsert: true,
+      });
+      if (up.error) throw up.error;
+
+      const { error } = await supabase.from("certificates").insert({
+        owner_id: user.id,
+        student_id: student.id,
+        course_id: course.id,
+        institution_id: institution?.id ?? null,
+        teacher_ids: [],
+        code,
+        estado: supUfExp.toUpperCase(),
+        pdf_url: path,
+        type: "certificado",
+      });
+      if (error) throw error;
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url; a.download = `${code}.pdf`; a.click();
+      URL.revokeObjectURL(url);
+
+      toast.success(`Certificado superior ${code} gerado!`);
+      setOpenSup(false);
+      resetSup();
+      qc.invalidateQueries({ queryKey: ["certificates"] });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erro ao gerar PDF");
+    } finally {
+      setGeneratingSup(false);
+    }
+  };
+
   const download = async (path: string, code: string) => {
     const { data, error } = await supabase.storage.from("certificates").createSignedUrl(path, 60);
     if (error || !data) return toast.error("Não foi possível baixar");

@@ -255,7 +255,7 @@ export async function generateCertificatePdf(input: CertificateInput): Promise<U
   await drawWatermark(page, pdfDoc, brasao);
 
   // Cabeçalho simétrico
-  // await drawHeader(page, pdfDoc, simbolo, brasao, bold);
+  await drawHeader(page, pdfDoc, simbolo, brasao, bold);
 
   // Subtítulo — UF
   const stateLabel = `${ufNome(input.uf).toUpperCase()} — ${input.uf.toUpperCase()}`;

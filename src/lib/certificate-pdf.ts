@@ -136,7 +136,7 @@ async function drawHeader(
   if (simbolo) {
     try {
       const img = await pdfDoc.embedPng(simbolo);
-     // page.drawImage(img, { x: 73, y: topY, width: 72, height: 48 });
+     page.drawImage(img, { x: 73, y: topY, width: 48, height: 48 });
     } catch { /* skip */ }
   }
 

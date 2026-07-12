@@ -244,7 +244,7 @@ function AlunosPage() {
       />
 
       <Card className="border-border/60 shadow-soft">
-        <div className="flex flex-col gap-3 border-b border-border/60 p-4 sm:flex-row">
+        <div className="no-print flex flex-col gap-3 border-b border-border/60 p-4 sm:flex-row">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input placeholder="Buscar por nome ou CPF..." value={search} onChange={(e) => setSearch(e.target.value)} className="rounded-xl pl-9" />
@@ -259,6 +259,22 @@ function AlunosPage() {
             </SelectContent>
           </Select>
         </div>
+
+        <div className="no-print grid gap-1.5 border-b border-border/60 p-4">
+          <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Link de Autenticação do QR Code (Histórico)
+          </Label>
+          <Input
+            className="rounded-xl"
+            placeholder={typeof window !== "undefined" ? window.location.origin : "https://..."}
+            value={authUrl}
+            onChange={(e) => setAuthUrl(e.target.value)}
+          />
+          <p className="text-xs text-muted-foreground">
+            Se vazio, o QR Code apontará para a URL atual do sistema.
+          </p>
+        </div>
+
 
         {filtered.length === 0 ? (
           <div className="p-6">

@@ -62,6 +62,8 @@ function AlunosPage() {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("todos");
+  const [authUrl, setAuthUrl] = useState<string>("");
+
 
   const { data: courses = [] } = useQuery({
     queryKey: ["courses-select"],

@@ -163,6 +163,7 @@ function AlunosPage() {
         code,
         issuedAt: new Date(),
         verifyBaseUrl: inst?.verification_base_url,
+        authUrl: authUrl.trim() || (typeof window !== "undefined" ? window.location.origin : null),
       });
 
       const blob = new Blob([new Uint8Array(pdfBytes)], { type: "application/pdf" });

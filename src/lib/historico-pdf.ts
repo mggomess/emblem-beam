@@ -30,6 +30,8 @@ export type HistoricoInput = {
   uf: string; // UF principal (institucional) para brasão/bandeira/marca d'água
   rows: HistoricoCourseRow[];
   code: string; // código único do histórico
+  /** Link personalizado que será codificado no QR Code. Se ausente, usa a URL padrão de verificação. */
+  authUrl?: string | null;
   issuedAt: Date;
   verifyBaseUrl?: string | null;
 };

@@ -168,20 +168,32 @@ export async function generateHistoricoPdf(input: HistoricoInput): Promise<Uint8
     y, size: 11, font: bold, color: rgb(0.15, 0.24, 0.72),
   });
 
-  // Rodapé: código + QR
+  // Rodapé: código + QR CENTRALIZADO
   const footer = `Código do histórico: ${input.code}`;
   page.drawText(footer, {
-    x: 50, y: 70, size: 9, font: italic, color: rgb(0.35, 0.35, 0.45),
-  });
-  const verifyUrl = buildVerifyUrl(input.code, input.verifyBaseUrl);
-  page.drawText("Escaneie o QR Code para validar este histórico:", {
-    x: 50, y: 55, size: 8, font, color: rgb(0.45, 0.45, 0.55),
+    x: 50, y: 150, size: 9, font: italic, color: rgb(0.35, 0.35, 0.45),
   });
 
-  const qrDataUrl = await QRCode.toDataURL(verifyUrl, { margin: 0, width: 160 });
+  const qrTarget =
+    (input.authUrl && input.authUrl.trim()) ||
+    buildVerifyUrl(input.code, input.verifyBaseUrl);
+
+  const qrDataUrl = await QRCode.toDataURL(qrTarget, { margin: 0, width: 400 });
   const qrPng = await fetch(qrDataUrl).then((r) => r.arrayBuffer());
   const qrImg = await pdfDoc.embedPng(qrPng);
-  page.drawImage(qrImg, { x: width - 110, y: 40, width: 65, height: 65 });
+  const qrSize = 110;
+  page.drawImage(qrImg, {
+    x: (width - qrSize) / 2, y: 55,
+    width: qrSize, height: qrSize,
+  });
+
+  const verifyLabel = `VERIFIQUE A AUTENTICIDADE COD: ${input.code.toUpperCase()}`;
+  const labelW = bold.widthOfTextAtSize(verifyLabel, 8.5);
+  page.drawText(verifyLabel, {
+    x: (width - labelW) / 2, y: 42,
+    size: 8.5, font: bold, color: rgb(0.10, 0.18, 0.55),
+  });
 
   return await pdfDoc.save();
 }
+

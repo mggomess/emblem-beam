@@ -18,6 +18,7 @@ import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedAppUsuariosRouteImport } from './routes/_authenticated/app/usuarios'
 import { Route as AuthenticatedAppLogsRouteImport } from './routes/_authenticated/app/logs'
 import { Route as AuthenticatedAppFaturamentoRouteImport } from './routes/_authenticated/app/faturamento'
+import { Route as AuthenticatedAppEmissaoRouteImport } from './routes/_authenticated/app/emissao'
 import { Route as AuthenticatedAppDocentesRouteImport } from './routes/_authenticated/app/docentes'
 import { Route as AuthenticatedAppCursosRouteImport } from './routes/_authenticated/app/cursos'
 import { Route as AuthenticatedAppConfiguracoesRouteImport } from './routes/_authenticated/app/configuracoes'
@@ -71,6 +72,11 @@ const AuthenticatedAppFaturamentoRoute =
     path: '/app/faturamento',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAppEmissaoRoute = AuthenticatedAppEmissaoRouteImport.update({
+  id: '/app/emissao',
+  path: '/app/emissao',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAppDocentesRoute =
   AuthenticatedAppDocentesRouteImport.update({
     id: '/app/docentes',
@@ -117,6 +123,7 @@ export interface FileRoutesByFullPath {
   '/app/configuracoes': typeof AuthenticatedAppConfiguracoesRoute
   '/app/cursos': typeof AuthenticatedAppCursosRoute
   '/app/docentes': typeof AuthenticatedAppDocentesRoute
+  '/app/emissao': typeof AuthenticatedAppEmissaoRoute
   '/app/faturamento': typeof AuthenticatedAppFaturamentoRoute
   '/app/logs': typeof AuthenticatedAppLogsRoute
   '/app/usuarios': typeof AuthenticatedAppUsuariosRoute
@@ -133,6 +140,7 @@ export interface FileRoutesByTo {
   '/app/configuracoes': typeof AuthenticatedAppConfiguracoesRoute
   '/app/cursos': typeof AuthenticatedAppCursosRoute
   '/app/docentes': typeof AuthenticatedAppDocentesRoute
+  '/app/emissao': typeof AuthenticatedAppEmissaoRoute
   '/app/faturamento': typeof AuthenticatedAppFaturamentoRoute
   '/app/logs': typeof AuthenticatedAppLogsRoute
   '/app/usuarios': typeof AuthenticatedAppUsuariosRoute
@@ -151,6 +159,7 @@ export interface FileRoutesById {
   '/_authenticated/app/configuracoes': typeof AuthenticatedAppConfiguracoesRoute
   '/_authenticated/app/cursos': typeof AuthenticatedAppCursosRoute
   '/_authenticated/app/docentes': typeof AuthenticatedAppDocentesRoute
+  '/_authenticated/app/emissao': typeof AuthenticatedAppEmissaoRoute
   '/_authenticated/app/faturamento': typeof AuthenticatedAppFaturamentoRoute
   '/_authenticated/app/logs': typeof AuthenticatedAppLogsRoute
   '/_authenticated/app/usuarios': typeof AuthenticatedAppUsuariosRoute
@@ -169,6 +178,7 @@ export interface FileRouteTypes {
     | '/app/configuracoes'
     | '/app/cursos'
     | '/app/docentes'
+    | '/app/emissao'
     | '/app/faturamento'
     | '/app/logs'
     | '/app/usuarios'
@@ -185,6 +195,7 @@ export interface FileRouteTypes {
     | '/app/configuracoes'
     | '/app/cursos'
     | '/app/docentes'
+    | '/app/emissao'
     | '/app/faturamento'
     | '/app/logs'
     | '/app/usuarios'
@@ -202,6 +213,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/configuracoes'
     | '/_authenticated/app/cursos'
     | '/_authenticated/app/docentes'
+    | '/_authenticated/app/emissao'
     | '/_authenticated/app/faturamento'
     | '/_authenticated/app/logs'
     | '/_authenticated/app/usuarios'
@@ -281,6 +293,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppFaturamentoRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/app/emissao': {
+      id: '/_authenticated/app/emissao'
+      path: '/app/emissao'
+      fullPath: '/app/emissao'
+      preLoaderRoute: typeof AuthenticatedAppEmissaoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/app/docentes': {
       id: '/_authenticated/app/docentes'
       path: '/app/docentes'
@@ -333,6 +352,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAppConfiguracoesRoute: typeof AuthenticatedAppConfiguracoesRoute
   AuthenticatedAppCursosRoute: typeof AuthenticatedAppCursosRoute
   AuthenticatedAppDocentesRoute: typeof AuthenticatedAppDocentesRoute
+  AuthenticatedAppEmissaoRoute: typeof AuthenticatedAppEmissaoRoute
   AuthenticatedAppFaturamentoRoute: typeof AuthenticatedAppFaturamentoRoute
   AuthenticatedAppLogsRoute: typeof AuthenticatedAppLogsRoute
   AuthenticatedAppUsuariosRoute: typeof AuthenticatedAppUsuariosRoute
@@ -346,6 +366,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAppConfiguracoesRoute: AuthenticatedAppConfiguracoesRoute,
   AuthenticatedAppCursosRoute: AuthenticatedAppCursosRoute,
   AuthenticatedAppDocentesRoute: AuthenticatedAppDocentesRoute,
+  AuthenticatedAppEmissaoRoute: AuthenticatedAppEmissaoRoute,
   AuthenticatedAppFaturamentoRoute: AuthenticatedAppFaturamentoRoute,
   AuthenticatedAppLogsRoute: AuthenticatedAppLogsRoute,
   AuthenticatedAppUsuariosRoute: AuthenticatedAppUsuariosRoute,

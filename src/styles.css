@@ -144,21 +144,49 @@
   &:hover { transform: translateY(-2px); box-shadow: var(--shadow-pop); }
 }
 
-@media print {
-  .no-print,
-  [data-sidebar],
-  header,
-  nav,
-  button {
-    display: none !important;
+/* ============ Print / A4 documents ============ */
+.print-root { display: none; }
+
+@media screen {
+  .doc-sheet {
+    background: white;
+    color: black;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    margin: 0 auto 24px;
+    position: relative;
+    overflow: hidden;
   }
+  .doc-sheet.a4-portrait  { width: 210mm; min-height: 297mm; padding: 15mm; }
+  .doc-sheet.a4-landscape { width: 297mm; min-height: 210mm; padding: 12mm; }
+}
+
+@media print {
+  @page { size: A4; margin: 0; }
+  @page landscape { size: A4 landscape; margin: 0; }
+  .no-print, [data-sidebar], header.app-topbar, nav.app-nav { display: none !important; }
+  body { background: white !important; margin: 0 !important; }
+  .screen-only { display: none !important; }
+  .print-root { display: block !important; }
+  .doc-sheet {
+    box-shadow: none !important;
+    margin: 0 !important;
+    page-break-after: always;
+    break-after: page;
+  }
+  .doc-sheet.a4-portrait  { width: 210mm; min-height: 297mm; padding: 15mm; page: portrait; }
+  .doc-sheet.a4-landscape { width: 297mm; min-height: 210mm; padding: 12mm; page: landscape; }
+  .doc-sheet:last-child { page-break-after: auto; break-after: auto; }
   * {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
     color-adjust: exact !important;
   }
-  body {
-    background: white !important;
-  }
+  .drag-handle-hint { display: none !important; }
 }
+
+.font-gothic { font-family: 'UnifrakturMaguntia', 'Times New Roman', serif; }
+.font-cinzel { font-family: 'Cinzel', 'Times New Roman', serif; }
+.font-vibes  { font-family: 'Great Vibes', cursive; }
+.font-serif-doc { font-family: Georgia, 'Times New Roman', serif; }
+.font-sans-doc  { font-family: Arial, Helvetica, 'Inter', sans-serif; }
 

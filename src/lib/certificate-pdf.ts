@@ -209,9 +209,9 @@ async function drawFooter(
 
   /* ===== COLUNA CENTRAL: bloco MEC ===== */
   // Marca d'água (brasão) atrás do bloco MEC
-  if (brasao) {
+  if (braao) {
     try {
-      const img = await pdfDoc.embedPng(brasao);
+      const img = await pdfDoc.embedPng(braao);
       const size = 0;
       page.drawImage(img, {
         x: centerCx - size / 2, y: colY - 15,

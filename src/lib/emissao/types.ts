@@ -1,10 +1,15 @@
 export type NivelEnsino = "medio" | "superior";
-export type TemplateSuperior = "estacio" | "unip";
+export type TemplateSuperior =
+  | "unip-certidao"
+  | "unip-diploma"
+  | "estacio-certidao"
+  | "estacio-diploma";
 
 export type MecStamp = {
   enabled: boolean;
-  x: number; // px offset within sheet
+  x: number;
   y: number;
+  rotation: number;
 };
 
 export type DisciplinaBNCC = {
@@ -25,11 +30,10 @@ export type DisciplinaSuperior = {
 };
 
 export type EmissaoState = {
-  // ==== Nível ====
   nivel: NivelEnsino;
   templateSuperior: TemplateSuperior;
 
-  // ==== Aluno ====
+  // Aluno
   nomeAluno: string;
   nacionalidade: string;
   cidadeNasc: string;
@@ -39,7 +43,7 @@ export type EmissaoState = {
   rg: string;
   matricula: string;
 
-  // ==== Instituição ====
+  // Instituição
   nomeColegio: string;
   uf: string;
   cidadeEmissao: string;
@@ -47,11 +51,11 @@ export type EmissaoState = {
   anoConclusao: string;
   logoUrl: string;
 
-  // ==== Rodapé médio ====
+  // Rodapé médio
   nomeSecretaria: string;
   rgSecretaria: string;
 
-  // ==== Superior ====
+  // Superior
   cursoSuperior: string;
   titulo: string;
   dataColacao: string;
@@ -61,16 +65,25 @@ export type EmissaoState = {
   resolucao: string;
   reitor: string;
   secretarioGeral: string;
-  corpoTextoSuperior: string; // Estácio: editável livre
+  corpoTextoSuperior: string;
 
-  // ==== MEC ====
+  // UNIP / Estácio extras
+  enderecoPolo: string;
+  assinaturaDigital: string;
+  mantenedora: string;
+  cnpj: string;
+  raCode: string;
+  lote: string;
+  livro: string;
+  folhaLivro: string;
+  secretarioAdjunto: string;
+
   mec: MecStamp;
 
-  // ==== QR / SEDU ====
   sedUrlBase: string;
   codigoUnico: string;
 
-  // ==== Histórico ====
+  // Histórico
   disciplinasBNCC: DisciplinaBNCC[];
   cargaHorariaAnual: string;
   diasLetivos: string;
@@ -84,62 +97,67 @@ export type EmissaoState = {
 
 export const defaultState: EmissaoState = {
   nivel: "medio",
-  templateSuperior: "estacio",
-  nomeAluno: "MARIA DA SILVA SANTOS",
+  templateSuperior: "unip-certidao",
+  nomeAluno: "",
   nacionalidade: "brasileira",
-  cidadeNasc: "São Paulo",
-  estadoNasc: "SP",
-  dataNasc: "15 de março de 2005",
-  cpf: "000.000.000-00",
-  rg: "00.000.000-0",
-  matricula: "2026001",
-  nomeColegio: "E.E.E.F.M. PROFESSOR JOÃO DA SILVA",
+  cidadeNasc: "",
+  estadoNasc: "",
+  dataNasc: "",
+  cpf: "",
+  rg: "",
+  matricula: "",
+  nomeColegio: "",
   uf: "SP",
-  cidadeEmissao: "São Paulo",
+  cidadeEmissao: "",
   dataEmissao: new Date().toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" }),
   anoConclusao: String(new Date().getFullYear()),
   logoUrl: "",
-  nomeSecretaria: "FLORÊNCIA MARIA ALVES",
-  rgSecretaria: "41.114.200",
-  cursoSuperior: "ADMINISTRAÇÃO",
+  nomeSecretaria: "",
+  rgSecretaria: "",
+  cursoSuperior: "",
   titulo: "BACHAREL",
-  dataColacao: "21/12/2025",
-  periodoInicio: "Janeiro de 2022",
-  periodoFim: "Dezembro de 2025",
-  portariaMec: "913, de 28/12/2018",
-  resolucao: "1, de 15 de maio de 2006",
-  reitor: "PROF. DR. JOÃO CARLOS DIAS DI GENIO",
-  secretarioGeral: "PROFA. MARIA LÚCIA SANTOS",
-  corpoTextoSuperior:
-    "Certificamos que MARIA DA SILVA SANTOS, portador(a) do CPF nº 000.000.000-00, concluiu com aproveitamento o curso de Bacharelado em ADMINISTRAÇÃO, com carga horária total de 3.000 (três mil) horas, nesta Universidade, satisfazendo integralmente as exigências curriculares e legais.",
-  mec: { enabled: true, x: 60, y: 460 },
+  dataColacao: "",
+  periodoInicio: "",
+  periodoFim: "",
+  portariaMec: "",
+  resolucao: "",
+  reitor: "",
+  secretarioGeral: "",
+  corpoTextoSuperior: "",
+  enderecoPolo:
+    "RUA EXEMPLO, 000 — BAIRRO — CIDADE/UF — CEP 00000-000",
+  assinaturaDigital:
+    "ASSUPERO ENSINO SUPERIOR LTDA: 06059229000101",
+  mantenedora: "ASSUPERO ENSINO SUPERIOR LTDA",
+  cnpj: "06.059.229/0001-01",
+  raCode: "",
+  lote: "",
+  livro: "",
+  folhaLivro: "",
+  secretarioAdjunto: "",
+  mec: { enabled: true, x: 60, y: 460, rotation: 0 },
   sedUrlBase: "https://validar.sedu.gov.br",
   codigoUnico: "",
   disciplinasBNCC: [
-    { nome: "Língua Portuguesa", s1: "8.0", s2: "8.5", s3: "9.0" },
-    { nome: "Matemática", s1: "7.5", s2: "8.0", s3: "8.5" },
-    { nome: "História", s1: "8.5", s2: "8.0", s3: "9.0" },
-    { nome: "Geografia", s1: "8.0", s2: "7.5", s3: "8.5" },
-    { nome: "Química", s1: "7.0", s2: "8.0", s3: "8.0" },
-    { nome: "Física", s1: "7.5", s2: "7.5", s3: "8.0" },
-    { nome: "Biologia", s1: "8.5", s2: "9.0", s3: "9.0" },
-    { nome: "Filosofia", s1: "9.0", s2: "9.0", s3: "9.5" },
-    { nome: "Sociologia", s1: "9.0", s2: "8.5", s3: "9.0" },
-    { nome: "Artes", s1: "9.5", s2: "9.5", s3: "9.5" },
-    { nome: "Ed. Física", s1: "9.0", s2: "9.5", s3: "9.5" },
-    { nome: "Inglês", s1: "8.0", s2: "8.5", s3: "9.0" },
+    { nome: "Língua Portuguesa", s1: "", s2: "", s3: "" },
+    { nome: "Matemática", s1: "", s2: "", s3: "" },
+    { nome: "História", s1: "", s2: "", s3: "" },
+    { nome: "Geografia", s1: "", s2: "", s3: "" },
+    { nome: "Química", s1: "", s2: "", s3: "" },
+    { nome: "Física", s1: "", s2: "", s3: "" },
+    { nome: "Biologia", s1: "", s2: "", s3: "" },
+    { nome: "Filosofia", s1: "", s2: "", s3: "" },
+    { nome: "Sociologia", s1: "", s2: "", s3: "" },
+    { nome: "Artes", s1: "", s2: "", s3: "" },
+    { nome: "Ed. Física", s1: "", s2: "", s3: "" },
+    { nome: "Inglês", s1: "", s2: "", s3: "" },
   ],
   cargaHorariaAnual: "1.000h",
   diasLetivos: "200",
-  faltasPct: "3%",
+  faltasPct: "",
   resultadoFinal: "APROVADO",
-  disciplinasSuperior: [
-    { periodo: "1º", codigo: "ADM101", descricao: "Introdução à Administração", ch: "80", perLetivo: "2022/1", media: "8.5", situacao: "AP" },
-    { periodo: "1º", codigo: "MAT101", descricao: "Matemática Aplicada", ch: "80", perLetivo: "2022/1", media: "8.0", situacao: "AP" },
-    { periodo: "2º", codigo: "ADM201", descricao: "Teoria Geral da Administração", ch: "80", perLetivo: "2022/2", media: "9.0", situacao: "AP" },
-    { periodo: "3º", codigo: "CTB301", descricao: "Contabilidade Geral", ch: "80", perLetivo: "2023/1", media: "8.2", situacao: "AP" },
-  ],
-  observacoesHistorico: "Aluno(a) com aproveitamento integral e frequência regular em todos os períodos letivos.",
+  disciplinasSuperior: [],
+  observacoesHistorico: "",
   legendaNotas: "AP - Aprovado | DS - Dispensado | RF - Reprovado por Falta | RM - Reprovado por Média",
   corTemaHistorico: "#1D3557",
 };

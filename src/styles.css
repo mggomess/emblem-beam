@@ -163,8 +163,17 @@
 @media print {
   @page { size: A4; margin: 0; }
   @page landscape { size: A4 landscape; margin: 0; }
-  .no-print, [data-sidebar], header.app-topbar, nav.app-nav { display: none !important; }
+  .no-print,
+  [data-sidebar],
+  aside[data-sidebar],
+  header.app-topbar,
+  nav.app-nav,
+  [data-sonner-toaster],
+  [role="status"],
+  [role="dialog"] { display: none !important; }
   body { background: white !important; margin: 0 !important; }
+  main { padding: 0 !important; }
+  .md\:pl-64 { padding-left: 0 !important; }
   .screen-only { display: none !important; }
   .print-root { display: block !important; }
   .doc-sheet {

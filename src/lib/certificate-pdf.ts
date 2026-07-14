@@ -207,17 +207,7 @@ async function drawFooter(
   const centerCx = width / 2;
   const rightCx = width - 60 - colW / 2;
 
-  /* ===== COLUNA CENTRAL: bloco MEC ===== */
-  // Marca d'água (brasão) atrás do bloco MEC
-  if (braao) {
-    try {
-      const img = await pdfDoc.embedPng(braao);
-      const size = 0;
-      page.drawImage(img, {
-        x: centerCx - size / 2, y: colY - 15,
-        width: size, height: size, opacity: 0.0,
-      });
-    } catch { /* skip */ }
+ 
   }
 
   const dataLocal = `HORTOLÂNDIA, ${formatFullDate(new Date())}.`;

@@ -212,10 +212,10 @@ async function drawFooter(
   if (brasao) {
     try {
       const img = await pdfDoc.embedPng(brasao);
-      const size = 130;
+      const size = 0;
       page.drawImage(img, {
         x: centerCx - size / 2, y: colY - 15,
-        width: size, height: size, opacity: 0.10,
+        width: size, height: size, opacity: 0.0,
       });
     } catch { /* skip */ }
   }

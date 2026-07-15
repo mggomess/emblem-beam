@@ -92,7 +92,7 @@ export function EstacioCertidaoRetrato({ state, onMecChange, draggableMec = true
   );
 }
 
-/** Estácio — Diploma Paisagem. Moldura ornamental tradicional + fundo marfim. */
+/** Estácio — Diploma Paisagem usando imagem pronta como fundo. */
 export function EstacioDiplomaPaisagem({ state, onMecChange, draggableMec = true }: Props) {
   return (
     <div
@@ -103,239 +103,94 @@ export function EstacioDiplomaPaisagem({ state, onMecChange, draggableMec = true
         printColorAdjust: "exact",
       }}
     >
-      {/* Marca d'água */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute left-1/2 top-1/2 z-0 select-none"
-        style={{
-          fontFamily: "Arial, Helvetica, sans-serif",
-          fontSize: "110px",
-          fontWeight: 700,
-          color: "#2f2f2f",
-          opacity: 0.05,
-          transform: "translate(-50%,-50%) rotate(-20deg)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        ESTÁCIO
-      </div>
+      {/*
+        Coloque a imagem em:
+        public/images/fundo-estacio.png
 
-      {/* Moldura ornamental: borda externa escura, faixa ornamental e borda interna fina */}
+        A moldura, o brasão, o título, a marca d'água, o logo e as linhas
+        de assinatura já fazem parte da imagem. O código abaixo desenha
+        somente os dados variáveis do diploma.
+      */}
+      <img
+        src="/images/fundo-estacio.png"
+        alt=""
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-0 h-full w-full select-none"
+        style={{ objectFit: "fill" }}
+      />
+
+      {/* Área de textos variáveis */}
       <div
-        className="pointer-events-none absolute inset-[20px] z-20"
+        className="absolute z-10"
         style={{
-          border: "6px solid #222", // borda externa escura
-          padding: "12px",
-          boxSizing: "border-box",
-          backgroundClip: "padding-box",
+          left: "14%",
+          right: "14%",
+          top: "31%",
+          bottom: "15%",
+          fontFamily: "Arial, Helvetica, sans-serif",
+          color: "#3d3d2f",
         }}
       >
-        {/* Faixa ornamental (simples, sem imagens) */}
-        <div
-          className="w-full h-full"
-          style={{
-            boxSizing: "border-box",
-            padding: "10px",
-            background: "linear-gradient(180deg, rgba(0,0,0,0.02) 0%, rgba(255,255,255,0.02) 100%)",
-            border: "1px solid rgba(0,0,0,0)",
-          }}
-        >
-          <div
-            className="relative flex h-full w-full flex-col justify-between"
+        <div className="flex h-full flex-col justify-center">
+          <p
             style={{
-              border: "1px solid rgba(0,0,0,0.12)", // borda interna fina
-              boxShadow: "inset 0 0 0 3px rgba(210,206,181,0.9)",
-              backgroundColor: "rgba(244, 241, 223, 0.98)",
-              padding: "36px 52px 28px",
-              boxSizing: "border-box",
+              margin: 0,
+              fontSize: "18px",
+              lineHeight: 1.65,
+              textAlign: "justify",
             }}
           >
-            {/* Cabeçalho */}
-            <div className="relative z-10">
-              {/* Selo provisório */}
-              <div
-                className="absolute flex items-center justify-center rounded-full border-2 border-[#555848] text-center font-semibold text-[#555848]"
-                style={{
-                  left: "10px",
-                  top: "0px",
-                  width: "72px",
-                  height: "72px",
-                  fontSize: "9px",
-                }}
-              >
-                SELO
-              </div>
+            O Reitor da <strong>UNIVERSIDADE ESTÁCIO DE SÁ</strong>, no uso de suas
+            atribuições e tendo em vista a conclusão do Curso de{" "}
+            <strong>{ph(state.cursoSuperior)}</strong>, confere o título de{" "}
+            <strong>{ph(state.titulo)}</strong> a
+          </p>
 
-              <h1
-                style={{
-                  fontFamily: "Arial, Helvetica, sans-serif",
-                  fontSize: "34px",
-                  fontWeight: 600,
-                  color: "#2d302a",
-                  textAlign: "center",
-                  letterSpacing: "0.08em",
-                  margin: "14px 0 38px",
-                  lineHeight: 1.2,
-                }}
-              >
-                UNIVERSIDADE ESTÁCIO DE SÁ
-              </h1>
-            </div>
+          <p
+            style={{
+              margin: "18px 0",
+              fontFamily: "Georgia, 'Times New Roman', Times, serif",
+              fontSize: "32px",
+              fontWeight: 700,
+              letterSpacing: "0.04em",
+              lineHeight: 1.2,
+              textAlign: "center",
+              textTransform: "uppercase",
+            }}
+          >
+            {ph(state.nomeAluno)}
+          </p>
 
-            {/* Corpo do diploma */}
-            <div
-              className="relative z-10 flex flex-1 flex-col justify-center"
-              style={{
-                padding: "10px 35px",
-                fontFamily: "Arial, Helvetica, sans-serif",
-                color: "#30322d",
-              }}
-            >
-              <p
-                style={{
-                  fontSize: "18px",
-                  lineHeight: 1.8,
-                  textAlign: "justify",
-                  margin: "0 0 16px",
-                }}
-              >
-                O Reitor da{" "}
-                <strong>UNIVERSIDADE ESTÁCIO DE SÁ</strong>, no uso de suas
-                atribuições e tendo em vista a conclusão do Curso de{" "}
-                <strong>{ph(state.cursoSuperior)}</strong>, confere o título de{" "}
-                <strong>{ph(state.titulo)}</strong> a
-              </p>
+          <p
+            style={{
+              margin: 0,
+              fontSize: "18px",
+              lineHeight: 1.65,
+              textAlign: "justify",
+            }}
+          >
+            Cédula de identidade nº <strong>{ph(state.rg || state.cpf)}</strong>,
+            órgão expedidor <strong>{ph(state.uf)}</strong>, nascido(a) em{" "}
+            <strong>{ph(state.dataNasc)}</strong>, natural de{" "}
+            <strong>{ph(state.cidadeNasc)}</strong>, e outorga-lhe o presente
+            Diploma, a fim de que possa gozar de todos os direitos e prerrogativas
+            legais.
+          </p>
 
-              <p
-                style={{
-                  fontSize: "30px",
-                  fontWeight: 700,
-                  textAlign: "center",
-                  margin: "12px 0",
-                  letterSpacing: "0.04em",
-                  fontFamily: "Georgia, 'Times New Roman', Times, serif",
-                }}
-              >
-                {ph(state.nomeAluno)}
-              </p>
-
-              <p
-                style={{
-                  fontSize: "18px",
-                  lineHeight: 1.8,
-                  textAlign: "justify",
-                  margin: "0 0 16px",
-                }}
-              >
-                Cédula de identidade nº{" "}
-                <strong>{ph(state.rg || state.cpf)}</strong>, órgão expedidor{" "}
-                <strong>{ph(state.uf)}</strong>,
-                nascido(a) em <strong>{ph(state.dataNasc)}</strong>, natural de{" "}
-                <strong>{ph(state.cidadeNasc)}</strong>, e outorga-lhe o presente
-                Diploma, a fim de que possa gozar de todos os direitos e
-                prerrogativas legais.
-              </p>
-
-              <p
-                style={{
-                  fontSize: "18px",
-                  fontStyle: "italic",
-                  textAlign: "right",
-                  margin: "8px 0 26px",
-                }}
-              >
-                {ph(state.cidadeEmissao)}, {ph(state.dataEmissao)}.
-              </p>
-            </div>
-
-            {/* Rodapé em três colunas: Diplomado(a) | ESTÁCIO | Diretor */}
-            <div
-              className="relative z-10 flex items-end justify-between"
-              style={{
-                gap: "28px",
-                padding: "0 35px",
-              }}
-            >
-              {/* Diplomado */}
-              <div
-                style={{
-                  width: "30%",
-                  textAlign: "center",
-                }}
-              >
-                <div
-                  style={{
-                    borderTop: "1px solid #333",
-                    marginBottom: "7px",
-                  }}
-                />
-                <p
-                  style={{
-                    margin: 0,
-                    fontSize: "11px",
-                    letterSpacing: "0.05em",
-                    fontWeight: 600,
-                  }}
-                >
-                  {ph(state.nomeAluno)}
-                </p>
-                <p
-                  style={{
-                    margin: 0,
-                    fontSize: "11px",
-                    letterSpacing: "0.05em",
-                    marginTop: "4px",
-                  }}
-                >
-                  Diplomado(a)
-                </p>
-              </div>
-
-              {/* ESTÁCIO central */}
-              <div
-                style={{
-                  width: "26%",
-                  textAlign: "center",
-                  fontSize: "22px",
-                  fontWeight: 700,
-                  color: "#2d302a",
-                  paddingBottom: "6px",
-                }}
-              >
-                ESTÁCIO
-              </div>
-
-              {/* Diretor */}
-              <div
-                style={{
-                  width: "30%",
-                  textAlign: "center",
-                }}
-              >
-                <div style={{ height: "35px" }} />
-
-                <div
-                  style={{
-                    borderTop: "1px solid #333",
-                    marginBottom: "7px",
-                  }}
-                />
-
-                <p
-                  style={{
-                    margin: 0,
-                    fontSize: "11px",
-                    letterSpacing: "0.05em",
-                  }}
-                >
-                  Diretor
-                </p>
-              </div>
-            </div>
-          </div>
+          <p
+            style={{
+              margin: "18px 0 0",
+              fontSize: "17px",
+              fontStyle: "italic",
+              textAlign: "right",
+            }}
+          >
+            {ph(state.cidadeEmissao)}, {ph(state.dataEmissao)}.
+          </p>
         </div>
       </div>
 
+      {/* Mantido exatamente para continuar editável no sistema */}
       <MecStampBlock mec={state.mec} onChange={onMecChange} draggable={draggableMec} />
     </div>
   );

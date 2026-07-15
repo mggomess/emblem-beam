@@ -96,7 +96,7 @@ export function EstacioCertidaoRetrato({ state, onMecChange, draggableMec = true
 export function EstacioDiplomaPaisagem({ state, onMecChange, draggableMec = true }: Props) {
   return (
     <div
-      className="relative h-full w-full overflow-hidden"
+      className="doc-sheet a4-landscape relative overflow-hidden"
       style={{
         backgroundColor: "#f4f1df",
         WebkitPrintColorAdjust: "exact",

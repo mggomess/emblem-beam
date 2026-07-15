@@ -247,7 +247,7 @@ export function EstacioDiplomaPaisagem({ state, onMecChange, draggableMec = true
                 fontStyle: "normal",
               }}
             >
-              {ph(state.orgaoExpedidor || state.uf)}
+             {ph(state.uf)}
             </strong>
           </p>
 

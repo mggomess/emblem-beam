@@ -99,9 +99,6 @@ export function EstacioDiplomaPaisagem({ state, onMecChange, draggableMec = true
       className="relative h-full w-full overflow-hidden"
       style={{
         backgroundColor: "#f4f1df",
-        backgroundImage:
-          "radial-gradient(rgba(90, 90, 70, 0.04) 1px, transparent 1px)",
-        backgroundSize: "6px 6px",
         WebkitPrintColorAdjust: "exact",
         printColorAdjust: "exact",
       }}
@@ -109,45 +106,47 @@ export function EstacioDiplomaPaisagem({ state, onMecChange, draggableMec = true
       {/* Marca d'água */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute left-1/2 top-1/2 z-0 -translate-x-1/2 -translate-y-1/2 select-none"
+        className="pointer-events-none absolute left-1/2 top-1/2 z-0 select-none"
         style={{
           fontFamily: "Arial, Helvetica, sans-serif",
-          fontSize: "90px",
+          fontSize: "110px",
           fontWeight: 700,
-          color: "#2f554f",
+          color: "#2f2f2f",
           opacity: 0.05,
+          transform: "translate(-50%,-50%) rotate(-20deg)",
+          whiteSpace: "nowrap",
         }}
       >
         ESTÁCIO
       </div>
 
-      {/* Moldura ornamental */}
+      {/* Moldura ornamental: borda externa escura, faixa ornamental e borda interna fina */}
       <div
-        className="pointer-events-none absolute inset-[22px] z-20"
+        className="pointer-events-none absolute inset-[20px] z-20"
         style={{
-          border: "2px solid #33352b",
-          padding: "10px",
+          border: "6px solid #222", // borda externa escura
+          padding: "12px",
           boxSizing: "border-box",
+          backgroundClip: "padding-box",
         }}
       >
+        {/* Faixa ornamental (simples, sem imagens) */}
         <div
-          className="h-full w-full"
+          className="w-full h-full"
           style={{
-            border: "18px double #35372e",
-            padding: "8px",
             boxSizing: "border-box",
-            background:
-              "repeating-linear-gradient(45deg, #292b23 0px, #292b23 3px, #666756 3px, #666756 6px, #34362c 6px, #34362c 9px)",
+            padding: "10px",
+            background: "linear-gradient(180deg, rgba(0,0,0,0.02) 0%, rgba(255,255,255,0.02) 100%)",
+            border: "1px solid rgba(0,0,0,0)",
           }}
         >
           <div
             className="relative flex h-full w-full flex-col justify-between"
             style={{
-              border: "2px solid #656857",
-              boxShadow:
-                "inset 0 0 0 3px #d2ceb5, inset 0 0 0 5px #5d604f",
-              backgroundColor: "rgba(244, 241, 223, 0.97)",
-              padding: "38px 55px 28px",
+              border: "1px solid rgba(0,0,0,0.12)", // borda interna fina
+              boxShadow: "inset 0 0 0 3px rgba(210,206,181,0.9)",
+              backgroundColor: "rgba(244, 241, 223, 0.98)",
+              padding: "36px 52px 28px",
               boxSizing: "border-box",
             }}
           >
@@ -171,7 +170,7 @@ export function EstacioDiplomaPaisagem({ state, onMecChange, draggableMec = true
                 style={{
                   fontFamily: "Arial, Helvetica, sans-serif",
                   fontSize: "34px",
-                  fontWeight: 400,
+                  fontWeight: 600,
                   color: "#2d302a",
                   textAlign: "center",
                   letterSpacing: "0.08em",
@@ -209,11 +208,12 @@ export function EstacioDiplomaPaisagem({ state, onMecChange, draggableMec = true
 
               <p
                 style={{
-                  fontSize: "25px",
-                  fontWeight: 500,
+                  fontSize: "30px",
+                  fontWeight: 700,
                   textAlign: "center",
                   margin: "12px 0",
-                  letterSpacing: "0.05em",
+                  letterSpacing: "0.04em",
+                  fontFamily: "Georgia, 'Times New Roman', Times, serif",
                 }}
               >
                 {ph(state.nomeAluno)}
@@ -248,7 +248,7 @@ export function EstacioDiplomaPaisagem({ state, onMecChange, draggableMec = true
               </p>
             </div>
 
-            {/* Rodapé */}
+            {/* Rodapé em três colunas: Diplomado(a) | ESTÁCIO | Diretor */}
             <div
               className="relative z-10 flex items-end justify-between"
               style={{
@@ -274,20 +274,31 @@ export function EstacioDiplomaPaisagem({ state, onMecChange, draggableMec = true
                     margin: 0,
                     fontSize: "11px",
                     letterSpacing: "0.05em",
+                    fontWeight: 600,
+                  }}
+                >
+                  {ph(state.nomeAluno)}
+                </p>
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: "11px",
+                    letterSpacing: "0.05em",
+                    marginTop: "4px",
                   }}
                 >
                   Diplomado(a)
                 </p>
               </div>
 
-              {/* Logo provisório */}
+              {/* ESTÁCIO central */}
               <div
                 style={{
                   width: "26%",
                   textAlign: "center",
                   fontSize: "22px",
                   fontWeight: 700,
-                  color: "#245f74",
+                  color: "#2d302a",
                   paddingBottom: "6px",
                 }}
               >

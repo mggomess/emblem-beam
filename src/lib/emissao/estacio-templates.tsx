@@ -10,34 +10,74 @@ type Props = {
 const ph = (v: string, fb = "—") =>
   v && v.trim() ? v : <span className="text-neutral-400">{fb}</span>;
 
-/** Logo Estácio — losango azul-marinho estilizado. */
+/** Logo Estácio, losango azul-marinho estilizado. */
 function EstacioLogo({ className = "h-14 w-auto" }: { className?: string }) {
   return (
     <svg viewBox="0 0 200 70" className={className}>
       <g>
-        <rect x="4" y="10" width="40" height="40" transform="rotate(45 24 30)" fill="#002B49" />
-        <rect x="14" y="20" width="20" height="20" transform="rotate(45 24 30)" fill="#fff" />
+        <rect
+          x="4"
+          y="10"
+          width="40"
+          height="40"
+          transform="rotate(45 24 30)"
+          fill="#002B49"
+        />
+        <rect
+          x="14"
+          y="20"
+          width="20"
+          height="20"
+          transform="rotate(45 24 30)"
+          fill="#fff"
+        />
       </g>
-      <text x="60" y="34" fontFamily="Arial, sans-serif" fontSize="22" fontWeight="900" fill="#002B49" letterSpacing="1">
+
+      <text
+        x="60"
+        y="34"
+        fontFamily="Arial, sans-serif"
+        fontSize="22"
+        fontWeight="900"
+        fill="#002B49"
+        letterSpacing="1"
+      >
         Estácio
       </text>
-      <text x="60" y="50" fontFamily="Arial, sans-serif" fontSize="9" fill="#002B49" letterSpacing="3">
+
+      <text
+        x="60"
+        y="50"
+        fontFamily="Arial, sans-serif"
+        fontSize="9"
+        fill="#002B49"
+        letterSpacing="3"
+      >
         UNIVERSIDADE
       </text>
     </svg>
   );
 }
 
-/** Estácio — Certidão de Conclusão (A4 retrato). Fundo branco puro. */
-export function EstacioCertidaoRetrato({ state, onMecChange, draggableMec = true }: Props) {
+/** Estácio, Certidão de Conclusão em A4 retrato. */
+export function EstacioCertidaoRetrato({
+  state,
+  onMecChange,
+  draggableMec = true,
+}: Props) {
   return (
     <div className="doc-sheet a4-portrait font-sans-doc relative bg-white">
-      {/* Cabeçalho azul-marinho */}
       <div className="relative z-10 flex items-center justify-between border-b-4 border-[#002B49] pb-4">
         <EstacioLogo className="h-16 w-auto" />
+
         <div className="text-right text-[10px] text-[#002B49]">
-          <div className="text-sm font-bold uppercase">Universidade Estácio de Sá</div>
-          <div>Credenciamento MEC — Portaria {state.portariaMec || "—"}</div>
+          <div className="text-sm font-bold uppercase">
+            Universidade Estácio de Sá
+          </div>
+
+          <div>
+            Credenciamento MEC, Portaria {state.portariaMec || "—"}
+          </div>
         </div>
       </div>
 
@@ -45,23 +85,33 @@ export function EstacioCertidaoRetrato({ state, onMecChange, draggableMec = true
         <h1 className="text-2xl font-bold uppercase tracking-[0.3em] text-[#002B49]">
           Certidão de Conclusão de Curso
         </h1>
+
         <div className="mx-auto mt-2 h-[2px] w-32 bg-[#002B49]" />
       </div>
 
       <div className="relative z-10 mx-auto mt-10 max-w-[170mm] text-center text-[13px] leading-[2] text-black">
         {state.corpoTextoSuperior ? (
-          <p className="whitespace-pre-wrap text-justify">{state.corpoTextoSuperior}</p>
+          <p className="whitespace-pre-wrap text-justify">
+            {state.corpoTextoSuperior}
+          </p>
         ) : (
           <p>
-            Certificamos que <b>{ph(state.nomeAluno)}</b>, portador(a) do CPF nº {ph(state.cpf)},
-            matrícula nº {ph(state.matricula)}, concluiu o curso de{" "}
-            <b>{ph(state.cursoSuperior)}</b>, fazendo jus ao título de <b>{ph(state.titulo)}</b>,
-            período letivo <b>{ph(state.periodoInicio)} a {ph(state.periodoFim)}</b>, colação em{" "}
-            <b>{ph(state.dataColacao)}</b>.
+            Certificamos que <b>{ph(state.nomeAluno)}</b>, portador(a) do CPF nº{" "}
+            {ph(state.cpf)}, matrícula nº {ph(state.matricula)}, concluiu o curso
+            de <b>{ph(state.cursoSuperior)}</b>, fazendo jus ao título de{" "}
+            <b>{ph(state.titulo)}</b>, período letivo{" "}
+            <b>
+              {ph(state.periodoInicio)} a {ph(state.periodoFim)}
+            </b>
+            , colação em <b>{ph(state.dataColacao)}</b>.
           </p>
         )}
+
         <p className="mt-8">
-          <b>{ph(state.cidadeEmissao)} - {ph(state.uf)}, {ph(state.dataEmissao)}.</b>
+          <b>
+            {ph(state.cidadeEmissao)} - {ph(state.uf)},{" "}
+            {ph(state.dataEmissao)}.
+          </b>
         </p>
       </div>
 
@@ -69,34 +119,49 @@ export function EstacioCertidaoRetrato({ state, onMecChange, draggableMec = true
         <div className="text-center">
           <div className="h-14" />
           <div className="border-t border-black" />
-          <div className="mt-1 text-[11px] font-bold uppercase">{ph(state.reitor)}</div>
-          <div className="text-[10px] uppercase text-[#002B49]">Reitor(a)</div>
+
+          <div className="mt-1 text-[11px] font-bold uppercase">
+            {ph(state.reitor)}
+          </div>
+
+          <div className="text-[10px] uppercase text-[#002B49]">
+            Reitor(a)
+          </div>
         </div>
+
         <div className="text-center">
           <div className="h-14" />
           <div className="border-t border-black" />
-          <div className="mt-1 text-[11px] font-bold uppercase">{ph(state.secretarioGeral)}</div>
-          <div className="text-[10px] uppercase text-[#002B49]">Secretário(a) Geral</div>
+
+          <div className="mt-1 text-[11px] font-bold uppercase">
+            {ph(state.secretarioGeral)}
+          </div>
+
+          <div className="text-[10px] uppercase text-[#002B49]">
+            Secretário(a) Geral
+          </div>
         </div>
       </div>
 
       <div className="absolute inset-x-[15mm] bottom-[10mm] z-10">
         <div className="border-t border-[#002B49]/40" />
+
         <div className="mt-1 text-center text-[10px] uppercase tracking-wide text-[#002B49]">
           {state.enderecoPolo || "—"}
         </div>
       </div>
 
-      <MecStampBlock mec={state.mec} onChange={onMecChange} draggable={draggableMec} />
+      <MecStampBlock
+        mec={state.mec}
+        onChange={onMecChange}
+        draggable={draggableMec}
+      />
     </div>
   );
 }
 
-/** Estácio — Diploma Paisagem usando imagem pronta como fundo. */
-export function EstacioDiplomaPaisagem({ state, onMecChange, draggableMec = true }: Props) {
-  return (
-    <div
-      export function EstacioDiplomaPaisagem({
+/** Estácio, Diploma Paisagem usando imagem pronta como fundo. */
+export function EstacioDiplomaPaisagem({
   state,
   onMecChange,
   draggableMec = true,
@@ -127,7 +192,7 @@ export function EstacioDiplomaPaisagem({ state, onMecChange, draggableMec = true
           right: "10.8%",
           top: "28.5%",
           bottom: "18%",
-          fontFamily: "'Arial Narrow', Arial, Helvetica, sans-serif",
+          fontFamily: "Arial, Helvetica, sans-serif",
           color: "#36372d",
         }}
       >
@@ -175,9 +240,7 @@ export function EstacioDiplomaPaisagem({ state, onMecChange, draggableMec = true
               {ph(state.cursoSuperior)}
             </strong>
 
-            <span>
-              , em {ph(state.dataColacao || state.dataEmissao)},
-            </span>
+            <span>, em {ph(state.dataEmissao)},</span>
           </p>
 
           <p
@@ -247,7 +310,7 @@ export function EstacioDiplomaPaisagem({ state, onMecChange, draggableMec = true
                 fontStyle: "normal",
               }}
             >
-             {ph(state.uf)}
+              {ph(state.uf)}
             </strong>
           </p>
 
@@ -291,8 +354,8 @@ export function EstacioDiplomaPaisagem({ state, onMecChange, draggableMec = true
               textAlign: "justify",
             }}
           >
-            e outorga-lhe o presente Diploma, a fim de que possa gozar de
-            todos os direitos e prerrogativas legais.
+            e outorga-lhe o presente Diploma, a fim de que possa gozar de todos
+            os direitos e prerrogativas legais.
           </p>
 
           <p

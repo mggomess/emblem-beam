@@ -104,7 +104,7 @@ export function EstacioDiplomaPaisagem({ state, onMecChange, draggableMec = true
         backgroundImage:
           "radial-gradient(rgba(90, 90, 70, 0.04) 1px, transparent 1px)",
         backgroundSize: "6px 6px",
-      } as React.CSSProperties}
+      }}
     >
       {/* Marca d'água Estácio (placeholder CSS) */}
       <div
@@ -120,13 +120,12 @@ export function EstacioDiplomaPaisagem({ state, onMecChange, draggableMec = true
 
       {/* Moldura ornamental */}
       <div
-        className="pointer-events-none absolute"
+        className="pointer-events-none absolute inset-[22px] z-20"
         style={{
-          inset: "22px",
           border: "2px solid #33352b",
           padding: "10px",
-          zIndex: 2,
-        } as React.CSSProperties}
+          boxSizing: "border-box",
+        }}
       >
         <div
           style={{
@@ -138,7 +137,7 @@ export function EstacioDiplomaPaisagem({ state, onMecChange, draggableMec = true
               "repeating-linear-gradient(45deg, #25271f 0, #25271f 4px, #5c5e4c 4px, #5c5e4c 7px, #2e3027 7px, #2e3027 11px) 20",
             padding: "8px",
             boxSizing: "border-box",
-          } as React.CSSProperties}
+          }}
         >
           <div
             style={{
@@ -154,12 +153,13 @@ export function EstacioDiplomaPaisagem({ state, onMecChange, draggableMec = true
               display: "flex",
               flexDirection: "column",
               justifyContent: "space-between",
-            } as React.CSSProperties}
+            }}
           >
             {/* Cabeçalho: Título institucional e Selo */}
             <div style={{ position: "relative", zIndex: 10 }}>
               {/* Selo institucional superior esquerdo (placeholder CSS) */}
-              <div className="absolute flex h-[72px] w-[72px] items-center justify-center rounded-full border-2 border-[#555848] text-[9px] font-semibold text-[#555848]"
+              <div
+                className="absolute flex h-[72px] w-[72px] items-center justify-center rounded-full border-2 border-[#555848] text-[9px] font-semibold text-[#555848]"
                 style={{
                   left: "55px",
                   top: "48px",
@@ -170,7 +170,6 @@ export function EstacioDiplomaPaisagem({ state, onMecChange, draggableMec = true
 
               {/* Título institucional */}
               <h1
-                className="institution-title"
                 style={{
                   fontFamily: "Arial, Helvetica, sans-serif",
                   fontSize: "32px",
@@ -181,7 +180,7 @@ export function EstacioDiplomaPaisagem({ state, onMecChange, draggableMec = true
                   textAlign: "center",
                   margin: "0 0 20px 0",
                   lineHeight: 1.2,
-                } as React.CSSProperties}
+                }}
               >
                 UNIVERSIDADE ESTÁCIO DE SÁ
               </h1>
@@ -197,7 +196,7 @@ export function EstacioDiplomaPaisagem({ state, onMecChange, draggableMec = true
                 flexDirection: "column",
                 justifyContent: "center",
                 padding: "20px 40px",
-              } as React.CSSProperties}
+              }}
             >
               <p
                 style={{
@@ -207,7 +206,7 @@ export function EstacioDiplomaPaisagem({ state, onMecChange, draggableMec = true
                   lineHeight: 1.8,
                   textAlign: "justify",
                   margin: "0 0 16px 0",
-                } as React.CSSProperties}
+                }}
               >
                 O Reitor da <strong>UNIVERSIDADE ESTÁCIO DE SÁ</strong>, no uso de suas atribuições
                 e tendo em vista a conclusão do Curso de{" "}
@@ -225,7 +224,7 @@ export function EstacioDiplomaPaisagem({ state, onMecChange, draggableMec = true
                   textAlign: "center",
                   margin: "12px 0 12px 0",
                   letterSpacing: "0.05em",
-                } as React.CSSProperties}
+                }}
               >
                 {ph(state.nomeAluno)}
               </p>
@@ -238,12 +237,12 @@ export function EstacioDiplomaPaisagem({ state, onMecChange, draggableMec = true
                   lineHeight: 1.8,
                   textAlign: "justify",
                   margin: "0 0 16px 0",
-                } as React.CSSProperties}
+                }}
               >
                 Cédula de identidade nº <strong>{ph(state.cpf)}</strong>, órgão expedidor{" "}
                 <strong>{ph(state.uf)}</strong>, nascido(a) em{" "}
-                <strong>{ph(state.dataColacao)}</strong>, natural de{" "}
-                <strong>{ph(state.cidadeEmissao)}</strong>, e outorga-lhe o presente Diploma, a
+                <strong>{ph(state.dataNasc)}</strong>, natural de{" "}
+                <strong>{ph(state.cidadeNasc)}</strong>, e outorga-lhe o presente Diploma, a
                 fim de que possa gozar de todos os direitos e prerrogativas legais.
               </p>
             </div>
@@ -259,7 +258,7 @@ export function EstacioDiplomaPaisagem({ state, onMecChange, draggableMec = true
                   color: "#30322d",
                   textAlign: "right",
                   margin: "0 0 40px 0",
-                } as React.CSSProperties}
+                }}
               >
                 {ph(state.cidadeEmissao)}, {ph(state.dataEmissao)}.
               </p>
@@ -272,7 +271,7 @@ export function EstacioDiplomaPaisagem({ state, onMecChange, draggableMec = true
                   gap: "40px",
                   alignItems: "flex-end",
                   position: "relative",
-                } as React.CSSProperties}
+                }}
               >
                 {/* Assinatura do diplomado */}
                 <div style={{ textAlign: "center" }}>
@@ -296,20 +295,19 @@ export function EstacioDiplomaPaisagem({ state, onMecChange, draggableMec = true
                       color: "#30322d",
                       margin: 0,
                       letterSpacing: "0.05em",
-                    } as React.CSSProperties}
+                    }}
                   >
                     Diplomado(a)
                   </p>
                 </div>
 
                 {/* Logo Estácio central (placeholder CSS) */}
-                <div className="absolute bottom-[55px] left-1/2 -translate-x-1/2 text-[22px] font-bold text-[#245f74]"
+                <div
                   style={{
-                    position: "relative",
-                    left: "auto",
-                    bottom: "auto",
-                    transform: "none",
-                  } as React.CSSProperties}
+                    fontSize: "22px",
+                    fontWeight: "bold",
+                    color: "#245f74",
+                  }}
                 >
                   ESTÁCIO
                 </div>
@@ -323,7 +321,7 @@ export function EstacioDiplomaPaisagem({ state, onMecChange, draggableMec = true
                       alignItems: "flex-end",
                       justifyContent: "center",
                       marginBottom: "0px",
-                    } as React.CSSProperties}
+                    }}
                   />
                   <div
                     style={{
@@ -340,7 +338,7 @@ export function EstacioDiplomaPaisagem({ state, onMecChange, draggableMec = true
                       color: "#30322d",
                       margin: 0,
                       letterSpacing: "0.05em",
-                    } as React.CSSProperties}
+                    }}
                   >
                     Diretor
                   </p>

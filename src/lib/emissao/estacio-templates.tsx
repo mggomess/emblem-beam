@@ -96,23 +96,26 @@ export function EstacioCertidaoRetrato({ state, onMecChange, draggableMec = true
 export function EstacioDiplomaPaisagem({ state, onMecChange, draggableMec = true }: Props) {
   return (
     <div
-      className="doc-sheet a4-landscape font-sans-doc relative"
+      className="relative h-full w-full overflow-hidden"
       style={{
-        width: "1123px",
-        height: "794px",
         backgroundColor: "#f4f1df",
         backgroundImage:
           "radial-gradient(rgba(90, 90, 70, 0.04) 1px, transparent 1px)",
         backgroundSize: "6px 6px",
+        WebkitPrintColorAdjust: "exact",
+        printColorAdjust: "exact",
       }}
     >
-      {/* Marca d'água Estácio (placeholder CSS) */}
+      {/* Marca d'água */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-[90px] font-bold text-[#2f554f]"
+        className="pointer-events-none absolute left-1/2 top-1/2 z-0 -translate-x-1/2 -translate-y-1/2 select-none"
         style={{
+          fontFamily: "Arial, Helvetica, sans-serif",
+          fontSize: "90px",
+          fontWeight: 700,
+          color: "#2f554f",
           opacity: 0.05,
-          zIndex: 1,
         }}
       >
         ESTÁCIO
@@ -128,57 +131,51 @@ export function EstacioDiplomaPaisagem({ state, onMecChange, draggableMec = true
         }}
       >
         <div
+          className="h-full w-full"
           style={{
-            width: "100%",
-            height: "100%",
-            borderWidth: "20px",
-            borderStyle: "solid",
-            borderImage:
-              "repeating-linear-gradient(45deg, #25271f 0, #25271f 4px, #5c5e4c 4px, #5c5e4c 7px, #2e3027 7px, #2e3027 11px) 20",
+            border: "18px double #35372e",
             padding: "8px",
             boxSizing: "border-box",
+            background:
+              "repeating-linear-gradient(45deg, #292b23 0px, #292b23 3px, #666756 3px, #666756 6px, #34362c 6px, #34362c 9px)",
           }}
         >
           <div
+            className="relative flex h-full w-full flex-col justify-between"
             style={{
-              position: "relative",
-              width: "100%",
-              height: "100%",
-              border: "2px solid #606352",
+              border: "2px solid #656857",
               boxShadow:
-                "inset 0 0 0 3px #c8c5ac, inset 0 0 0 5px #555848",
-              backgroundColor: "rgba(244, 241, 223, 0.96)",
-              padding: "40px",
+                "inset 0 0 0 3px #d2ceb5, inset 0 0 0 5px #5d604f",
+              backgroundColor: "rgba(244, 241, 223, 0.97)",
+              padding: "38px 55px 28px",
               boxSizing: "border-box",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-between",
             }}
           >
-            {/* Cabeçalho: Título institucional e Selo */}
-            <div style={{ position: "relative", zIndex: 10 }}>
-              {/* Selo institucional superior esquerdo (placeholder CSS) */}
+            {/* Cabeçalho */}
+            <div className="relative z-10">
+              {/* Selo provisório */}
               <div
-                className="absolute flex h-[72px] w-[72px] items-center justify-center rounded-full border-2 border-[#555848] text-[9px] font-semibold text-[#555848]"
+                className="absolute flex items-center justify-center rounded-full border-2 border-[#555848] text-center font-semibold text-[#555848]"
                 style={{
-                  left: "55px",
-                  top: "48px",
+                  left: "10px",
+                  top: "0px",
+                  width: "72px",
+                  height: "72px",
+                  fontSize: "9px",
                 }}
               >
                 SELO
               </div>
 
-              {/* Título institucional */}
               <h1
                 style={{
                   fontFamily: "Arial, Helvetica, sans-serif",
-                  fontSize: "32px",
+                  fontSize: "34px",
                   fontWeight: 400,
-                  letterSpacing: "0.15em",
-                  textTransform: "uppercase",
                   color: "#2d302a",
                   textAlign: "center",
-                  margin: "0 0 20px 0",
+                  letterSpacing: "0.08em",
+                  margin: "14px 0 38px",
                   lineHeight: 1.2,
                 }}
               >
@@ -188,41 +185,34 @@ export function EstacioDiplomaPaisagem({ state, onMecChange, draggableMec = true
 
             {/* Corpo do diploma */}
             <div
+              className="relative z-10 flex flex-1 flex-col justify-center"
               style={{
-                position: "relative",
-                zIndex: 10,
-                flexGrow: 1,
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                padding: "20px 40px",
+                padding: "10px 35px",
+                fontFamily: "Arial, Helvetica, sans-serif",
+                color: "#30322d",
               }}
             >
               <p
                 style={{
-                  fontFamily: "Arial, Helvetica, sans-serif",
                   fontSize: "18px",
-                  color: "#30322d",
                   lineHeight: 1.8,
                   textAlign: "justify",
-                  margin: "0 0 16px 0",
+                  margin: "0 0 16px",
                 }}
               >
-                O Reitor da <strong>UNIVERSIDADE ESTÁCIO DE SÁ</strong>, no uso de suas atribuições
-                e tendo em vista a conclusão do Curso de{" "}
-                <strong>{ph(state.cursoSuperior)}</strong>, em{" "}
-                <strong>{ph(state.dataColacao)}</strong>, confere o título de{" "}
+                O Reitor da{" "}
+                <strong>UNIVERSIDADE ESTÁCIO DE SÁ</strong>, no uso de suas
+                atribuições e tendo em vista a conclusão do Curso de{" "}
+                <strong>{ph(state.cursoSuperior)}</strong>, confere o título de{" "}
                 <strong>{ph(state.titulo)}</strong> a
               </p>
 
               <p
                 style={{
-                  fontFamily: "Arial, Helvetica, sans-serif",
-                  fontSize: "20px",
+                  fontSize: "25px",
                   fontWeight: 500,
-                  color: "#30322d",
                   textAlign: "center",
-                  margin: "12px 0 12px 0",
+                  margin: "12px 0",
                   letterSpacing: "0.05em",
                 }}
               >
@@ -231,118 +221,104 @@ export function EstacioDiplomaPaisagem({ state, onMecChange, draggableMec = true
 
               <p
                 style={{
-                  fontFamily: "Arial, Helvetica, sans-serif",
                   fontSize: "18px",
-                  color: "#30322d",
                   lineHeight: 1.8,
                   textAlign: "justify",
-                  margin: "0 0 16px 0",
+                  margin: "0 0 16px",
                 }}
               >
-                Cédula de identidade nº <strong>{ph(state.cpf)}</strong>, órgão expedidor{" "}
-                <strong>{ph(state.uf)}</strong>, nascido(a) em{" "}
-                <strong>{ph(state.dataNasc)}</strong>, natural de{" "}
-                <strong>{ph(state.cidadeNasc)}</strong>, e outorga-lhe o presente Diploma, a
-                fim de que possa gozar de todos os direitos e prerrogativas legais.
+                Cédula de identidade nº{" "}
+                <strong>{ph(state.rg || state.cpf)}</strong>, órgão expedidor{" "}
+                <strong>{ph(state.uf)}</strong>,
+                nascido(a) em <strong>{ph(state.dataNasc)}</strong>, natural de{" "}
+                <strong>{ph(state.cidadeNasc)}</strong>, e outorga-lhe o presente
+                Diploma, a fim de que possa gozar de todos os direitos e
+                prerrogativas legais.
               </p>
-            </div>
 
-            {/* Rodapé com data, local e assinaturas */}
-            <div style={{ position: "relative", zIndex: 10 }}>
-              {/* Data e local */}
               <p
                 style={{
-                  fontFamily: "Arial, Helvetica, sans-serif",
-                  fontSize: "16px",
+                  fontSize: "18px",
                   fontStyle: "italic",
-                  color: "#30322d",
                   textAlign: "right",
-                  margin: "0 0 40px 0",
+                  margin: "8px 0 26px",
                 }}
               >
                 {ph(state.cidadeEmissao)}, {ph(state.dataEmissao)}.
               </p>
+            </div>
 
-              {/* Assinaturas e logo */}
+            {/* Rodapé */}
+            <div
+              className="relative z-10 flex items-end justify-between"
+              style={{
+                gap: "28px",
+                padding: "0 35px",
+              }}
+            >
+              {/* Diplomado */}
               <div
                 style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr auto 1fr",
-                  gap: "40px",
-                  alignItems: "flex-end",
-                  position: "relative",
+                  width: "30%",
+                  textAlign: "center",
                 }}
               >
-                {/* Assinatura do diplomado */}
-                <div style={{ textAlign: "center" }}>
-                  <div
-                    style={{
-                      height: "50px",
-                    }}
-                  />
-                  <div
-                    style={{
-                      borderTop: "1px solid #30322d",
-                      marginBottom: "8px",
-                    }}
-                  />
-                  <p
-                    style={{
-                      fontFamily: "Arial, Helvetica, sans-serif",
-                      fontSize: "14px",
-                      fontWeight: 600,
-                      textTransform: "uppercase",
-                      color: "#30322d",
-                      margin: 0,
-                      letterSpacing: "0.05em",
-                    }}
-                  >
-                    Diplomado(a)
-                  </p>
-                </div>
-
-                {/* Logo Estácio central (placeholder CSS) */}
                 <div
                   style={{
-                    fontSize: "22px",
-                    fontWeight: "bold",
-                    color: "#245f74",
+                    borderTop: "1px solid #333",
+                    marginBottom: "7px",
+                  }}
+                />
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: "11px",
+                    letterSpacing: "0.05em",
                   }}
                 >
-                  ESTÁCIO
-                </div>
+                  Diplomado(a)
+                </p>
+              </div>
 
-                {/* Assinatura do diretor */}
-                <div style={{ textAlign: "center" }}>
-                  <div
-                    style={{
-                      height: "50px",
-                      display: "flex",
-                      alignItems: "flex-end",
-                      justifyContent: "center",
-                      marginBottom: "0px",
-                    }}
-                  />
-                  <div
-                    style={{
-                      borderTop: "1px solid #30322d",
-                      marginBottom: "8px",
-                    }}
-                  />
-                  <p
-                    style={{
-                      fontFamily: "Arial, Helvetica, sans-serif",
-                      fontSize: "14px",
-                      fontWeight: 600,
-                      textTransform: "uppercase",
-                      color: "#30322d",
-                      margin: 0,
-                      letterSpacing: "0.05em",
-                    }}
-                  >
-                    Diretor
-                  </p>
-                </div>
+              {/* Logo provisório */}
+              <div
+                style={{
+                  width: "26%",
+                  textAlign: "center",
+                  fontSize: "22px",
+                  fontWeight: 700,
+                  color: "#245f74",
+                  paddingBottom: "6px",
+                }}
+              >
+                ESTÁCIO
+              </div>
+
+              {/* Diretor */}
+              <div
+                style={{
+                  width: "30%",
+                  textAlign: "center",
+                }}
+              >
+                <div style={{ height: "35px" }} />
+
+                <div
+                  style={{
+                    borderTop: "1px solid #333",
+                    marginBottom: "7px",
+                  }}
+                />
+
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: "11px",
+                    letterSpacing: "0.05em",
+                  }}
+                >
+                  Diretor
+                </p>
               </div>
             </div>
           </div>

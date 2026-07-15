@@ -96,6 +96,13 @@ export function EstacioCertidaoRetrato({ state, onMecChange, draggableMec = true
 export function EstacioDiplomaPaisagem({ state, onMecChange, draggableMec = true }: Props) {
   return (
     <div
+      export function EstacioDiplomaPaisagem({
+  state,
+  onMecChange,
+  draggableMec = true,
+}: Props) {
+  return (
+    <div
       className="doc-sheet a4-landscape relative overflow-hidden"
       style={{
         backgroundColor: "#f4f1df",
@@ -103,57 +110,108 @@ export function EstacioDiplomaPaisagem({ state, onMecChange, draggableMec = true
         printColorAdjust: "exact",
       }}
     >
-      {/*
-        Coloque a imagem em:
-        public/images/fundo-estacio.png
-
-        A moldura, o brasão, o título, a marca d'água, o logo e as linhas
-        de assinatura já fazem parte da imagem. O código abaixo desenha
-        somente os dados variáveis do diploma.
-      */}
       <img
         src="/images/fundo-estacio.png"
         alt=""
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 z-0 h-full w-full select-none"
-        style={{ objectFit: "fill" }}
+        style={{
+          objectFit: "fill",
+        }}
       />
 
-      {/* Área de textos variáveis */}
       <div
         className="absolute z-10"
         style={{
-          left: "14%",
-          right: "14%",
-          top: "31%",
-          bottom: "15%",
-          fontFamily: "Arial, Helvetica, sans-serif",
-          color: "#3d3d2f",
+          left: "10.8%",
+          right: "10.8%",
+          top: "28.5%",
+          bottom: "18%",
+          fontFamily: "'Arial Narrow', Arial, Helvetica, sans-serif",
+          color: "#36372d",
         }}
       >
-        <div className="flex h-full flex-col justify-center">
+        <div
+          style={{
+            width: "100%",
+            fontSize: "17px",
+            lineHeight: 1.45,
+            fontStyle: "italic",
+          }}
+        >
           <p
             style={{
               margin: 0,
-              fontSize: "18px",
-              lineHeight: 1.65,
               textAlign: "justify",
             }}
           >
-            O Reitor da <strong>UNIVERSIDADE ESTÁCIO DE SÁ</strong>, no uso de suas
-            atribuições e tendo em vista a conclusão do Curso de{" "}
-            <strong>{ph(state.cursoSuperior)}</strong>, confere o título de{" "}
-            <strong>{ph(state.titulo)}</strong> a
+            O Reitor da{" "}
+            <strong style={{ fontWeight: 600 }}>
+              UNIVERSIDADE ESTÁCIO DE SÁ
+            </strong>
+            , no uso de suas atribuições e tendo em vista a
           </p>
 
           <p
             style={{
-              margin: "18px 0",
-              fontFamily: "Georgia, 'Times New Roman', Times, serif",
-              fontSize: "32px",
-              fontWeight: 700,
-              letterSpacing: "0.04em",
-              lineHeight: 1.2,
+              margin: "5px 0 0",
+              display: "flex",
+              alignItems: "baseline",
+              justifyContent: "space-between",
+              gap: "14px",
+            }}
+          >
+            <span>conclusão do Curso de</span>
+
+            <strong
+              style={{
+                flex: 1,
+                fontWeight: 500,
+                fontStyle: "normal",
+                textAlign: "center",
+                textTransform: "uppercase",
+              }}
+            >
+              {ph(state.cursoSuperior)}
+            </strong>
+
+            <span>
+              , em {ph(state.dataColacao || state.dataEmissao)},
+            </span>
+          </p>
+
+          <p
+            style={{
+              margin: "5px 0 0",
+              display: "flex",
+              alignItems: "baseline",
+              gap: "14px",
+            }}
+          >
+            <span>confere o título de</span>
+
+            <strong
+              style={{
+                flex: 1,
+                fontWeight: 500,
+                fontStyle: "normal",
+                textAlign: "center",
+                textTransform: "uppercase",
+              }}
+            >
+              {ph(state.titulo)}
+            </strong>
+
+            <span>a</span>
+          </p>
+
+          <p
+            style={{
+              margin: "15px 0 17px",
+              fontSize: "29px",
+              fontWeight: 400,
+              fontStyle: "normal",
+              lineHeight: 1.1,
               textAlign: "center",
               textTransform: "uppercase",
             }}
@@ -164,23 +222,83 @@ export function EstacioDiplomaPaisagem({ state, onMecChange, draggableMec = true
           <p
             style={{
               margin: 0,
-              fontSize: "18px",
-              lineHeight: 1.65,
-              textAlign: "justify",
+              display: "grid",
+              gridTemplateColumns: "auto 1fr auto 1fr",
+              alignItems: "baseline",
+              columnGap: "12px",
             }}
           >
-            Cédula de identidade nº <strong>{ph(state.rg || state.cpf)}</strong>,
-            órgão expedidor <strong>{ph(state.uf)}</strong>, nascido(a) em{" "}
-            <strong>{ph(state.dataNasc)}</strong>, natural de{" "}
-            <strong>{ph(state.cidadeNasc)}</strong>, e outorga-lhe o presente
-            Diploma, a fim de que possa gozar de todos os direitos e prerrogativas
-            legais.
+            <span>Cédula de identidade nº</span>
+
+            <strong
+              style={{
+                fontWeight: 400,
+                fontStyle: "normal",
+              }}
+            >
+              {ph(state.rg || state.cpf)}
+            </strong>
+
+            <span>, órgão expedidor</span>
+
+            <strong
+              style={{
+                fontWeight: 400,
+                fontStyle: "normal",
+              }}
+            >
+              {ph(state.orgaoExpedidor || state.uf)}
+            </strong>
           </p>
 
           <p
             style={{
-              margin: "18px 0 0",
-              fontSize: "17px",
+              margin: "8px 0 0",
+              display: "grid",
+              gridTemplateColumns: "auto auto auto 1fr",
+              alignItems: "baseline",
+              columnGap: "12px",
+            }}
+          >
+            <span>nascido(a) em</span>
+
+            <strong
+              style={{
+                fontWeight: 400,
+                fontStyle: "normal",
+              }}
+            >
+              {ph(state.dataNasc)}
+            </strong>
+
+            <span>, natural de</span>
+
+            <strong
+              style={{
+                fontWeight: 400,
+                fontStyle: "normal",
+                textTransform: "uppercase",
+              }}
+            >
+              {ph(state.cidadeNasc)}
+              {state.uf ? ` - ${state.uf}` : ""}
+            </strong>
+          </p>
+
+          <p
+            style={{
+              margin: "10px 0 0",
+              textAlign: "justify",
+            }}
+          >
+            e outorga-lhe o presente Diploma, a fim de que possa gozar de
+            todos os direitos e prerrogativas legais.
+          </p>
+
+          <p
+            style={{
+              margin: "18px 5% 0 0",
+              fontSize: "18px",
               fontStyle: "italic",
               textAlign: "right",
             }}
@@ -190,8 +308,11 @@ export function EstacioDiplomaPaisagem({ state, onMecChange, draggableMec = true
         </div>
       </div>
 
-      {/* Mantido exatamente para continuar editável no sistema */}
-      <MecStampBlock mec={state.mec} onChange={onMecChange} draggable={draggableMec} />
+      <MecStampBlock
+        mec={state.mec}
+        onChange={onMecChange}
+        draggable={draggableMec}
+      />
     </div>
   );
 }

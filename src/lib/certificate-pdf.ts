@@ -208,7 +208,7 @@ async function drawFooter(
   const rightCx = width - 60 - colW / 2;
 
  
-  }
+  
 
   const dataLocal = `HORTOLÂNDIA, ${formatFullDate(new Date())}.`;
   drawCenteredText(page, dataLocal, centerCx, footerTop, 8.5, bold, BLACK);

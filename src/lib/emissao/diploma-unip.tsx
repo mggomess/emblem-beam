@@ -9,33 +9,40 @@ type Props = {
 };
 
 const ph = (value?: string | null, fallback = "-"): ReactNode =>
-  value?.trim() ? value : <span className="du-placeholder">{fallback}</span>;
+  value?.trim() ? value : <span style={{ color: "#777" }}>{fallback}</span>;
 
-const bodyFont = '"EB Garamond", "Times New Roman", Times, serif';
-const gothicFont =
-  '"UnifrakturCook", "Old English Text MT", "Engravers Old English", "UnifrakturMaguntia", serif';
+const FONT_GOTHIC = '"Old English Text MT", "Cloister Black", "UnifrakturMaguntia", serif';
+const FONT_BODY = '"Times New Roman", Times, serif';
 
-const pageStyle: CSSProperties = {
-  position: "relative",
-  width: "297mm",
-  height: "210mm",
-  overflow: "hidden",
-  background: "#fff",
-  color: "#111",
-  fontFamily: bodyFont,
-  WebkitPrintColorAdjust: "exact",
-  printColorAdjust: "exact",
-  boxSizing: "border-box",
-  flex: "0 0 auto",
+const PAGE = {
+  width: 297,
+  height: 210,
 };
 
-/**
- * Modelo estável para A4 horizontal.
- *
- * O layout usa milímetros em vez de porcentagens, reduzindo diferenças entre
- * navegadores, visualização e impressão em PDF. A imagem fundo-unip.png deve
- * conter somente moldura, brasão e logomarca.
- */
+const POS = {
+  title: { top: 16.5, left: 54, width: 189, size: 15.5 },
+  body: { top: 55.5, left: 57, width: 183, size: 3.1 },
+  degree: { top: 78.2, left: 48, width: 201, size: 7.1 },
+  student: { top: 91.5, left: 42, width: 213, size: 8.3 },
+  identity: { top: 109.5, left: 55, width: 187, size: 3.2 },
+  grant: { top: 126.3, left: 54, width: 189, size: 3.2 },
+  date: { top: 144.3, left: 62, width: 173, size: 4.7 },
+  signature: { top: 158.5, left: 104, width: 89 },
+  validation: { top: 169.5, left: 211, width: 53 },
+};
+
+const mm = (value: number): string => `${value}mm`;
+
+function absoluteStyle(top: number, left: number, width: number): CSSProperties {
+  return {
+    position: "absolute",
+    top: mm(top),
+    left: mm(left),
+    width: mm(width),
+    zIndex: 2,
+  };
+}
+
 export function DiplomaUnip({
   state,
   onMecChange,
@@ -48,13 +55,6 @@ export function DiplomaUnip({
   return (
     <>
       <style>{`
-        @import url("https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&family=UnifrakturCook:wght@700&display=swap");
-
-        .du-page, .du-page * { box-sizing: border-box; }
-        .du-placeholder { color: #777; }
-        .du-nowrap { white-space: nowrap; }
-        .du-break { overflow-wrap: anywhere; word-break: break-word; }
-
         @page {
           size: A4 landscape;
           margin: 0;
@@ -67,196 +67,197 @@ export function DiplomaUnip({
             background: #fff !important;
           }
 
-          .du-page {
-            width: 297mm !important;
-            height: 210mm !important;
+          .unip-diploma-page {
             margin: 0 !important;
             box-shadow: none !important;
-            page-break-after: always;
             break-after: page;
-          }
-
-          .du-page:last-of-type {
-            page-break-after: auto;
-            break-after: auto;
+            page-break-after: always;
           }
         }
       `}</style>
 
-      {/* FOLHA 1, FRENTE */}
-      <section className="du-page" style={pageStyle}>
+      <section
+        className="unip-diploma-page"
+        style={{
+          position: "relative",
+          width: mm(PAGE.width),
+          height: mm(PAGE.height),
+          overflow: "hidden",
+          background: "#fff",
+          color: "#000",
+          fontFamily: FONT_BODY,
+          WebkitPrintColorAdjust: "exact",
+          printColorAdjust: "exact",
+          boxSizing: "border-box",
+        }}
+      >
         <img
           src="/images/fundo-unip.png"
           alt=""
           aria-hidden="true"
-          draggable={false}
           style={{
             position: "absolute",
             inset: 0,
-            width: "297mm",
-            height: "auto",
-            maxWidth: "none",
-            objectFit: "contain",
-            objectPosition: "top left",
-            userSelect: "none",
-            pointerEvents: "none",
             zIndex: 0,
+            width: "100%",
+            height: "100%",
+            objectFit: "contain",
+            objectPosition: "center",
+            pointerEvents: "none",
+            userSelect: "none",
           }}
         />
 
-        {/* Cabeçalho */}
         <header
           style={{
-            position: "absolute",
-            top: "16.5mm",
-            left: "62mm",
-            width: "173mm",
-            zIndex: 2,
+            ...absoluteStyle(POS.title.top, POS.title.left, POS.title.width),
+            fontFamily: FONT_GOTHIC,
+            fontSize: mm(POS.title.size),
+            lineHeight: 0.92,
+            fontWeight: 400,
             textAlign: "center",
+            whiteSpace: "nowrap",
           }}
         >
-          <div
-            className="du-nowrap"
-            style={{
-              fontFamily: gothicFont,
-              fontSize: "12.2mm",
-              lineHeight: 1,
-              fontWeight: 700,
-              letterSpacing: "-0.15mm",
-            }}
-          >
-            Universidade Paulista
-          </div>
+          Universidade Paulista
         </header>
 
-        {/* Texto principal */}
         <main
           style={{
-            position: "absolute",
-            top: "52mm",
-            left: "59mm",
-            width: "179mm",
-            zIndex: 2,
+            ...absoluteStyle(POS.body.top, POS.body.left, POS.body.width),
+            fontFamily: FONT_BODY,
+            fontSize: mm(POS.body.size),
+            lineHeight: 1.32,
             textAlign: "center",
-            fontSize: "3.45mm",
-            lineHeight: 1.42,
           }}
         >
           <p style={{ margin: 0 }}>
-            A Reitora da Universidade Paulista, no uso de suas atribuições,
+            A Reitora da Universidade Paulista, no uso de suas atribuições
           </p>
-          <p style={{ margin: "1.2mm 0 0" }}>
-            tendo em vista a conclusão do Curso Superior de{" "}
-            {ph(state.cursoSuperior)},
+          <p style={{ margin: "1.1mm 0 0" }}>
+            e tendo em vista a conclusão do Curso Superior de {ph(state.cursoSuperior)},
           </p>
-          <p style={{ margin: "1.2mm 0 0" }}>
-            na data de {ph(state.dataColacao)}, e a Colação de Grau realizada na
-            mesma data,
-          </p>
-          <p style={{ margin: "1.2mm 0 0" }}>confere o título de</p>
-
-          <div
-            style={{
-              marginTop: "3.2mm",
-              minHeight: "11mm",
-              fontFamily: gothicFont,
-              fontSize: "7.2mm",
-              lineHeight: 1.05,
-              fontWeight: 700,
-              letterSpacing: "0",
-            }}
-          >
-            {ph(state.titulo)} em {ph(state.cursoSuperior)} a
-          </div>
-
-          <div
-            style={{
-              marginTop: "3.3mm",
-              minHeight: "10mm",
-              fontFamily: gothicFont,
-              fontSize: "8mm",
-              fontWeight: 700,
-              lineHeight: 1.05,
-              textTransform: "none",
-              letterSpacing: "0",
-            }}
-          >
-            {ph(state.nomeAluno)}
-          </div>
-
-          <p style={{ margin: "4.1mm 0 0" }}>
-            {ph(state.nacionalidade, "brasileiro(a)")}, natural de{" "}
-            {naturalidade || "-"}, nascido(a) em {ph(state.dataNasc)},
-          </p>
-          <p style={{ margin: "1mm 0 0" }}>
-            RG nº {ph(state.rg)} e CPF nº {ph(state.cpf)},
-          </p>
-          <p style={{ margin: "3.4mm 0 0" }}>
-            e outorga-lhe o presente Diploma,
-          </p>
-          <p style={{ margin: "1mm 0 0" }}>
-            a fim de que possa gozar de todos os direitos e prerrogativas
-            legais.
-          </p>
-          <p style={{ margin: "3.7mm 0 0" }}>
-            {ph(state.cidadeEmissao, "São Paulo")}, {ph(state.dataEmissao)}.
+          <p style={{ margin: "1.1mm 0 0" }}>
+            na data de {ph(state.dataConclusao || state.dataColacao)}, e a Colação de Grau na data de {ph(state.dataColacao)}, confere o título de
           </p>
         </main>
 
-        {/* Assinatura da reitoria */}
         <div
           style={{
-            position: "absolute",
-            top: "153mm",
-            left: "103.5mm",
-            width: "90mm",
-            zIndex: 2,
+            ...absoluteStyle(POS.degree.top, POS.degree.left, POS.degree.width),
+            fontFamily: FONT_GOTHIC,
+            fontSize: mm(POS.degree.size),
+            lineHeight: 1,
             textAlign: "center",
-            fontFamily: bodyFont,
+            whiteSpace: "nowrap",
           }}
         >
-          <div style={{ height: "10mm", borderBottom: "0.25mm solid #111" }} />
+          {ph(state.titulo)} em {ph(state.cursoSuperior)} a
+        </div>
+
+        <div
+          style={{
+            ...absoluteStyle(POS.student.top, POS.student.left, POS.student.width),
+            fontFamily: FONT_GOTHIC,
+            fontSize: mm(POS.student.size),
+            lineHeight: 1,
+            textAlign: "center",
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+        >
+          {ph(state.nomeAluno)}
+        </div>
+
+        <div
+          style={{
+            ...absoluteStyle(POS.identity.top, POS.identity.left, POS.identity.width),
+            fontSize: mm(POS.identity.size),
+            lineHeight: 1.35,
+            textAlign: "center",
+          }}
+        >
+          <p style={{ margin: 0 }}>
+            {ph(state.nacionalidade, "brasileiro(a)")}, natural de {naturalidade || "-"}, nascido(a) em {ph(state.dataNasc)},
+          </p>
+          <p style={{ margin: "1.1mm 0 0" }}>
+            RG nº {ph(state.rg)} e CPF nº {ph(state.cpf)}
+          </p>
+        </div>
+
+        <div
+          style={{
+            ...absoluteStyle(POS.grant.top, POS.grant.left, POS.grant.width),
+            fontSize: mm(POS.grant.size),
+            lineHeight: 1.4,
+            textAlign: "center",
+          }}
+        >
+          <p style={{ margin: 0 }}>e outorga-lhe o presente Diploma,</p>
+          <p style={{ margin: "1.2mm 0 0" }}>
+            a fim de que possa gozar de todos os direitos e prerrogativas legais.
+          </p>
+        </div>
+
+        <div
+          style={{
+            ...absoluteStyle(POS.date.top, POS.date.left, POS.date.width),
+            fontFamily: FONT_GOTHIC,
+            fontSize: mm(POS.date.size),
+            lineHeight: 1,
+            textAlign: "center",
+          }}
+        >
+          {ph(state.cidadeEmissao, "São Paulo")}, {ph(state.dataEmissao)}.
+        </div>
+
+        <div
+          style={{
+            ...absoluteStyle(POS.signature.top, POS.signature.left, POS.signature.width),
+            textAlign: "center",
+            fontFamily: FONT_BODY,
+          }}
+        >
+          <div
+            aria-hidden="true"
+            style={{
+              height: "12mm",
+              borderBottom: "0.25mm solid #000",
+            }}
+          />
           <div
             style={{
-              marginTop: "1.5mm",
-              fontSize: "2.65mm",
-              lineHeight: 1.05,
+              marginTop: "1.2mm",
+              fontSize: "2.45mm",
               fontWeight: 700,
               textTransform: "uppercase",
+              lineHeight: 1,
             }}
           >
             {state.reitor || "SANDRA REJANE GOMES MIESSA"}
           </div>
-          <div style={{ marginTop: "0.7mm", fontSize: "2.5mm", lineHeight: 1 }}>
+          <div style={{ marginTop: "0.7mm", fontSize: "2.25mm", lineHeight: 1 }}>
             Reitora
           </div>
         </div>
 
-        {/* Validação */}
         <aside
           style={{
-            position: "absolute",
-            right: "30mm",
-            bottom: "21mm",
-            width: "54mm",
-            zIndex: 2,
-            fontSize: "2.15mm",
-            lineHeight: 1.2,
+            ...absoluteStyle(POS.validation.top, POS.validation.left, POS.validation.width),
+            fontSize: "2.1mm",
+            lineHeight: 1.25,
             textAlign: "left",
           }}
         >
           <div>Documento digital</div>
           <div style={{ marginTop: "0.8mm" }}>Código de validação:</div>
-          <div
-            className="du-break"
-            style={{ marginTop: "0.5mm", fontWeight: 700 }}
-          >
+          <div style={{ fontWeight: 700, overflowWrap: "anywhere" }}>
             {ph(state.codigoUnico)}
           </div>
         </aside>
 
-        {/* Integração preservada */}
-        <div hidden aria-hidden="true">
+        <div style={{ display: "none" }} aria-hidden="true">
           <MecStampBlock
             mec={state.mec}
             onChange={onMecChange}
@@ -264,226 +265,6 @@ export function DiplomaUnip({
           />
         </div>
       </section>
-
-      {/* FOLHA 2, VERSO */}
-      <section
-        className="du-page"
-        style={{
-          ...pageStyle,
-          pageBreakBefore: "always",
-          breakBefore: "page",
-          padding: "13mm 15mm",
-        }}
-      >
-        <div
-          style={{
-            position: "absolute",
-            inset: "8mm",
-            border: "0.45mm solid #6b521f",
-            pointerEvents: "none",
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            inset: "10mm",
-            border: "0.18mm solid #6b521f",
-            pointerEvents: "none",
-          }}
-        />
-
-        <div
-          style={{
-            position: "relative",
-            zIndex: 1,
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: "11mm",
-            height: "100%",
-            padding: "6mm 7mm",
-          }}
-        >
-          <div style={{ fontSize: "3mm", lineHeight: 1.45 }}>
-            <SectionTitle>Mantenedora</SectionTitle>
-            <InfoLine label="Razão Social" value={state.mantenedora} />
-            <InfoLine label="CNPJ" value={state.cnpj} />
-            <InfoLine
-              label="Recredenciamento"
-              value={`Portaria MEC nº ${state.portariaMec || "-"}`}
-            />
-            <InfoLine label="Resolução CNE/CP" value={state.resolucao} />
-            <InfoLine label="Endereço" value={state.enderecoPolo} />
-
-            <div style={{ height: "7mm" }} />
-            <SectionTitle>Dados do Diplomado</SectionTitle>
-            <InfoLine label="Nome" value={state.nomeAluno} />
-            <InfoLine label="CPF" value={state.cpf} />
-            <InfoLine label="RG" value={state.rg} />
-            <InfoLine label="Naturalidade" value={naturalidade} />
-            <InfoLine label="Nascimento" value={state.dataNasc} />
-            <InfoLine label="Nacionalidade" value={state.nacionalidade} />
-            <InfoLine label="Curso" value={state.cursoSuperior} />
-            <InfoLine label="Título" value={state.titulo} />
-            <InfoLine label="Colação de grau" value={state.dataColacao} />
-
-            <div
-              style={{
-                marginTop: "10mm",
-                width: "34mm",
-                height: "34mm",
-                border: "1mm double #6b521f",
-                borderRadius: "50%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                textAlign: "center",
-                fontSize: "2.7mm",
-                lineHeight: 1.15,
-                fontWeight: 700,
-                color: "#6b521f",
-              }}
-            >
-              UNIVERSIDADE
-              <br />
-              PAULISTA
-              <br />
-              UNIP
-            </div>
-          </div>
-
-          <div
-            style={{
-              height: "100%",
-              border: "0.45mm solid #6b521f",
-              padding: "7mm",
-              fontSize: "3mm",
-              lineHeight: 1.4,
-            }}
-          >
-            <div
-              style={{
-                textAlign: "center",
-                color: "#6b521f",
-                fontWeight: 700,
-                textTransform: "uppercase",
-                fontSize: "4mm",
-              }}
-            >
-              Secretaria Geral
-            </div>
-            <div
-              style={{
-                textAlign: "center",
-                marginTop: "1mm",
-                fontSize: "2.8mm",
-                color: "#6b521f",
-              }}
-            >
-              Departamento de Registro de Diplomas
-            </div>
-
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: "3mm",
-                marginTop: "8mm",
-              }}
-            >
-              <Box label="RA" value={state.raCode} />
-              <Box label="LOTE" value={state.lote} />
-              <Box label="LIVRO" value={state.livro} />
-              <Box label="FOLHA" value={state.folhaLivro} />
-            </div>
-
-            <p style={{ margin: "10mm 0 0" }}>
-              Registrado sob as condições acima, nos termos da legislação
-              vigente e do Regimento Geral desta Universidade.
-            </p>
-            <p style={{ margin: "4mm 0 0" }}>
-              {ph(state.cidadeEmissao)} - {ph(state.uf)},{" "}
-              {ph(state.dataEmissao)}.
-            </p>
-
-            <div style={{ marginTop: "25mm", textAlign: "center" }}>
-              <div style={{ borderTop: "0.25mm solid #111" }} />
-              <div
-                style={{
-                  marginTop: "1.5mm",
-                  fontWeight: 700,
-                  textTransform: "uppercase",
-                }}
-              >
-                {ph(state.secretarioAdjunto)}
-              </div>
-              <div
-                style={{
-                  marginTop: "0.8mm",
-                  fontSize: "2.6mm",
-                  textTransform: "uppercase",
-                }}
-              >
-                Secretário(a) Geral Adjunto(a)
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
     </>
-  );
-}
-
-function SectionTitle({ children }: { children: ReactNode }) {
-  return (
-    <div
-      style={{
-        marginBottom: "3mm",
-        paddingBottom: "1.2mm",
-        borderBottom: "0.45mm solid #6b521f",
-        color: "#6b521f",
-        fontSize: "3.6mm",
-        fontWeight: 700,
-        textTransform: "uppercase",
-      }}
-    >
-      {children}
-    </div>
-  );
-}
-
-function InfoLine({ label, value }: { label: string; value?: string | null }) {
-  return (
-    <div style={{ marginTop: "1.3mm" }}>
-      <strong>{label}:</strong> {value?.trim() || "-"}
-    </div>
-  );
-}
-
-function Box({ label, value }: { label: string; value?: string | null }) {
-  return (
-    <div
-      style={{
-        minHeight: "16mm",
-        border: "0.25mm solid #6b521f",
-        padding: "3mm",
-      }}
-    >
-      <div
-        style={{
-          color: "#6b521f",
-          fontSize: "2.4mm",
-          fontWeight: 700,
-          textTransform: "uppercase",
-        }}
-      >
-        {label}
-      </div>
-      <div
-        className="du-break"
-        style={{ marginTop: "1mm", fontSize: "3mm", fontWeight: 600 }}
-      >
-        {value?.trim() || "-"}
-      </div>
-    </div>
   );
 }

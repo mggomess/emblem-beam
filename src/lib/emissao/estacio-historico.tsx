@@ -1,391 +1,307 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import type { EmissaoState } from "./types";
 import { QrBlock } from "./qr-block";
 
-const ph = (v: string, fb = "—") =>
-  v && v.trim() ? v : <span className="text-neutral-400">{fb}</span>;
+const PAGE_W = 1085;
+const PAGE_H = 1450;
 
-function Field({
-  label,
-  value,
-  className = "",
-}: {
-  label: string;
-  value: ReactNode;
-  className?: string;
-}) {
-  return (
-    <div
-      className={`min-h-[28px] border px-2.5 py-1.5 ${className}`}
-      style={{ borderColor: "#4d4d43" }}
-    >
-      <span className="mr-1 text-[8px] font-bold uppercase tracking-wide text-[#4d4d43]">
-        {label}:
-      </span>
-      <span className="text-[9.5px] text-black">{value}</span>
-    </div>
-  );
-}
+const pxX = (value: number) => `${(value / PAGE_W) * 100}%`;
+const pxY = (value: number) => `${(value / PAGE_H) * 100}%`;
 
-function SectionTitle({ children }: { children: ReactNode }) {
-  return (
-    <div className="relative -mb-px ml-3 w-fit bg-[#f8f7ef] px-2 text-[9px] font-bold uppercase tracking-wide text-[#3f4035]">
-      {children}
-    </div>
-  );
-}
+const absoluteText: CSSProperties = {
+  position: "absolute",
+  zIndex: 2,
+  margin: 0,
+  color: "#111",
+  lineHeight: 1.1,
+  overflow: "hidden",
+  boxSizing: "border-box",
+};
 
-/** Histórico Escolar, Estácio, Ensino Superior. */
-export function EstacioHistoricoSuperior({ state }: { state: EmissaoState }) {
-  const border = "#4d4d43";
-  const olive = "#4b4c3d";
-  const paper = "#f8f7ef";
+const valueOrDash = (value?: string | null): ReactNode =>
+  value?.trim() ? value : "—";
+
+/** Histórico Escolar UNIP, com imagem fixa de fundo e dados dinâmicos sobrepostos. */
+export function HistoricoSuperior({ state }: { state: EmissaoState }) {
+  const disciplinas = state.disciplinasSuperior ?? [];
 
   return (
     <div
-      className="doc-sheet a4-portrait font-sans-doc relative overflow-hidden"
+      className="doc-sheet a4-portrait relative overflow-hidden bg-white font-sans-doc"
       style={{
-        backgroundColor: paper,
+        position: "relative",
+        width: "210mm",
+        height: "297mm",
+        padding: 0,
+        overflow: "hidden",
+        backgroundColor: "#fff",
         WebkitPrintColorAdjust: "exact",
         printColorAdjust: "exact",
       }}
     >
-      {/* Marca d'água */}
-      <div
+      <img
+        src="/images/historico-estacio.png"
+        alt=""
         aria-hidden="true"
-        className="pointer-events-none absolute left-1/2 top-[49%] z-0 select-none text-[84px] font-bold uppercase"
+        draggable={false}
         style={{
-          color: olive,
-          opacity: 0.03,
-          transform: "translate(-50%, -50%) rotate(-18deg)",
-          whiteSpace: "nowrap",
+          position: "absolute",
+          inset: 0,
+          zIndex: 0,
+          width: "100%",
+          height: "100%",
+          objectFit: "fill",
+          userSelect: "none",
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* Folhas e data de emissão */}
+      <div
+        style={{
+          ...absoluteText,
+          top: pxY(66),
+          left: pxX(912),
+          width: pxX(95),
+          height: pxY(27),
+          textAlign: "center",
+          fontSize: "2.45mm",
+          fontWeight: 600,
         }}
       >
-        ESTÁCIO
+        1/1
       </div>
 
-      <div className="relative z-10 px-[11mm] pb-[10mm] pt-[9mm]">
-        {/* Cabeçalho institucional */}
-        <div
-          className="grid grid-cols-[110px_1fr_120px] items-center border p-3.5"
-          style={{ borderColor: border }}
-        >
-          <div className="flex items-center justify-center">
-            <img
-              src="/simbolo.png"
-              alt="Brasão institucional"
-              className="h-[78px] w-[78px] object-contain"
-            />
-          </div>
-
-          <div className="px-3 text-center leading-tight">
-            <div className="text-[10px] uppercase tracking-wide">
-              Ministério da Educação
-            </div>
-
-            <div
-              className="mt-1 text-[15px] font-bold uppercase tracking-[0.08em]"
-              style={{ color: olive }}
-            >
-              Universidade Estácio de Sá
-            </div>
-
-            <div className="mt-1.5 text-[11px] font-bold uppercase">
-              Histórico Escolar
-            </div>
-
-            <div className="text-[8.5px] font-semibold uppercase tracking-wide">
-              Ensino Superior
-            </div>
-
-            <div className="mt-1 text-[8.5px]">
-              {ph(state.cidadeEmissao)} - {ph(state.uf)}
-            </div>
-
-            <div className="text-[8.5px]">
-              Portaria MEC nº {ph(state.portariaMec)}
-            </div>
-          </div>
-
-          <div className="flex flex-col items-center justify-center">
-            <svg viewBox="0 0 120 78" className="h-[72px] w-[110px]">
-              <g>
-                <rect
-                  x="11"
-                  y="10"
-                  width="38"
-                  height="38"
-                  transform="rotate(45 30 29)"
-                  fill="#6dbfb2"
-                />
-                <rect
-                  x="20"
-                  y="19"
-                  width="20"
-                  height="20"
-                  transform="rotate(45 30 29)"
-                  fill="#f8f7ef"
-                />
-              </g>
-              <text
-                x="56"
-                y="39"
-                fontFamily="Arial, sans-serif"
-                fontSize="18"
-                fontWeight="900"
-                fill={olive}
-              >
-                Estácio
-              </text>
-            </svg>
-
-            <div className="mt-1 text-[8px] font-bold uppercase" style={{ color: olive }}>
-              Folha 1 de 1
-            </div>
-          </div>
-        </div>
-
-        {/* Dados acadêmicos */}
-        <div className="mt-3">
-          <SectionTitle>Dados acadêmicos</SectionTitle>
-
-          <div className="border p-2.5" style={{ borderColor: border }}>
-            <div className="grid grid-cols-2 gap-1.5">
-              <Field
-                label="Curso"
-                value={ph(state.cursoSuperior)}
-                className="col-span-2"
-              />
-              <Field label="Título conferido" value={ph(state.titulo)} />
-              <Field label="Matrícula" value={ph(state.matricula)} />
-              <Field label="Período inicial" value={ph(state.periodoInicio)} />
-              <Field label="Período final" value={ph(state.periodoFim)} />
-              <Field label="Data da colação" value={ph(state.dataColacao)} />
-              <Field label="Data da emissão" value={ph(state.dataEmissao)} />
-            </div>
-          </div>
-        </div>
-
-        {/* Dados pessoais */}
-        <div className="mt-3">
-          <SectionTitle>Dados pessoais</SectionTitle>
-
-          <div className="border p-2.5" style={{ borderColor: border }}>
-            <div className="grid grid-cols-2 gap-1.5">
-              <Field
-                label="Nome completo"
-                value={ph(state.nomeAluno)}
-                className="col-span-2"
-              />
-              <Field label="CPF" value={ph(state.cpf)} />
-              <Field label="RG" value={ph(state.rg)} />
-              <Field label="Data de nascimento" value={ph(state.dataNasc)} />
-              <Field label="Nacionalidade" value={ph(state.nacionalidade)} />
-              <Field
-                label="Naturalidade"
-                value={
-                  `${state.cidadeNasc || ""}${
-                    state.estadoNasc ? ` - ${state.estadoNasc}` : ""
-                  }` || "—"
-                }
-                className="col-span-2"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Grade curricular */}
-        <div className="mt-3">
-          <SectionTitle>Componentes curriculares</SectionTitle>
-
-          <div className="border" style={{ borderColor: border }}>
-            <table className="w-full table-fixed border-collapse text-[8px]">
-              <colgroup>
-                <col style={{ width: "8%" }} />
-                <col style={{ width: "10%" }} />
-                <col style={{ width: "50%" }} />
-                <col style={{ width: "8%" }} />
-                <col style={{ width: "8%" }} />
-                <col style={{ width: "8%" }} />
-                <col style={{ width: "8%" }} />
-              </colgroup>
-
-              <thead>
-                <tr className="text-white" style={{ backgroundColor: olive }}>
-                  <th className="border border-white/30 p-1">PERÍODO</th>
-                  <th className="border border-white/30 p-1">CÓDIGO</th>
-                  <th className="border border-white/30 p-1 text-left">
-                    DISCIPLINA
-                  </th>
-                  <th className="border border-white/30 p-1">C.H.</th>
-                  <th className="border border-white/30 p-1">NOTA</th>
-                  <th className="border border-white/30 p-1">FREQ.</th>
-                  <th className="border border-white/30 p-1">SIT.</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {state.disciplinasSuperior.length > 0 ? (
-                  state.disciplinasSuperior.map((d, i) => (
-                    <tr
-                      key={i}
-                      style={{
-                        backgroundColor: i % 2 === 0 ? "#fff" : "#f1f0e8",
-                      }}
-                    >
-                      <td
-                        className="border p-1 text-center"
-                        style={{ borderColor: border }}
-                      >
-                        {d.periodo || "—"}
-                      </td>
-
-                      <td
-                        className="border p-1 text-center"
-                        style={{ borderColor: border }}
-                      >
-                        {d.codigo || "—"}
-                      </td>
-
-                      <td className="border p-1" style={{ borderColor: border }}>
-                        {d.descricao || "—"}
-                      </td>
-
-                      <td
-                        className="border p-1 text-center"
-                        style={{ borderColor: border }}
-                      >
-                        {d.ch || "—"}
-                      </td>
-
-                      <td
-                        className="border p-1 text-center"
-                        style={{ borderColor: border }}
-                      >
-                        {d.media || "—"}
-                      </td>
-
-                      <td
-                        className="border p-1 text-center"
-                        style={{ borderColor: border }}
-                      >
-                        {d.perLetivo || "—"}
-                      </td>
-
-                      <td
-                        className="border p-1 text-center font-bold"
-                        style={{ borderColor: border }}
-                      >
-                        {d.situacao || "—"}
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  Array.from({ length: 9 }).map((_, i) => (
-                    <tr key={i}>
-                      <td className="h-[22px] border" style={{ borderColor: border }} />
-                      <td className="border" style={{ borderColor: border }} />
-                      <td className="border" style={{ borderColor: border }} />
-                      <td className="border" style={{ borderColor: border }} />
-                      <td className="border" style={{ borderColor: border }} />
-                      <td className="border" style={{ borderColor: border }} />
-                      <td className="border" style={{ borderColor: border }} />
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* Observações e validação */}
-        <div className="mt-3 grid grid-cols-[1fr_122px] gap-3">
-          <div>
-            <SectionTitle>Observações e legenda</SectionTitle>
-
-            <div
-              className="min-h-[108px] border p-2.5 text-[8.5px] leading-relaxed"
-              style={{ borderColor: border }}
-            >
-              <div>
-                <span className="font-bold uppercase" style={{ color: olive }}>
-                  Observações:
-                </span>{" "}
-                {state.observacoesHistorico || "—"}
-              </div>
-
-              <div className="mt-2">
-                <span className="font-bold uppercase" style={{ color: olive }}>
-                  Legenda:
-                </span>{" "}
-                {state.legendaNotas || "—"}
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <SectionTitle>Validação</SectionTitle>
-
-            <div
-              className="flex min-h-[108px] flex-col items-center justify-center border p-2"
-              style={{ borderColor: border }}
-            >
-              <QrBlock
-                code={state.codigoUnico}
-                sedUrlBase={state.sedUrlBase}
-                size={80}
-              />
-
-              <div className="mt-1 text-center text-[7px] font-bold uppercase">
-                Verifique a autenticidade
-              </div>
-
-              <div className="mt-1 max-w-full break-all text-center text-[6.5px] leading-tight">
-                {state.codigoUnico || "—"}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Assinaturas */}
-        <div className="mt-7 grid grid-cols-2 gap-16 px-8">
-          <div className="text-center">
-            <div className="h-8" />
-            <div className="border-t border-black" />
-            <div className="mt-1 text-[9px] font-bold uppercase">
-              {ph(state.secretarioGeral)}
-            </div>
-            <div className="text-[8px] uppercase">Secretário(a) Geral</div>
-          </div>
-
-          <div className="text-center">
-            <div className="h-8" />
-            <div className="border-t border-black" />
-            <div className="mt-1 text-[9px] font-bold uppercase">
-              {ph(state.reitor)}
-            </div>
-            <div className="text-[8px] uppercase">Reitor(a)</div>
-          </div>
-        </div>
-
-        {/* Rodapé */}
-        <div
-          className="mt-6 grid grid-cols-3 items-end border-t pt-2 text-[7.5px]"
-          style={{ borderColor: border }}
-        >
-          <div>
-            Emitido em {ph(state.cidadeEmissao)} - {ph(state.uf)}
-            <br />
-            {ph(state.dataEmissao)}
-          </div>
-
-          <div className="text-center">
-            Documento assinado digitalmente
-          </div>
-
-          <div className="text-right font-bold uppercase">Página 1 de 1</div>
-        </div>
+      <div
+        style={{
+          ...absoluteText,
+          top: pxY(111),
+          left: pxX(908),
+          width: pxX(99),
+          height: pxY(28),
+          textAlign: "center",
+          fontSize: "2.35mm",
+          fontWeight: 600,
+        }}
+      >
+        {valueOrDash(state.dataEmissao)}
       </div>
+
+      {/* Nome */}
+      <div
+        style={{
+          ...absoluteText,
+          top: pxY(122),
+          left: pxX(286),
+          width: pxX(608),
+          height: pxY(30),
+          textAlign: "center",
+          fontSize: "3.05mm",
+          fontWeight: 700,
+          textTransform: "uppercase",
+          whiteSpace: "nowrap",
+          textOverflow: "ellipsis",
+        }}
+      >
+        {valueOrDash(state.nomeAluno)}
+      </div>
+
+      {/* Dados superiores */}
+      <FieldText x={34} y={189} w={142} h={26} value={state.matricula} />
+      <FieldText x={194} y={189} w={145} h={26} value={state.dataNasc} />
+      <FieldText x={359} y={189} w={334} h={26} value={state.cidadeNasc} />
+      <FieldText x={708} y={189} w={64} h={26} value={state.estadoNasc} />
+      <FieldText x={786} y={189} w={221} h={26} value={state.nacionalidade} />
+
+      <FieldText x={34} y={257} w={214} h={26} value={state.rg} />
+      <FieldText x={265} y={257} w={143} h={26} value={undefined} />
+      <FieldText x={423} y={257} w={139} h={26} value={state.cpf} />
+      <FieldText x={580} y={257} w={172} h={26} value={undefined} />
+      <FieldText x={770} y={257} w={105} h={26} value={undefined} />
+      <FieldText x={891} y={257} w={116} h={26} value={undefined} />
+
+      <FieldText x={34} y={336} w={656} h={27} value={undefined} />
+      <FieldText x={707} y={336} w={167} h={27} value={undefined} />
+      <FieldText x={892} y={336} w={115} h={27} value={undefined} />
+
+      <FieldText x={34} y={408} w={461} h={39} value={state.cursoSuperior} align="left" />
+      <FieldText x={511} y={408} w={95} h={39} value={undefined} />
+
+      <div
+        style={{
+          ...absoluteText,
+          top: pxY(406),
+          left: pxX(621),
+          width: pxX(229),
+          height: pxY(50),
+          fontSize: "2.35mm",
+          lineHeight: 1.25,
+          padding: "0.4mm 1mm",
+        }}
+      >
+        <div>{valueOrDash(state.portariaMec)}</div>
+        <div>{valueOrDash(state.resolucao)}</div>
+      </div>
+
+      <div
+        style={{
+          ...absoluteText,
+          top: pxY(407),
+          left: pxX(866),
+          width: pxX(140),
+          height: pxY(52),
+          fontSize: "2.35mm",
+          lineHeight: 1.35,
+          padding: "0.4mm 1mm",
+        }}
+      >
+        <div>Exigida: {valueOrDash(String(state.cargaHorariaExigida ?? ""))}</div>
+        <div>Cumprida: {valueOrDash(String(state.cargaHorariaCumprida ?? ""))}</div>
+      </div>
+
+      {/* Disciplinas */}
+      <div
+        style={{
+          position: "absolute",
+          zIndex: 2,
+          top: pxY(566),
+          left: pxX(31),
+          width: pxX(975),
+          height: pxY(560),
+          overflow: "hidden",
+        }}
+      >
+        {disciplinas.slice(0, 38).map((d, index) => (
+          <div
+            key={`${d.codigo}-${index}`}
+            style={{
+              display: "grid",
+              gridTemplateColumns: "72px 89px 493px 67px 96px 89px 115px",
+              minHeight: "14px",
+              alignItems: "center",
+              fontSize: "2.15mm",
+              lineHeight: 1.05,
+              color: "#111",
+              marginBottom: "1px",
+            }}
+          >
+            <span style={{ textAlign: "center" }}>{d.periodo}</span>
+            <span style={{ textAlign: "center" }}>{d.codigo}</span>
+            <span style={{ textAlign: "left", paddingLeft: "1.5mm" }}>{d.descricao}</span>
+            <span style={{ textAlign: "center" }}>{d.ch}</span>
+            <span style={{ textAlign: "center" }}>{d.perLetivo}</span>
+            <span style={{ textAlign: "center" }}>{d.media}</span>
+            <span style={{ textAlign: "center", fontWeight: 700 }}>{d.situacao}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Observações */}
+      <div
+        style={{
+          ...absoluteText,
+          top: pxY(1176),
+          left: pxX(24),
+          width: pxX(976),
+          height: pxY(80),
+          fontSize: "2.35mm",
+          lineHeight: 1.2,
+          whiteSpace: "pre-wrap",
+          padding: "1mm 1.5mm",
+        }}
+      >
+        {state.observacoesHistorico}
+      </div>
+
+      {/* Rodapé */}
+      <FieldText x={28} y={1298} w={118} h={25} value={state.dataColacao} />
+      <FieldText x={155} y={1298} w={115} h={25} value={state.dataEmissao} />
+      <FieldText x={282} y={1298} w={99} h={25} value={undefined} />
+      <FieldText x={395} y={1298} w={106} h={25} value={state.dataColacao} />
+      <FieldText x={511} y={1298} w={128} h={25} value={state.titulo} />
+
+      <div
+        style={{
+          position: "absolute",
+          zIndex: 3,
+          top: pxY(1256),
+          left: pxX(873),
+          width: pxX(105),
+          height: pxY(105),
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <QrBlock code={state.codigoUnico} sedUrlBase={state.sedUrlBase} size={84} />
+      </div>
+
+      <div
+        style={{
+          ...absoluteText,
+          top: pxY(1374),
+          left: pxX(440),
+          width: pxX(170),
+          height: pxY(26),
+          textAlign: "center",
+          fontSize: "2.15mm",
+          fontWeight: 600,
+          textTransform: "uppercase",
+        }}
+      >
+        {valueOrDash(state.secretarioGeral)}
+      </div>
+
+      <div
+        style={{
+          ...absoluteText,
+          top: pxY(1374),
+          left: pxX(724),
+          width: pxX(170),
+          height: pxY(26),
+          textAlign: "center",
+          fontSize: "2.15mm",
+          fontWeight: 600,
+          textTransform: "uppercase",
+        }}
+      >
+        {valueOrDash(state.reitor)}
+      </div>
+    </div>
+  );
+}
+
+type FieldTextProps = {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  value?: string | null;
+  align?: "left" | "center" | "right";
+};
+
+function FieldText({ x, y, w, h, value, align = "center" }: FieldTextProps) {
+  return (
+    <div
+      style={{
+        ...absoluteText,
+        top: pxY(y),
+        left: pxX(x),
+        width: pxX(w),
+        height: pxY(h),
+        display: "flex",
+        alignItems: "center",
+        justifyContent:
+          align === "left" ? "flex-start" : align === "right" ? "flex-end" : "center",
+        textAlign: align,
+        fontSize: "2.45mm",
+        fontWeight: 600,
+        padding: align === "left" ? "0 1.5mm" : "0 0.8mm",
+        whiteSpace: "nowrap",
+        textOverflow: "ellipsis",
+      }}
+    >
+      {valueOrDash(value)}
     </div>
   );
 }

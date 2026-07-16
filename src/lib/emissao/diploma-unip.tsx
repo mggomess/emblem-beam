@@ -15,76 +15,123 @@ export function DiplomaUnip({ state, onMecChange, draggableMec = true }: Props) 
   return (
     <>
       {/* ============ FOLHA 1 — FRENTE ============ */}
-      <div className="doc-sheet a4-landscape font-serif-doc relative">
-        {/* Moldura dourada arabesco */}
-        <div
-          className="pointer-events-none absolute inset-[6mm] border-[6px]"
-          style={{
-            borderImage:
-              "repeating-linear-gradient(45deg, #b8860b 0 6px, #daa520 6px 12px, #8b6914 12px 18px) 20",
-          }}
-        />
-        <div className="pointer-events-none absolute inset-[11mm] border-2 border-[#8b6914]" />
-        <div className="pointer-events-none absolute inset-[13mm] border border-[#daa520]/60" />
-
-        {["top-[10mm] left-[10mm]", "top-[10mm] right-[10mm]", "bottom-[10mm] left-[10mm]", "bottom-[10mm] right-[10mm]"].map((pos, i) => (
-          <div key={i} className={`pointer-events-none absolute ${pos} size-8 rounded-full border-4 border-[#b8860b]`} />
-        ))}
-
-        <div
-          className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.06]"
-          style={{
-            backgroundImage: "url(/simbolo.png)",
-            backgroundRepeat: "no-repeat",
-            backgroundPosition: "center",
-            backgroundSize: "45%",
-          }}
+      <div
+        className="doc-sheet a4-portrait font-serif-doc relative overflow-hidden bg-white"
+        style={{
+          WebkitPrintColorAdjust: "exact",
+          printColorAdjust: "exact",
+        }}
+      >
+        {/* Imagem completa utilizada como fundo da primeira folha */}
+        <img
+          src="/images/fundo-unip.png"
+          alt=""
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 z-0 h-full w-full select-none"
+          style={{ objectFit: "fill" }}
         />
 
-        {/* Título centralizado gótico */}
-        <div className="relative z-10 mt-[20mm] text-center">
-          <div className="font-gothic text-[54px] leading-none text-[#5a3e0a]">Universidade Paulista</div>
-          <div className="mt-2 font-cinzel text-xs tracking-[0.5em] text-[#5a3e0a]">DIPLOMA</div>
-        </div>
+        {/* Conteúdo principal dentro da área superior da imagem */}
+        <div
+          className="absolute z-10 text-center text-black"
+          style={{
+            left: "9%",
+            right: "9%",
+            top: "17%",
+          }}
+        >
+          <p className="text-[12px] leading-[1.8]">
+            O Magnífico Reitor da Universidade Paulista, no uso de suas atribuições,
+            confere a
+          </p>
 
-        {/* Corpo serifado centralizado */}
-        <div className="relative z-10 mx-auto mt-8 max-w-[220mm] text-center text-[13px] leading-[2.1] text-black">
-          <p>O Magnífico Reitor da Universidade Paulista, no uso de suas atribuições, confere a</p>
-          <div className="my-3 font-vibes text-[42px] leading-none text-[#5a3e0a]">
+          <div className="my-5 font-vibes text-[38px] leading-none text-[#5a3e0a]">
             {ph(state.nomeAluno)}
           </div>
-          <p>
+
+          <p className="text-[11px] leading-[1.8]">
             portador(a) do CPF nº {ph(state.cpf)}, matrícula {ph(state.matricula)},
             havendo concluído o Curso Superior de
           </p>
-          <div className="mt-2 font-cinzel text-[22px] font-bold uppercase tracking-wider text-[#5a3e0a]">
+
+          <div className="mt-3 font-cinzel text-[18px] font-bold uppercase tracking-wide text-[#5a3e0a]">
             {ph(state.cursoSuperior)}
           </div>
-          <p className="mt-2">
-            o título de <b className="uppercase">{ph(state.titulo)}</b>, nos termos da legislação vigente,
-            Portaria MEC nº {ph(state.portariaMec)}, Resolução CNE/CP nº {ph(state.resolucao)}.
+
+          <p className="mt-3 text-[11px] leading-[1.8]">
+            o título de <b className="uppercase">{ph(state.titulo)}</b>, nos termos da
+            legislação vigente, Portaria MEC nº {ph(state.portariaMec)}, Resolução
+            CNE/CP nº {ph(state.resolucao)}.
           </p>
-          <p className="mt-2 text-[11px] italic">
-            Colação de grau em {ph(state.dataColacao)} — período letivo {ph(state.periodoInicio)} a {ph(state.periodoFim)}.
+
+          <p className="mt-3 text-[10px] italic leading-[1.7]">
+            Colação de grau em {ph(state.dataColacao)}, período letivo de{" "}
+            {ph(state.periodoInicio)} a {ph(state.periodoFim)}.
           </p>
-          <p className="mt-3">
-            <b>Universidade Paulista, {ph(state.cidadeEmissao)} - {ph(state.uf)}, {ph(state.dataEmissao)}.</b>
+
+          <p className="mt-4 text-[10px] font-bold">
+            {ph(state.cidadeEmissao)} - {ph(state.uf)}, {ph(state.dataEmissao)}.
           </p>
         </div>
 
-        {/* Rodapé — uma única assinatura centralizada da Reitora */}
-        <div className="absolute inset-x-0 bottom-[20mm] z-10 flex justify-center">
-          <div className="w-[90mm] text-center">
-            <div className="h-14" />
-            <div className="border-t border-black" />
-            <div className="mt-1 text-[11px] font-bold uppercase">
+        {/* Identificação inferior esquerda, alinhada às linhas existentes na imagem */}
+        <div
+          className="absolute z-10 text-[8.5px] leading-tight text-black"
+          style={{
+            left: "5.3%",
+            top: "62.2%",
+            width: "43.5%",
+          }}
+        >
+          <div className="flex h-[52px] items-end px-2 pb-1">
+            <span className="font-semibold uppercase">
               {state.reitor || "SANDRA REJANE GOMES MIESSA"}
-            </div>
-            <div className="text-[10px] uppercase tracking-wider text-neutral-700">Reitora</div>
+            </span>
+          </div>
+          <div className="flex h-[52px] items-end px-2 pb-1">
+            <span>{ph(state.secretarioGeral)}</span>
+          </div>
+          <div className="flex h-[52px] items-end px-2 pb-1">
+            <span>RA: {ph(state.raCode || state.matricula)}</span>
+          </div>
+          <div className="flex h-[52px] items-end px-2 pb-1">
+            <span>RG: {ph(state.rg)} | CPF: {ph(state.cpf)}</span>
+          </div>
+          <div className="flex h-[52px] items-end px-2 pb-1">
+            <span>Código: {ph(state.codigoUnico)}</span>
           </div>
         </div>
 
-        <MecStampBlock mec={state.mec} onChange={onMecChange} draggable={draggableMec} />
+        {/* Área de registro inferior direita */}
+        <div
+          className="absolute z-10 flex items-center justify-center p-5 text-center text-[8.5px] leading-relaxed text-black"
+          style={{
+            right: "5.3%",
+            top: "61.4%",
+            width: "39.1%",
+            height: "27.5%",
+          }}
+        >
+          <div>
+            <p className="font-bold uppercase">Registro do diploma</p>
+            <p className="mt-3">
+              Registrado sob as condições constantes no verso, nos termos da legislação
+              vigente e do Regimento Geral desta Universidade.
+            </p>
+            <p className="mt-3">
+              Livro {ph(state.livro)}, folha {ph(state.folhaLivro)}, lote {ph(state.lote)}.
+            </p>
+            <p className="mt-3 break-all font-semibold">
+              {ph(state.codigoUnico)}
+            </p>
+          </div>
+        </div>
+
+        <MecStampBlock
+          mec={state.mec}
+          onChange={onMecChange}
+          draggable={draggableMec}
+        />
       </div>
 
       {/* ============ FOLHA 2 — VERSO ============ */}

@@ -122,19 +122,69 @@ export function HistoricoSuperior({ state }: Props) {
   const maxLinhas = 25;
 
   return (
-    <div
-      className="doc-sheet a4-portrait"
-      style={{
-        position: "relative",
-        width: "210mm",
-        height: "297mm",
-        overflow: "hidden",
-        background: "#fff",
-        color: "#000",
-        WebkitPrintColorAdjust: "exact",
-        printColorAdjust: "exact",
-      }}
-    >
+    <>
+      <style>{`
+        @page historico-unip-page {
+          size: A4 portrait;
+          margin: 0;
+        }
+
+        .historico-unip-a4 {
+          page: historico-unip-page;
+          position: relative !important;
+          width: 210mm !important;
+          min-width: 210mm !important;
+          max-width: 210mm !important;
+          height: 297mm !important;
+          min-height: 297mm !important;
+          max-height: 297mm !important;
+          flex: 0 0 210mm !important;
+          aspect-ratio: 210 / 297 !important;
+          overflow: hidden !important;
+          transform: none !important;
+          box-sizing: border-box !important;
+          page-break-before: always;
+          page-break-after: always;
+          break-before: page;
+          break-after: page;
+          break-inside: avoid;
+        }
+
+        @media print {
+          .historico-unip-a4 {
+            width: 210mm !important;
+            min-width: 210mm !important;
+            max-width: 210mm !important;
+            height: 297mm !important;
+            min-height: 297mm !important;
+            max-height: 297mm !important;
+            margin: 0 !important;
+            box-shadow: none !important;
+            transform: none !important;
+            overflow: hidden !important;
+          }
+        }
+      `}</style>
+
+      <div
+        className="doc-sheet a4-portrait historico-unip-a4"
+        style={{
+          position: "relative",
+          width: "210mm",
+          minWidth: "210mm",
+          maxWidth: "210mm",
+          height: "297mm",
+          minHeight: "297mm",
+          maxHeight: "297mm",
+          flex: "0 0 210mm",
+          overflow: "hidden",
+          background: "#fff",
+          color: "#000",
+          boxSizing: "border-box",
+          WebkitPrintColorAdjust: "exact",
+          printColorAdjust: "exact",
+        }}
+      >
       <img
         src="/images/historico-unip.png"
         alt=""
@@ -390,6 +440,7 @@ export function HistoricoSuperior({ state }: Props) {
       >
         {state.reitor || "—"}
       </div>
-    </div>
+      </div>
+    </>
   );
 }

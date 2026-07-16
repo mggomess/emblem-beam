@@ -1,6 +1,4 @@
-import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
-import QRCode from "qrcode";
-import { ufNome } from "./uf";
+import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage } from "pdf-lib";
 import { buildVerifyUrl } from "./certificate-pdf";
 
 async function fetchPng(url: string): Promise<ArrayBuffer | null> {
@@ -27,173 +25,160 @@ export type HistoricoInput = {
   studentEmail?: string | null;
   institutionName: string;
   institutionLogoUrl?: string | null;
-  uf: string; // UF principal (institucional) para brasão/bandeira/marca d'água
+  uf: string;
   rows: HistoricoCourseRow[];
-  code: string; // código único do histórico
-  /** Link personalizado que será codificado no QR Code. Se ausente, usa a URL padrão de verificação. */
+  code: string;
   authUrl?: string | null;
   issuedAt: Date;
   verifyBaseUrl?: string | null;
 };
 
+const PAGE_WIDTH = 595;
+const PAGE_HEIGHT = 842;
+const TEXT = rgb(0.06, 0.12, 0.26);
+
+function formatDate(date: Date): string {
+  return date.toLocaleDateString("pt-BR");
+}
+
+function fitText(font: PDFFont, text: string, maxWidth: number, initialSize: number, minSize = 5): number {
+  let size = initialSize;
+  while (font.widthOfTextAtSize(text, size) > maxWidth && size > minSize) size -= 0.25;
+  return size;
+}
+
+function drawCentered(
+  page: PDFPage,
+  font: PDFFont,
+  text: string,
+  centerX: number,
+  y: number,
+  size: number,
+  maxWidth: number,
+): void {
+  const fitted = fitText(font, text, maxWidth, size);
+  const width = font.widthOfTextAtSize(text, fitted);
+  page.drawText(text, {
+    x: centerX - width / 2,
+    y,
+    size: fitted,
+    font,
+    color: TEXT,
+  });
+}
+
+function drawCell(
+  page: PDFPage,
+  font: PDFFont,
+  value: string,
+  x: number,
+  y: number,
+  width: number,
+  size = 6.2,
+  align: "left" | "center" = "center",
+): void {
+  const text = value || "";
+  const fitted = fitText(font, text, width - 4, size, 4.5);
+  const textWidth = font.widthOfTextAtSize(text, fitted);
+  const drawX = align === "left" ? x + 2 : x + (width - textWidth) / 2;
+  page.drawText(text, {
+    x: drawX,
+    y,
+    size: fitted,
+    font,
+    color: TEXT,
+  });
+}
+
 export async function generateHistoricoPdf(input: HistoricoInput): Promise<Uint8Array> {
   const pdfDoc = await PDFDocument.create();
-  // A4 retrato
-  let page = pdfDoc.addPage([595, 842]);
-  const { width, height } = page.getSize();
+  const page = pdfDoc.addPage([PAGE_WIDTH, PAGE_HEIGHT]);
 
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
   const bold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-  const italic = await pdfDoc.embedFont(StandardFonts.HelveticaOblique);
 
-  // Borda
-  page.drawRectangle({
-    x: 20, y: 20, width: width - 40, height: height - 40,
-    borderColor: rgb(0.15, 0.24, 0.72), borderWidth: 1.5,
-  });
-
-  const uf = input.uf.toLowerCase();
-  const [brasao, bandeira] = await Promise.all([
-    fetchPng(`/estados/brasoes/${uf}.png`),
-    fetchPng(`/estados/bandeiras/${uf}.png`),
-  ]);
-
-  // Marca d'água central usando o próprio brasão do estado
-  if (brasao) {
-    try {
-      const img = await pdfDoc.embedPng(brasao);
-      const size = 380;
-      page.drawImage(img, {
-        x: (width - size) / 2,
-        y: (height - size) / 2,
-        width: size, height: size, opacity: 0.06,
-      });
-    } catch { /* ignore */ }
+  const backgroundBuffer = await fetchPng("/images/historico-unip.png");
+  if (!backgroundBuffer) {
+    throw new Error(
+      "Fundo do histórico não encontrado. Salve a imagem como public/images/historico-unip.png.",
+    );
   }
 
-  // Cabeçalho: bandeira (esquerda), logo (centro), brasão (direita)
-  if (bandeira) {
-    try {
-      const img = await pdfDoc.embedPng(bandeira);
-      page.drawImage(img, { x: 45, y: height - 90, width: 55, height: 40 });
-    } catch { /* skip */ }
-  }
-  if (brasao) {
-    try {
-      const img = await pdfDoc.embedPng(brasao);
-      page.drawImage(img, { x: width - 100, y: height - 100, width: 55, height: 55 });
-    } catch { /* skip */ }
-  }
-  if (input.institutionLogoUrl) {
-    const buf = await fetchPng(input.institutionLogoUrl);
-    if (buf) {
-      try {
-        const img = await pdfDoc.embedPng(buf);
-        page.drawImage(img, { x: (width - 55) / 2, y: height - 100, width: 55, height: 55 });
-      } catch { /* skip */ }
-    }
-  }
-
-  // Cabeçalho textual
-  const instName = input.institutionName.toUpperCase();
-  page.drawText(instName, {
-    x: width / 2 - bold.widthOfTextAtSize(instName, 11) / 2,
-    y: height - 115, size: 11, font: bold, color: rgb(0.15, 0.15, 0.25),
-  });
-  const stateLabel = `${ufNome(input.uf).toUpperCase()} — ${input.uf.toUpperCase()}`;
-  page.drawText(stateLabel, {
-    x: width / 2 - font.widthOfTextAtSize(stateLabel, 8) / 2,
-    y: height - 128, size: 8, font, color: rgb(0.4, 0.4, 0.5),
+  const background = await pdfDoc.embedPng(backgroundBuffer);
+  page.drawImage(background, {
+    x: 0,
+    y: 0,
+    width: PAGE_WIDTH,
+    height: PAGE_HEIGHT,
   });
 
-  // Título
-  const title = "HISTÓRICO ESCOLAR";
-  page.drawText(title, {
-    x: width / 2 - bold.widthOfTextAtSize(title, 20) / 2,
-    y: height - 165, size: 20, font: bold, color: rgb(0.15, 0.24, 0.72),
-  });
+  const issueDate = formatDate(input.issuedAt);
+  const firstRow = input.rows[0];
+  const courseName = firstRow?.courseName ?? "";
+  const totalWorkload = input.rows.reduce((sum, row) => sum + (row.workload || 0), 0);
 
-  // Dados do aluno
-  let y = height - 205;
-  const drawField = (label: string, value: string) => {
-    page.drawText(label, { x: 50, y, size: 9, font: bold, color: rgb(0.35, 0.35, 0.45) });
-    page.drawText(value, { x: 130, y, size: 10, font, color: rgb(0.15, 0.15, 0.2) });
-    y -= 16;
+  // Cabeçalho e dados do aluno
+  drawCentered(page, bold, input.studentName.toUpperCase(), 329, 756, 8.5, 338);
+  drawCentered(page, font, issueDate, 529, 756, 7, 66);
+
+  drawCentered(page, font, input.studentCpf ?? "", 282, 668, 7, 80);
+  drawCentered(page, font, input.uf?.toUpperCase() ?? "", 409, 710, 7, 34);
+  drawCentered(page, font, "BRASILEIRA", 510, 710, 7, 122);
+
+  drawCentered(page, bold, courseName.toUpperCase(), 151, 523, 8, 254);
+  drawCentered(page, font, String(totalWorkload), 539, 505, 7, 72);
+  drawCentered(page, font, String(totalWorkload), 539, 478, 7, 72);
+
+  // Relação de disciplinas. Mantém os dados existentes sem exigir nova tabela.
+  // Cada certificado emitido é exibido como uma linha do histórico.
+  const tableTopY = 467;
+  const rowHeight = 14.2;
+  const maxRows = 29;
+
+  // Colunas aproximadas conforme o fundo 1085 x 1450.
+  const columns = {
+    periodo: { x: 10, width: 49 },
+    codigo: { x: 59, width: 49 },
+    descricao: { x: 108, width: 269 },
+    ch: { x: 377, width: 37 },
+    letivo: { x: 414, width: 55 },
+    media: { x: 469, width: 48 },
+    situacao: { x: 517, width: 68 },
   };
-  drawField("Aluno:", input.studentName);
-  if (input.studentCpf) drawField("CPF:", input.studentCpf);
-  if (input.studentEmail) drawField("Email:", input.studentEmail);
-  drawField("Emitido em:", input.issuedAt.toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" }));
 
-  // Tabela de cursos concluídos
-  y -= 10;
-  page.drawLine({ start: { x: 45, y }, end: { x: width - 45, y }, thickness: 0.6, color: rgb(0.15, 0.24, 0.72) });
-  y -= 16;
-  const headers = [
-    { text: "Curso", x: 50 },
-    { text: "Carga", x: 340 },
-    { text: "Emissão", x: 400 },
-    { text: "Código", x: 470 },
-  ];
-  headers.forEach((h) => page.drawText(h.text, { x: h.x, y, size: 9, font: bold, color: rgb(0.3, 0.3, 0.4) }));
-  y -= 6;
-  page.drawLine({ start: { x: 45, y }, end: { x: width - 45, y }, thickness: 0.3, color: rgb(0.7, 0.7, 0.8) });
-  y -= 14;
+  input.rows.slice(0, maxRows).forEach((row, index) => {
+    const y = tableTopY - index * rowHeight;
+    const periodo = String(index + 1);
+    const codigo = row.certificateCode.slice(0, 12);
+    const periodoLetivo = String(row.issuedAt.getFullYear());
 
-  let totalWorkload = 0;
-  for (const row of input.rows) {
-    if (y < 140) {
-      // nova página
-      page = pdfDoc.addPage([595, 842]);
-      y = height - 60;
-    }
-    totalWorkload += row.workload;
-    // Nome do curso truncado
-    let name = row.courseName;
-    while (font.widthOfTextAtSize(name, 10) > 280 && name.length > 3) name = name.slice(0, -1);
-    if (name !== row.courseName) name = name.slice(0, -1) + "…";
-    page.drawText(name, { x: 50, y, size: 10, font, color: rgb(0.15, 0.15, 0.2) });
-    page.drawText(`${row.workload}h`, { x: 340, y, size: 10, font, color: rgb(0.15, 0.15, 0.2) });
-    page.drawText(row.issuedAt.toLocaleDateString("pt-BR"), { x: 400, y, size: 9, font, color: rgb(0.3, 0.3, 0.4) });
-    page.drawText(row.certificateCode.slice(0, 14), { x: 470, y, size: 8, font, color: rgb(0.4, 0.4, 0.5) });
-    y -= 16;
-  }
-
-  y -= 4;
-  page.drawLine({ start: { x: 45, y }, end: { x: width - 45, y }, thickness: 0.3, color: rgb(0.7, 0.7, 0.8) });
-  y -= 18;
-  const totalLabel = `Carga horária total: ${totalWorkload}h`;
-  page.drawText(totalLabel, {
-    x: width - 45 - bold.widthOfTextAtSize(totalLabel, 11),
-    y, size: 11, font: bold, color: rgb(0.15, 0.24, 0.72),
+    drawCell(page, font, periodo, columns.periodo.x, y, columns.periodo.width);
+    drawCell(page, font, codigo, columns.codigo.x, y, columns.codigo.width, 5.4);
+    drawCell(page, font, row.courseName.toUpperCase(), columns.descricao.x, y, columns.descricao.width, 6.2, "left");
+    drawCell(page, font, String(row.workload), columns.ch.x, y, columns.ch.width);
+    drawCell(page, font, periodoLetivo, columns.letivo.x, y, columns.letivo.width);
+    drawCell(page, font, "", columns.media.x, y, columns.media.width);
+    drawCell(page, bold, "AP", columns.situacao.x, y, columns.situacao.width);
   });
 
-  // Rodapé: código + QR CENTRALIZADO
-  const footer = `Código do histórico: ${input.code}`;
-  page.drawText(footer, {
-    x: 50, y: 150, size: 9, font: italic, color: rgb(0.35, 0.35, 0.45),
-  });
+  // Rodapé
+  drawCentered(page, font, issueDate, 48, 69, 5.8, 68);
+  drawCentered(page, font, courseName.toUpperCase(), 314, 69, 5.8, 80);
 
-  const qrTarget =
+  const verifyUrl =
     (input.authUrl && input.authUrl.trim()) ||
     buildVerifyUrl(input.code, input.verifyBaseUrl);
 
-  const qrDataUrl = await QRCode.toDataURL(qrTarget, { margin: 0, width: 400 });
-  const qrPng = await fetch(qrDataUrl).then((r) => r.arrayBuffer());
-  const qrImg = await pdfDoc.embedPng(qrPng);
-  const qrSize = 110;
-  page.drawImage(qrImg, {
-    x: (width - qrSize) / 2, y: 55,
-    width: qrSize, height: qrSize,
-  });
-
-  const verifyLabel = `VERIFIQUE A AUTENTICIDADE COD: ${input.code.toUpperCase()}`;
-  const labelW = bold.widthOfTextAtSize(verifyLabel, 8.5);
-  page.drawText(verifyLabel, {
-    x: (width - labelW) / 2, y: 42,
-    size: 8.5, font: bold, color: rgb(0.10, 0.18, 0.55),
+  const validationText = `${verifyUrl} | Código: ${input.code}`;
+  const validationSize = fitText(font, validationText, 220, 5.2, 4);
+  page.drawText(validationText, {
+    x: 360,
+    y: 67,
+    size: validationSize,
+    font,
+    color: TEXT,
+    maxWidth: 220,
   });
 
   return await pdfDoc.save();
 }
-

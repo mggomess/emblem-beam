@@ -13,30 +13,31 @@ const ph = (value?: string | null, fallback = "-"): ReactNode =>
 
 const MM = (value: number) => `${value}mm`;
 
+// Coordenadas calibradas a partir do diploma de referência em A4 horizontal.
 const POS = {
   front: {
-    titleTop: 15.3,
+    titleTop: 37.0,
     titleLeft: 55,
     titleWidth: 187,
-    introTop: 52.5,
+    introTop: 65.5,
     introLeft: 51,
     introWidth: 195,
-    degreeTop: 72.5,
+    degreeTop: 88.0,
     degreeLeft: 43,
     degreeWidth: 211,
-    studentTop: 84.5,
+    studentTop: 100.0,
     studentLeft: 38,
     studentWidth: 221,
-    identityTop: 101,
+    identityTop: 115.5,
     identityLeft: 46,
     identityWidth: 205,
-    grantTop: 118,
+    grantTop: 133.0,
     grantLeft: 49,
     grantWidth: 199,
-    dateTop: 136,
+    dateTop: 146.5,
     dateLeft: 49,
     dateWidth: 199,
-    signatureTop: 156,
+    signatureTop: 159.0,
     signatureLeft: 95,
     signatureWidth: 107,
     validationTop: 171,
@@ -152,10 +153,10 @@ export function DiplomaUnip({
             left: MM(POS.front.titleLeft),
             width: MM(POS.front.titleWidth),
             ...oldEnglishBase,
-            fontSize: "14mm",
+            fontSize: "13.4mm",
             lineHeight: 1,
-            letterSpacing: "-0.15mm",
-            transform: "scaleX(1.06) scaleY(0.78)",
+            letterSpacing: "-0.10mm",
+            transform: "scaleX(1) scaleY(0.90)",
           }}
         >
           Universidade Paulista
@@ -173,12 +174,16 @@ export function DiplomaUnip({
             lineHeight: 1.42,
           }}
         >
-          <div>A Reitora da Universidade Paulista, no uso de suas atribuições</div>
           <div>
-            e tendo em vista a conclusão do Curso Superior de {ph(state.cursoSuperior)},
+            A Reitora da Universidade Paulista, no uso de suas atribuições
           </div>
           <div>
-            na data de {ph(state.dataColacao)}, e a Colação de Grau na data de {ph(state.dataColacao)}, confere o título de
+            e tendo em vista a conclusão do Curso Superior de{" "}
+            {ph(state.cursoSuperior)},
+          </div>
+          <div>
+            na data de {ph(state.dataColacao)}, e a Colação de Grau na data de{" "}
+            {ph(state.dataColacao)}, confere o título de
           </div>
         </div>
 
@@ -191,10 +196,10 @@ export function DiplomaUnip({
             left: MM(POS.front.degreeLeft),
             width: MM(POS.front.degreeWidth),
             ...oldEnglishBase,
-            fontSize: "6.4mm",
+            fontSize: "6.6mm",
             lineHeight: 1,
             letterSpacing: "-0.05mm",
-            transform: "scaleX(1.04) scaleY(0.82)",
+            transform: "scaleX(1.02) scaleY(0.88)",
           }}
         >
           {ph(state.titulo)} em {ph(state.cursoSuperior)} a
@@ -209,10 +214,10 @@ export function DiplomaUnip({
             left: MM(POS.front.studentLeft),
             width: MM(POS.front.studentWidth),
             ...oldEnglishBase,
-            fontSize: "8mm",
+            fontSize: "8.2mm",
             lineHeight: 1,
             letterSpacing: "-0.08mm",
-            transform: "scaleX(1.04) scaleY(0.82)",
+            transform: "scaleX(1.02) scaleY(0.88)",
           }}
         >
           {ph(state.nomeAluno)}
@@ -231,7 +236,8 @@ export function DiplomaUnip({
           }}
         >
           <div>
-            {nacionalidade}, natural de {naturalidade || "-"}, nascido(a) em {ph(state.dataNasc)},
+            {nacionalidade}, natural de {naturalidade || "-"}, nascido(a) em{" "}
+            {ph(state.dataNasc)},
           </div>
           <div>
             RG nº {ph(state.rg)} e CPF nº {ph(state.cpf)},
@@ -251,7 +257,10 @@ export function DiplomaUnip({
           }}
         >
           <div>e outorga-lhe o presente Diploma,</div>
-          <div>a fim de que possa gozar de todos os direitos e prerrogativas legais.</div>
+          <div>
+            a fim de que possa gozar de todos os direitos e prerrogativas
+            legais.
+          </div>
         </div>
 
         <div
@@ -263,10 +272,10 @@ export function DiplomaUnip({
             left: MM(POS.front.dateLeft),
             width: MM(POS.front.dateWidth),
             ...oldEnglishBase,
-            fontSize: "4.6mm",
+            fontSize: "4.8mm",
             lineHeight: 1,
             letterSpacing: "-0.03mm",
-            transform: "scaleX(1.03) scaleY(0.84)",
+            transform: "scaleX(1.01) scaleY(0.90)",
           }}
         >
           {cidadeEmissao}, {ph(state.dataEmissao)}.
@@ -284,11 +293,26 @@ export function DiplomaUnip({
           }}
         >
           <div style={{ height: "10mm" }} />
-          <div style={{ borderTop: "0.25mm solid #000", width: "58mm", margin: "0 auto" }} />
-          <div style={{ marginTop: "1.2mm", fontSize: "2.55mm", fontWeight: 700, lineHeight: 1 }}>
+          <div
+            style={{
+              borderTop: "0.25mm solid #000",
+              width: "58mm",
+              margin: "0 auto",
+            }}
+          />
+          <div
+            style={{
+              marginTop: "1.2mm",
+              fontSize: "2.55mm",
+              fontWeight: 700,
+              lineHeight: 1,
+            }}
+          >
             {reitor}
           </div>
-          <div style={{ marginTop: "0.8mm", fontSize: "2.4mm", lineHeight: 1 }}>Reitora</div>
+          <div style={{ marginTop: "0.8mm", fontSize: "2.4mm", lineHeight: 1 }}>
+            Reitora
+          </div>
         </div>
 
         <div
@@ -306,7 +330,9 @@ export function DiplomaUnip({
         >
           <div>Documento digital</div>
           <div>Código de validação:</div>
-          <div style={{ fontWeight: 700, overflowWrap: "anywhere" }}>{ph(state.codigoUnico)}</div>
+          <div style={{ fontWeight: 700, overflowWrap: "anywhere" }}>
+            {ph(state.codigoUnico)}
+          </div>
         </div>
 
         <div style={{ display: "none" }} aria-hidden="true">
@@ -338,13 +364,17 @@ export function DiplomaUnip({
             lineHeight: 1.45,
           }}
         >
-          <div style={{ fontWeight: 700 }}>{state.mantenedora || "ASSUPERO - ENSINO SUPERIOR LTDA"}</div>
+          <div style={{ fontWeight: 700 }}>
+            {state.mantenedora || "ASSUPERO - ENSINO SUPERIOR LTDA"}
+          </div>
           <div>CNPJ {state.cnpj || "-"}</div>
           <div style={{ marginTop: "11mm" }}>Universidade Paulista - UNIP</div>
           <div style={{ marginTop: "11mm" }}>
             Recredenciada pela Portaria MEC nº {ph(state.portariaMec)}
           </div>
-          <div style={{ marginTop: "11mm" }}>Curso Superior de {ph(state.cursoSuperior)}</div>
+          <div style={{ marginTop: "11mm" }}>
+            Curso Superior de {ph(state.cursoSuperior)}
+          </div>
           <div style={{ marginTop: "4mm" }}>{ph(state.resolucao)}</div>
         </div>
 
@@ -361,18 +391,37 @@ export function DiplomaUnip({
             lineHeight: 1.35,
           }}
         >
-          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4mm" }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              marginBottom: "4mm",
+            }}
+          >
             <b>RA: {state.raCode || "-"}</b>
             <b>LOTE: {state.lote || "-"}</b>
           </div>
-          <div style={{ textAlign: "center", fontWeight: 700 }}>{state.mantenedora || "ASSUPERO - ENSINO SUPERIOR LTDA"}</div>
+          <div style={{ textAlign: "center", fontWeight: 700 }}>
+            {state.mantenedora || "ASSUPERO - ENSINO SUPERIOR LTDA"}
+          </div>
           <div style={{ textAlign: "center" }}>CNPJ {state.cnpj || "-"}</div>
-          <div style={{ textAlign: "center", marginTop: "3mm", fontWeight: 700 }}>UNIVERSIDADE PAULISTA - UNIP</div>
-          <div style={{ textAlign: "center", marginTop: "7mm", fontWeight: 700 }}>Secretaria Geral</div>
-          <div style={{ textAlign: "center", fontWeight: 700 }}>Departamento de Registro de Diplomas</div>
+          <div
+            style={{ textAlign: "center", marginTop: "3mm", fontWeight: 700 }}
+          >
+            UNIVERSIDADE PAULISTA - UNIP
+          </div>
+          <div
+            style={{ textAlign: "center", marginTop: "7mm", fontWeight: 700 }}
+          >
+            Secretaria Geral
+          </div>
+          <div style={{ textAlign: "center", fontWeight: 700 }}>
+            Departamento de Registro de Diplomas
+          </div>
 
           <div style={{ marginTop: "8mm" }}>
-            Diploma registrado sob nº {ph(state.folhaLivro)}, Livro {ph(state.livro)}, em {ph(state.dataEmissao)}.
+            Diploma registrado sob nº {ph(state.folhaLivro)}, Livro{" "}
+            {ph(state.livro)}, em {ph(state.dataEmissao)}.
           </div>
 
           <div style={{ marginTop: "8mm" }}>
@@ -384,11 +433,21 @@ export function DiplomaUnip({
           </div>
 
           <div style={{ height: "18mm" }} />
-          <div style={{ borderTop: "0.25mm solid #000", width: "58mm", margin: "0 auto" }} />
-          <div style={{ marginTop: "1mm", textAlign: "center", fontWeight: 700 }}>
+          <div
+            style={{
+              borderTop: "0.25mm solid #000",
+              width: "58mm",
+              margin: "0 auto",
+            }}
+          />
+          <div
+            style={{ marginTop: "1mm", textAlign: "center", fontWeight: 700 }}
+          >
             {ph(state.secretarioAdjunto)}
           </div>
-          <div style={{ textAlign: "center" }}>Secretário(a) Geral Adjunto(a)</div>
+          <div style={{ textAlign: "center" }}>
+            Secretário(a) Geral Adjunto(a)
+          </div>
         </div>
       </div>
     </>

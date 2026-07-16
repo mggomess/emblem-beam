@@ -11,9 +11,9 @@ type Props = {
 const ph = (value?: string | null, fallback = "-"): ReactNode =>
   value?.trim() ? value : <span className="du-placeholder">{fallback}</span>;
 
-const bodyFont = '"Times New Roman", Times, "Liberation Serif", serif';
+const bodyFont = '"EB Garamond", "Times New Roman", Times, serif';
 const gothicFont =
-  '"UnifrakturMaguntia", "Old English Text MT", "Cloister Black", "Lucida Blackletter", serif';
+  '"UnifrakturCook", "Old English Text MT", "Engravers Old English", "UnifrakturMaguntia", serif';
 
 const pageStyle: CSSProperties = {
   position: "relative",
@@ -48,6 +48,8 @@ export function DiplomaUnip({
   return (
     <>
       <style>{`
+        @import url("https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&family=UnifrakturCook:wght@700&display=swap");
+
         .du-page, .du-page * { box-sizing: border-box; }
         .du-placeholder { color: #777; }
         .du-nowrap { white-space: nowrap; }
@@ -92,8 +94,10 @@ export function DiplomaUnip({
             position: "absolute",
             inset: 0,
             width: "297mm",
-            height: "210mm",
-            objectFit: "fill",
+            height: "auto",
+            maxWidth: "none",
+            objectFit: "contain",
+            objectPosition: "top left",
             userSelect: "none",
             pointerEvents: "none",
             zIndex: 0,
@@ -115,10 +119,10 @@ export function DiplomaUnip({
             className="du-nowrap"
             style={{
               fontFamily: gothicFont,
-              fontSize: "13.2mm",
-              lineHeight: 0.95,
-              fontWeight: 400,
-              letterSpacing: "-0.35mm",
+              fontSize: "12.2mm",
+              lineHeight: 1,
+              fontWeight: 700,
+              letterSpacing: "-0.15mm",
             }}
           >
             Universidade Paulista
@@ -156,9 +160,10 @@ export function DiplomaUnip({
               marginTop: "3.2mm",
               minHeight: "11mm",
               fontFamily: gothicFont,
-              fontSize: "8.1mm",
-              lineHeight: 1,
-              letterSpacing: "-0.16mm",
+              fontSize: "7.2mm",
+              lineHeight: 1.05,
+              fontWeight: 700,
+              letterSpacing: "0",
             }}
           >
             {ph(state.titulo)} em {ph(state.cursoSuperior)} a
@@ -168,12 +173,12 @@ export function DiplomaUnip({
             style={{
               marginTop: "3.3mm",
               minHeight: "10mm",
-              fontFamily: bodyFont,
-              fontSize: "7mm",
+              fontFamily: gothicFont,
+              fontSize: "8mm",
               fontWeight: 700,
               lineHeight: 1.05,
-              textTransform: "uppercase",
-              letterSpacing: "0.12mm",
+              textTransform: "none",
+              letterSpacing: "0",
             }}
           >
             {ph(state.nomeAluno)}

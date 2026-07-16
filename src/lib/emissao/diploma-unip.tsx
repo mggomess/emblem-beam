@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type { EmissaoState } from "./types";
 import { MecStampBlock } from "./mec-stamp";
 
@@ -7,26 +8,34 @@ type Props = {
   draggableMec?: boolean;
 };
 
-const ph = (value?: string | null, fallback = "—") =>
-  value && value.trim() ? value : <span className="text-neutral-400">{fallback}</span>;
+const ph = (value?: string | null, fallback = "—"): ReactNode =>
+  value?.trim() ? value : <span className="text-neutral-400">{fallback}</span>;
 
-/** UNIP, Diploma tradicional. Duas folhas: frente e verso. */
+const gothicFont = '"UnifrakturMaguntia", "Old English Text MT", serif';
+const bodyFont = '"Times New Roman", Times, serif';
+
+/** UNIP, Diploma Tradicional em duas folhas: frente e verso. */
 export function DiplomaUnip({
   state,
   onMecChange,
   draggableMec = true,
 }: Props) {
+  const naturalidade = [state.cidadeNasc, state.estadoNasc]
+    .filter((item) => item?.trim())
+    .join(" - ");
+
   return (
     <>
       {/* ============ FOLHA 1, FRENTE ============ */}
       <div
-        className="doc-sheet a4-portrait relative overflow-hidden bg-white"
+        className="doc-sheet a4-landscape relative overflow-hidden bg-white"
         style={{
           WebkitPrintColorAdjust: "exact",
           printColorAdjust: "exact",
-          fontFamily: '"Times New Roman", Times, serif',
+          fontFamily: bodyFont,
         }}
       >
+        {/* A imagem contém somente a moldura, o brasão e a logomarca. */}
         <img
           src="/images/fundo-unip.png"
           alt=""
@@ -35,120 +44,134 @@ export function DiplomaUnip({
           style={{ objectFit: "fill" }}
         />
 
-        {/* Conteúdo principal do diploma, dentro da moldura superior */}
+        {/* Título, posicionado entre o brasão e a logomarca. */}
+        <div
+          className="absolute z-10 whitespace-nowrap text-center text-black"
+          style={{
+            top: "8.4%",
+            left: "21%",
+            right: "21%",
+            fontFamily: gothicFont,
+            fontSize: "38px",
+            lineHeight: 1,
+            fontWeight: 400,
+          }}
+        >
+          Universidade Paulista
+        </div>
+
+        {/* Corpo principal, seguindo a distribuição do modelo de referência. */}
         <div
           className="absolute z-10 text-center text-black"
           style={{
-            left: "14.5%",
-            right: "14.5%",
-            top: "6.6%",
+            top: "22.5%",
+            left: "20.5%",
+            right: "20.5%",
+            fontFamily: bodyFont,
+            fontSize: "10.5px",
+            lineHeight: 1.42,
           }}
         >
-          <div
-            className="whitespace-nowrap text-[35px] leading-none"
-            style={{ fontFamily: '"UnifrakturMaguntia", cursive' }}
-          >
-            Universidade Paulista
-          </div>
+          <p className="m-0">
+            A Reitora da Universidade Paulista, no uso de suas atribuições
+          </p>
 
-          <p className="mx-auto mt-6 max-w-[155mm] text-[10px] leading-[1.35]">
-            A Reitora da Universidade Paulista, no uso de suas atribuições e tendo em
-            vista a conclusão do Curso Superior de {ph(state.cursoSuperior)}, confere o
-            título de
+          <p className="m-0 mt-[3px]">
+            e tendo em vista a conclusão do Curso Superior de {ph(state.cursoSuperior)},
+          </p>
+
+          <p className="m-0 mt-[3px]">
+            na data de {ph(state.dataColacao)}, e a Colação de Grau na data de{" "}
+            {ph(state.dataColacao)}, confere o título de
           </p>
 
           <div
-            className="mt-3 text-[20px] leading-none"
-            style={{ fontFamily: '"UnifrakturMaguntia", cursive' }}
+            className="mt-[9px] text-black"
+            style={{
+              fontFamily: gothicFont,
+              fontSize: "22px",
+              lineHeight: 1.05,
+            }}
           >
-            {ph(state.titulo)} em {ph(state.cursoSuperior)}
+            {ph(state.titulo)} em {ph(state.cursoSuperior)} a
           </div>
 
           <div
-            className="mt-3 text-[25px] leading-none"
-            style={{ fontFamily: '"UnifrakturMaguntia", cursive' }}
+            className="mt-[8px] text-black"
+            style={{
+              fontFamily: gothicFont,
+              fontSize: "27px",
+              lineHeight: 1.05,
+            }}
           >
             {ph(state.nomeAluno)}
           </div>
 
-          <p className="mx-auto mt-4 max-w-[155mm] text-[9.5px] leading-[1.4]">
-            {ph(state.nacionalidade)}, natural de {ph(state.cidadeNasc)} - {ph(state.estadoNasc)},
-            nascido(a) em {ph(state.dataNasc)}, portador(a) do RG nº {ph(state.rg)} e CPF nº {ph(state.cpf)},
+          <p className="m-0 mt-[11px]">
+            {ph(state.nacionalidade, "brasileiro(a)")}, natural de{" "}
+            {naturalidade || "—"}, nascido(a) em {ph(state.dataNasc)},
           </p>
 
-          <p className="mx-auto mt-3 max-w-[155mm] text-[9.5px] leading-[1.4]">
-            e outorga-lhe o presente Diploma, a fim de que possa gozar de todos os direitos
-            e prerrogativas legais.
+          <p className="m-0 mt-[2px]">
+            RG nº {ph(state.rg)} e CPF nº {ph(state.cpf)},
           </p>
 
-          <p className="mt-3 text-[9.5px]">
-            {ph(state.cidadeEmissao)} - {ph(state.uf)}, {ph(state.dataEmissao)}.
+          <p className="m-0 mt-[10px]">e outorga-lhe o presente Diploma,</p>
+
+          <p className="m-0 mt-[2px]">
+            a fim de que possa gozar de todos os direitos e prerrogativas legais.
           </p>
 
-          {/* Assinatura central, conforme o modelo */}
-          <div className="mx-auto mt-5 w-[66mm] text-center">
-            <div className="h-7" />
-            <div className="border-t border-black" />
-            <div className="mt-1 text-[8.5px] font-semibold uppercase">
-              {state.reitor || "SANDRA REJANE GOMES MIESSA"}
-            </div>
-            <div className="text-[8px]">Reitora</div>
-          </div>
+          <p className="m-0 mt-[11px]">
+            {ph(state.cidadeEmissao, "São Paulo")}, {ph(state.dataEmissao)}.
+          </p>
         </div>
 
-        {/* Campos inferiores à esquerda, alinhados às linhas da imagem */}
+        {/* Assinatura central, conforme o modelo. */}
         <div
-          className="absolute z-10 text-[8px] leading-tight text-black"
+          className="absolute z-10 text-center text-black"
           style={{
-            left: "5.2%",
-            top: "60.6%",
-            width: "43.8%",
+            left: "35.5%",
+            width: "29%",
+            top: "69.5%",
+            fontFamily: bodyFont,
           }}
         >
-          <div className="flex h-[54px] items-end px-2 pb-1">
-            <span>{state.reitor || "SANDRA REJANE GOMES MIESSA"}</span>
+          <div
+            className="mx-auto h-[24px] w-[78%] border-b border-black"
+            aria-hidden="true"
+          />
+          <div className="mt-[4px] text-[8.5px] font-bold uppercase leading-none">
+            {state.reitor || "SANDRA REJANE GOMES MIESSA"}
           </div>
-          <div className="flex h-[54px] items-end px-2 pb-1">
-            <span>{ph(state.secretarioGeral)}</span>
-          </div>
-          <div className="flex h-[54px] items-end px-2 pb-1">
-            <span>RA: {ph(state.raCode || state.matricula)}</span>
-          </div>
-          <div className="flex h-[54px] items-end px-2 pb-1">
-            <span>RG: {ph(state.rg)} | CPF: {ph(state.cpf)}</span>
-          </div>
-          <div className="flex h-[54px] items-end px-2 pb-1">
-            <span>Código: {ph(state.codigoUnico)}</span>
-          </div>
+          <div className="mt-[2px] text-[8px] leading-none">Reitora</div>
         </div>
 
-        {/* Registro inferior direito */}
+        {/* Informações de validação, no canto inferior direito da área interna. */}
         <div
-          className="absolute z-10 flex items-center justify-center px-5 text-center text-[8px] leading-[1.35] text-black"
+          className="absolute z-10 text-left text-black"
           style={{
-            right: "5.2%",
-            top: "60.2%",
-            width: "39.4%",
-            height: "27.8%",
+            right: "10.5%",
+            bottom: "11.2%",
+            width: "21%",
+            fontFamily: bodyFont,
+            fontSize: "7px",
+            lineHeight: 1.15,
           }}
         >
-          <div>
-            <p className="font-bold uppercase">Registro do Diploma</p>
-            <p className="mt-4">
-              Registrado sob as condições constantes no verso, nos termos da legislação
-              vigente e do Regimento Geral desta Universidade.
-            </p>
-            <p className="mt-4">
-              Livro {ph(state.livro)}, folha {ph(state.folhaLivro)}, lote {ph(state.lote)}.
-            </p>
-          </div>
+          <div>Documento digital</div>
+          <div className="mt-[2px] break-all">Código de validação:</div>
+          <div className="break-all font-bold">{ph(state.codigoUnico)}</div>
         </div>
 
-        <MecStampBlock
-          mec={state.mec}
-          onChange={onMecChange}
-          draggable={draggableMec}
-        />
+        {/* Mantém a integração existente, sem sobrepor o modelo da frente. */}
+        <div className="hidden" aria-hidden="true">
+          <MecStampBlock
+            mec={state.mec}
+            onChange={onMecChange}
+            draggable={draggableMec}
+          />
+        </div>
       </div>
 
       {/* ============ FOLHA 2, VERSO ============ */}
@@ -157,6 +180,7 @@ export function DiplomaUnip({
         style={{ pageBreakBefore: "always", breakBefore: "page" }}
       >
         <div className="grid h-full grid-cols-2 gap-8 p-6">
+          {/* Coluna esquerda, mantenedora. */}
           <div className="text-[11px] leading-relaxed">
             <div className="border-b-2 border-[#5a3e0a] pb-1 text-[13px] font-bold uppercase text-[#5a3e0a]">
               Mantenedora
@@ -193,6 +217,7 @@ export function DiplomaUnip({
             </div>
           </div>
 
+          {/* Coluna direita, Secretaria Geral. */}
           <div className="rounded-md border-2 border-[#5a3e0a] p-3 text-[11px]">
             <div className="text-center text-[13px] font-bold uppercase text-[#5a3e0a]">
               Secretaria Geral

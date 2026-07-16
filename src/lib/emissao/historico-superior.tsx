@@ -1,40 +1,136 @@
-import type { CSSProperties, ReactNode } from "react";
+import type { CSSProperties } from "react";
 import type { EmissaoState } from "./types";
 import { QrBlock } from "./qr-block";
 
-const PAGE_W = 1085;
-const PAGE_H = 1450;
-
-const pxX = (value: number) => `${(value / PAGE_W) * 100}%`;
-const pxY = (value: number) => `${(value / PAGE_H) * 100}%`;
-
-const absoluteText: CSSProperties = {
-  position: "absolute",
-  zIndex: 2,
-  margin: 0,
-  color: "#111",
-  lineHeight: 1.1,
-  overflow: "hidden",
-  boxSizing: "border-box",
+type Props = {
+  state: EmissaoState;
 };
 
-const valueOrDash = (value?: string | null): ReactNode =>
-  value?.trim() ? value : "—";
+const MM = (value: number) => `${value}mm`;
 
-/** Histórico Escolar UNIP, com imagem fixa de fundo e dados dinâmicos sobrepostos. */
-export function HistoricoSuperior({ state }: { state: EmissaoState }) {
+const baseText: CSSProperties = {
+  position: "absolute",
+  zIndex: 2,
+  color: "#000",
+  fontFamily: '"Arial Narrow", Arial, sans-serif',
+  lineHeight: 1.05,
+};
+
+const centered: CSSProperties = {
+  ...baseText,
+  textAlign: "center",
+};
+
+const valueStyle: CSSProperties = {
+  ...baseText,
+  fontSize: "2.15mm",
+  whiteSpace: "nowrap",
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+};
+
+const POS = {
+  nome: { top: 27.1, left: 53.5, width: 121.2, height: 7.2 },
+  folhas: { top: 12.5, left: 179.2, width: 20.6, height: 8.1 },
+  dataEmissao: { top: 26.0, left: 179.0, width: 21.0, height: 8.0 },
+
+  matricula: { top: 42.6, left: 7.4, width: 31.7 },
+  dataNascimento: { top: 42.6, left: 41.7, width: 29.4 },
+  cidadeNascimento: { top: 42.6, left: 74.1, width: 61.5 },
+  estadoNascimento: { top: 42.6, left: 137.2, width: 11.5 },
+  nacionalidade: { top: 42.6, left: 151.0, width: 49.0 },
+
+  rg: { top: 55.2, left: 7.3, width: 42.5 },
+  certificadoMilitar: { top: 55.2, left: 52.2, width: 28.7 },
+  cpf: { top: 55.2, left: 83.5, width: 28.7 },
+  tituloEleitor: { top: 55.2, left: 114.9, width: 30.3 },
+  zona: { top: 55.2, left: 147.7, width: 19.2 },
+  secao: { top: 55.2, left: 169.5, width: 30.3 },
+
+  disciplinasVestibular: { top: 69.4, left: 7.5, width: 126.4 },
+  formaIngresso: { top: 69.4, left: 137.0, width: 31.9 },
+  realizacao: { top: 69.4, left: 172.0, width: 27.7 },
+
+  curso: { top: 86.9, left: 7.5, width: 88.7 },
+  codigoEmec: { top: 86.9, left: 98.8, width: 20.6 },
+  reconhecimento: { top: 86.9, left: 122.0, width: 41.4 },
+  cargaHoraria: { top: 86.9, left: 166.2, width: 33.8 },
+
+  tabelaTop: 108.1,
+  linhaAltura: 4.75,
+  colunas: {
+    periodo: { left: 3.9, width: 17.7 },
+    codigo: { left: 21.6, width: 17.6 },
+    descricao: { left: 39.2, width: 94.4 },
+    ch: { left: 133.6, width: 13.0 },
+    perLetivo: { left: 146.6, width: 18.5 },
+    media: { left: 165.1, width: 17.8 },
+    situacao: { left: 182.9, width: 23.0 },
+  },
+
+  observacoes: { top: 232.5, left: 4.3, width: 201.5, height: 17.0 },
+
+  dataColacao: { top: 259.1, left: 3.8, width: 26.1 },
+  dataExpDiploma: { top: 259.1, left: 30.1, width: 25.2 },
+  codigoCurso: { top: 259.1, left: 55.7, width: 20.6 },
+  dataConclusao: { top: 259.1, left: 76.5, width: 22.4 },
+  titulo: { top: 259.1, left: 99.2, width: 26.7 },
+  validacao: { top: 259.1, left: 126.3, width: 79.2 },
+
+  vistos: { top: 270.3, left: 78.0, width: 47.0 },
+  secretario: { top: 283.4, left: 119.0, width: 38.0 },
+  reitor: { top: 283.4, left: 158.0, width: 38.0 },
+  qr: { top: 247.2, left: 176.6, size: 19.5 },
+};
+
+function TextValue({
+  value,
+  top,
+  left,
+  width,
+  align = "left",
+  fontSize = "2.15mm",
+  bold = false,
+}: {
+  value?: string | number | null;
+  top: number;
+  left: number;
+  width: number;
+  align?: "left" | "center" | "right";
+  fontSize?: string;
+  bold?: boolean;
+}) {
+  return (
+    <div
+      style={{
+        ...valueStyle,
+        top: MM(top),
+        left: MM(left),
+        width: MM(width),
+        textAlign: align,
+        fontSize,
+        fontWeight: bold ? 700 : 400,
+      }}
+    >
+      {value || "—"}
+    </div>
+  );
+}
+
+export function HistoricoSuperior({ state }: Props) {
   const disciplinas = state.disciplinasSuperior ?? [];
+  const maxLinhas = 25;
 
   return (
     <div
-      className="doc-sheet a4-portrait relative overflow-hidden bg-white font-sans-doc"
+      className="doc-sheet a4-portrait"
       style={{
         position: "relative",
         width: "210mm",
         height: "297mm",
-        padding: 0,
         overflow: "hidden",
-        backgroundColor: "#fff",
+        background: "#fff",
+        color: "#000",
         WebkitPrintColorAdjust: "exact",
         printColorAdjust: "exact",
       }}
@@ -48,260 +144,252 @@ export function HistoricoSuperior({ state }: { state: EmissaoState }) {
           position: "absolute",
           inset: 0,
           zIndex: 0,
-          width: "100%",
-          height: "100%",
+          width: "210mm",
+          height: "297mm",
           objectFit: "fill",
           userSelect: "none",
           pointerEvents: "none",
         }}
       />
 
-      {/* Folhas e data de emissão */}
-      <div
-        style={{
-          ...absoluteText,
-          top: pxY(66),
-          left: pxX(912),
-          width: pxX(95),
-          height: pxY(27),
-          textAlign: "center",
-          fontSize: "2.45mm",
-          fontWeight: 600,
-        }}
-      >
-        1/1
-      </div>
+      <TextValue
+        value={state.nomeAluno}
+        {...POS.nome}
+        align="center"
+        fontSize="2.55mm"
+        bold
+      />
 
-      <div
-        style={{
-          ...absoluteText,
-          top: pxY(111),
-          left: pxX(908),
-          width: pxX(99),
-          height: pxY(28),
-          textAlign: "center",
-          fontSize: "2.35mm",
-          fontWeight: 600,
-        }}
-      >
-        {valueOrDash(state.dataEmissao)}
-      </div>
+      <TextValue value="1" {...POS.folhas} align="center" fontSize="2.1mm" />
+      <TextValue
+        value={state.dataEmissao}
+        {...POS.dataEmissao}
+        align="center"
+        fontSize="1.95mm"
+      />
 
-      {/* Nome */}
-      <div
-        style={{
-          ...absoluteText,
-          top: pxY(122),
-          left: pxX(286),
-          width: pxX(608),
-          height: pxY(30),
-          textAlign: "center",
-          fontSize: "3.05mm",
-          fontWeight: 700,
-          textTransform: "uppercase",
-          whiteSpace: "nowrap",
-          textOverflow: "ellipsis",
-        }}
-      >
-        {valueOrDash(state.nomeAluno)}
-      </div>
+      <TextValue value={state.matricula} {...POS.matricula} />
+      <TextValue value={state.dataNasc} {...POS.dataNascimento} align="center" />
+      <TextValue value={state.cidadeNasc} {...POS.cidadeNascimento} align="center" />
+      <TextValue value={state.estadoNasc} {...POS.estadoNascimento} align="center" />
+      <TextValue value={state.nacionalidade} {...POS.nacionalidade} align="center" />
 
-      {/* Dados superiores */}
-      <FieldText x={34} y={189} w={142} h={26} value={state.matricula} />
-      <FieldText x={194} y={189} w={145} h={26} value={state.dataNasc} />
-      <FieldText x={359} y={189} w={334} h={26} value={state.cidadeNasc} />
-      <FieldText x={708} y={189} w={64} h={26} value={state.estadoNasc} />
-      <FieldText x={786} y={189} w={221} h={26} value={state.nacionalidade} />
+      <TextValue value={state.rg} {...POS.rg} />
+      <TextValue value="" {...POS.certificadoMilitar} align="center" />
+      <TextValue value={state.cpf} {...POS.cpf} align="center" />
+      <TextValue value="" {...POS.tituloEleitor} align="center" />
+      <TextValue value="" {...POS.zona} align="center" />
+      <TextValue value="" {...POS.secao} align="center" />
 
-      <FieldText x={34} y={257} w={214} h={26} value={state.rg} />
-      <FieldText x={265} y={257} w={143} h={26} value={undefined} />
-      <FieldText x={423} y={257} w={139} h={26} value={state.cpf} />
-      <FieldText x={580} y={257} w={172} h={26} value={undefined} />
-      <FieldText x={770} y={257} w={105} h={26} value={undefined} />
-      <FieldText x={891} y={257} w={116} h={26} value={undefined} />
+      <TextValue value="" {...POS.disciplinasVestibular} align="center" />
+      <TextValue value="" {...POS.formaIngresso} align="center" />
+      <TextValue
+        value={
+          state.periodoInicio && state.periodoFim
+            ? `${state.periodoInicio} a ${state.periodoFim}`
+            : ""
+        }
+        {...POS.realizacao}
+        align="center"
+        fontSize="1.85mm"
+      />
 
-      <FieldText x={34} y={336} w={656} h={27} value={undefined} />
-      <FieldText x={707} y={336} w={167} h={27} value={undefined} />
-      <FieldText x={892} y={336} w={115} h={27} value={undefined} />
+      <TextValue
+        value={state.cursoSuperior}
+        {...POS.curso}
+        align="center"
+        fontSize="2.2mm"
+        bold
+      />
+      <TextValue value="" {...POS.codigoEmec} align="center" />
+      <TextValue
+        value={
+          [state.portariaMec, state.resolucao]
+            .filter(Boolean)
+            .join(" | ")
+        }
+        {...POS.reconhecimento}
+        align="center"
+        fontSize="1.75mm"
+      />
+      <TextValue
+        value=""
+        {...POS.cargaHoraria}
+        align="center"
+        fontSize="1.8mm"
+      />
 
-      <FieldText x={34} y={408} w={461} h={39} value={state.cursoSuperior} align="left" />
-      <FieldText x={511} y={408} w={95} h={39} value={undefined} />
+      {disciplinas.slice(0, maxLinhas).map((disciplina, index) => {
+        const top = POS.tabelaTop + index * POS.linhaAltura;
 
-      <div
-        style={{
-          ...absoluteText,
-          top: pxY(406),
-          left: pxX(621),
-          width: pxX(229),
-          height: pxY(50),
-          fontSize: "2.35mm",
-          lineHeight: 1.25,
-          padding: "0.4mm 1mm",
-        }}
-      >
-        <div>{valueOrDash(state.portariaMec)}</div>
-        <div>{valueOrDash(state.resolucao)}</div>
-      </div>
-
-      <div
-        style={{
-          ...absoluteText,
-          top: pxY(407),
-          left: pxX(866),
-          width: pxX(140),
-          height: pxY(52),
-          fontSize: "2.35mm",
-          lineHeight: 1.35,
-          padding: "0.4mm 1mm",
-        }}
-      >
-        <div>Exigida: {valueOrDash(String(state.cargaHorariaExigida ?? ""))}</div>
-        <div>Cumprida: {valueOrDash(String(state.cargaHorariaCumprida ?? ""))}</div>
-      </div>
-
-      {/* Disciplinas */}
-      <div
-        style={{
-          position: "absolute",
-          zIndex: 2,
-          top: pxY(566),
-          left: pxX(31),
-          width: pxX(975),
-          height: pxY(560),
-          overflow: "hidden",
-        }}
-      >
-        {disciplinas.slice(0, 38).map((d, index) => (
-          <div
-            key={`${d.codigo}-${index}`}
-            style={{
-              display: "grid",
-              gridTemplateColumns: "72px 89px 493px 67px 96px 89px 115px",
-              minHeight: "14px",
-              alignItems: "center",
-              fontSize: "2.15mm",
-              lineHeight: 1.05,
-              color: "#111",
-              marginBottom: "1px",
-            }}
-          >
-            <span style={{ textAlign: "center" }}>{d.periodo}</span>
-            <span style={{ textAlign: "center" }}>{d.codigo}</span>
-            <span style={{ textAlign: "left", paddingLeft: "1.5mm" }}>{d.descricao}</span>
-            <span style={{ textAlign: "center" }}>{d.ch}</span>
-            <span style={{ textAlign: "center" }}>{d.perLetivo}</span>
-            <span style={{ textAlign: "center" }}>{d.media}</span>
-            <span style={{ textAlign: "center", fontWeight: 700 }}>{d.situacao}</span>
+        return (
+          <div key={`${disciplina.codigo}-${index}`}>
+            <TextValue
+              value={disciplina.periodo}
+              top={top}
+              {...POS.colunas.periodo}
+              align="center"
+              fontSize="1.85mm"
+            />
+            <TextValue
+              value={disciplina.codigo}
+              top={top}
+              {...POS.colunas.codigo}
+              align="center"
+              fontSize="1.85mm"
+            />
+            <TextValue
+              value={disciplina.descricao}
+              top={top}
+              {...POS.colunas.descricao}
+              fontSize="1.85mm"
+            />
+            <TextValue
+              value={disciplina.ch}
+              top={top}
+              {...POS.colunas.ch}
+              align="center"
+              fontSize="1.85mm"
+            />
+            <TextValue
+              value={disciplina.perLetivo}
+              top={top}
+              {...POS.colunas.perLetivo}
+              align="center"
+              fontSize="1.85mm"
+            />
+            <TextValue
+              value={disciplina.media}
+              top={top}
+              {...POS.colunas.media}
+              align="center"
+              fontSize="1.85mm"
+            />
+            <TextValue
+              value={disciplina.situacao}
+              top={top}
+              {...POS.colunas.situacao}
+              align="center"
+              fontSize="1.85mm"
+              bold
+            />
           </div>
-        ))}
-      </div>
+        );
+      })}
 
-      {/* Observações */}
       <div
         style={{
-          ...absoluteText,
-          top: pxY(1176),
-          left: pxX(24),
-          width: pxX(976),
-          height: pxY(80),
-          fontSize: "2.35mm",
-          lineHeight: 1.2,
+          ...baseText,
+          top: MM(POS.observacoes.top),
+          left: MM(POS.observacoes.left),
+          width: MM(POS.observacoes.width),
+          height: MM(POS.observacoes.height),
+          padding: "1.8mm 2.2mm",
+          boxSizing: "border-box",
+          fontSize: "1.85mm",
           whiteSpace: "pre-wrap",
-          padding: "1mm 1.5mm",
+          overflow: "hidden",
         }}
       >
         {state.observacoesHistorico}
       </div>
 
-      {/* Rodapé */}
-      <FieldText x={28} y={1298} w={118} h={25} value={state.dataColacao} />
-      <FieldText x={155} y={1298} w={115} h={25} value={state.dataEmissao} />
-      <FieldText x={282} y={1298} w={99} h={25} value={undefined} />
-      <FieldText x={395} y={1298} w={106} h={25} value={state.dataColacao} />
-      <FieldText x={511} y={1298} w={128} h={25} value={state.titulo} />
+      <TextValue
+        value={state.dataColacao}
+        {...POS.dataColacao}
+        align="center"
+        fontSize="1.6mm"
+      />
+      <TextValue
+        value={state.dataEmissao}
+        {...POS.dataExpDiploma}
+        align="center"
+        fontSize="1.6mm"
+      />
+      <TextValue value="" {...POS.codigoCurso} align="center" fontSize="1.6mm" />
+      <TextValue
+        value={state.dataEmissao}
+        {...POS.dataConclusao}
+        align="center"
+        fontSize="1.6mm"
+      />
+      <TextValue value={state.titulo} {...POS.titulo} align="center" fontSize="1.6mm" />
+
+      <div
+        style={{
+          ...baseText,
+          top: MM(POS.validacao.top),
+          left: MM(POS.validacao.left),
+          width: MM(POS.validacao.width),
+          fontSize: "1.45mm",
+          lineHeight: 1.15,
+        }}
+      >
+        <div>A autenticidade deste documento pode ser verificada em:</div>
+        <div>{state.sedUrlBase || "https://www.unip.br/servicos/verificacao"}</div>
+        <div>Número do documento: {state.codigoUnico || "—"}</div>
+      </div>
 
       <div
         style={{
           position: "absolute",
           zIndex: 3,
-          top: pxY(1256),
-          left: pxX(873),
-          width: pxX(105),
-          height: pxY(105),
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
+          top: MM(POS.qr.top),
+          left: MM(POS.qr.left),
+          width: MM(POS.qr.size),
+          height: MM(POS.qr.size),
+          display: "grid",
+          placeItems: "center",
         }}
       >
-        <QrBlock code={state.codigoUnico} sedUrlBase={state.sedUrlBase} size={84} />
+        <QrBlock
+          code={state.codigoUnico}
+          sedUrlBase={state.sedUrlBase}
+          size={74}
+        />
       </div>
 
       <div
         style={{
-          ...absoluteText,
-          top: pxY(1374),
-          left: pxX(440),
-          width: pxX(170),
-          height: pxY(26),
-          textAlign: "center",
-          fontSize: "2.15mm",
-          fontWeight: 600,
+          ...centered,
+          top: MM(POS.vistos.top),
+          left: MM(POS.vistos.left),
+          width: MM(POS.vistos.width),
+          fontSize: "1.55mm",
+          fontWeight: 700,
           textTransform: "uppercase",
         }}
       >
-        {valueOrDash(state.secretarioGeral)}
+        Vistos
       </div>
 
       <div
         style={{
-          ...absoluteText,
-          top: pxY(1374),
-          left: pxX(724),
-          width: pxX(170),
-          height: pxY(26),
-          textAlign: "center",
-          fontSize: "2.15mm",
-          fontWeight: 600,
+          ...centered,
+          top: MM(POS.secretario.top),
+          left: MM(POS.secretario.left),
+          width: MM(POS.secretario.width),
+          fontSize: "1.65mm",
+          fontWeight: 700,
           textTransform: "uppercase",
         }}
       >
-        {valueOrDash(state.reitor)}
+        {state.secretarioGeral || "—"}
       </div>
-    </div>
-  );
-}
 
-type FieldTextProps = {
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-  value?: string | null;
-  align?: "left" | "center" | "right";
-};
-
-function FieldText({ x, y, w, h, value, align = "center" }: FieldTextProps) {
-  return (
-    <div
-      style={{
-        ...absoluteText,
-        top: pxY(y),
-        left: pxX(x),
-        width: pxX(w),
-        height: pxY(h),
-        display: "flex",
-        alignItems: "center",
-        justifyContent:
-          align === "left" ? "flex-start" : align === "right" ? "flex-end" : "center",
-        textAlign: align,
-        fontSize: "2.45mm",
-        fontWeight: 600,
-        padding: align === "left" ? "0 1.5mm" : "0 0.8mm",
-        whiteSpace: "nowrap",
-        textOverflow: "ellipsis",
-      }}
-    >
-      {valueOrDash(value)}
+      <div
+        style={{
+          ...centered,
+          top: MM(POS.reitor.top),
+          left: MM(POS.reitor.left),
+          width: MM(POS.reitor.width),
+          fontSize: "1.65mm",
+          fontWeight: 700,
+          textTransform: "uppercase",
+        }}
+      >
+        {state.reitor || "—"}
+      </div>
     </div>
   );
 }

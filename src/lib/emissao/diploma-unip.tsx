@@ -13,6 +13,7 @@ const ph = (value?: string | null, fallback = "-"): ReactNode =>
 
 const MM = (value: number) => `${value}mm`;
 
+// Versão de teste: todos os textos utilizam OldEnglishTextMT.ttf.
 // Coordenadas calibradas a partir do diploma de referência em A4 horizontal.
 const POS = {
   front: {
@@ -107,7 +108,10 @@ export function DiplomaUnip({
         }
 
         .unip-body {
-          font-family: "Times New Roman", Times, serif;
+          font-family: "OldEnglishUNIP", "Old English Text MT", "Cloister Black", serif;
+          font-synthesis: none;
+          font-weight: 400;
+          font-style: normal;
         }
 
         @page {
@@ -170,8 +174,9 @@ export function DiplomaUnip({
             top: MM(POS.front.introTop),
             left: MM(POS.front.introLeft),
             width: MM(POS.front.introWidth),
-            fontSize: "3.1mm",
-            lineHeight: 1.42,
+            fontSize: "2.72mm",
+            lineHeight: 1.38,
+            letterSpacing: "-0.015mm",
           }}
         >
           <div>
@@ -231,8 +236,9 @@ export function DiplomaUnip({
             top: MM(POS.front.identityTop),
             left: MM(POS.front.identityLeft),
             width: MM(POS.front.identityWidth),
-            fontSize: "3.15mm",
-            lineHeight: 1.44,
+            fontSize: "2.78mm",
+            lineHeight: 1.40,
+            letterSpacing: "-0.015mm",
           }}
         >
           <div>
@@ -252,8 +258,9 @@ export function DiplomaUnip({
             top: MM(POS.front.grantTop),
             left: MM(POS.front.grantLeft),
             width: MM(POS.front.grantWidth),
-            fontSize: "3.25mm",
-            lineHeight: 1.52,
+            fontSize: "2.82mm",
+            lineHeight: 1.46,
+            letterSpacing: "-0.015mm",
           }}
         >
           <div>e outorga-lhe o presente Diploma,</div>
@@ -303,14 +310,14 @@ export function DiplomaUnip({
           <div
             style={{
               marginTop: "1.2mm",
-              fontSize: "2.55mm",
-              fontWeight: 700,
+              fontSize: "2.15mm",
+              fontWeight: 400,
               lineHeight: 1,
             }}
           >
             {reitor}
           </div>
-          <div style={{ marginTop: "0.8mm", fontSize: "2.4mm", lineHeight: 1 }}>
+          <div style={{ marginTop: "0.8mm", fontSize: "2.05mm", lineHeight: 1 }}>
             Reitora
           </div>
         </div>
@@ -323,14 +330,14 @@ export function DiplomaUnip({
             top: MM(POS.front.validationTop),
             left: MM(POS.front.validationLeft),
             width: MM(POS.front.validationWidth),
-            fontSize: "2.05mm",
-            lineHeight: 1.1,
+            fontSize: "1.75mm",
+            lineHeight: 1.08,
             textAlign: "left",
           }}
         >
           <div>Documento digital</div>
           <div>Código de validação:</div>
-          <div style={{ fontWeight: 700, overflowWrap: "anywhere" }}>
+          <div style={{ fontWeight: 400, overflowWrap: "anywhere" }}>
             {ph(state.codigoUnico)}
           </div>
         </div>
@@ -351,7 +358,7 @@ export function DiplomaUnip({
           ...pageBase,
           pageBreakBefore: "always",
           breakBefore: "page",
-          fontSize: "3.05mm",
+          fontSize: "2.65mm",
         }}
       >
         <div
@@ -387,7 +394,7 @@ export function DiplomaUnip({
             border: "0.45mm solid #000",
             padding: "5mm 5mm 4mm",
             boxSizing: "border-box",
-            fontSize: "2.85mm",
+            fontSize: "2.45mm",
             lineHeight: 1.35,
           }}
         >

@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import type { EmissaoState } from "./types";
 import { MecStampBlock } from "./mec-stamp";
 
@@ -9,17 +9,33 @@ type Props = {
 };
 
 const ph = (value?: string | null, fallback = "-"): ReactNode =>
-  value?.trim() ? value : <span className="text-neutral-400">{fallback}</span>;
+  value?.trim() ? value : <span className="du-placeholder">{fallback}</span>;
 
-/*
- * A fonte da imagem de referência é semelhante a Old English Text MT.
- * Em computadores que não possuam essa fonte, o navegador usa os fallbacks.
+const bodyFont = '"Times New Roman", Times, "Liberation Serif", serif';
+const gothicFont =
+  '"UnifrakturMaguntia", "Old English Text MT", "Cloister Black", "Lucida Blackletter", serif';
+
+const pageStyle: CSSProperties = {
+  position: "relative",
+  width: "297mm",
+  height: "210mm",
+  overflow: "hidden",
+  background: "#fff",
+  color: "#111",
+  fontFamily: bodyFont,
+  WebkitPrintColorAdjust: "exact",
+  printColorAdjust: "exact",
+  boxSizing: "border-box",
+  flex: "0 0 auto",
+};
+
+/**
+ * Modelo estável para A4 horizontal.
+ *
+ * O layout usa milímetros em vez de porcentagens, reduzindo diferenças entre
+ * navegadores, visualização e impressão em PDF. A imagem fundo-unip.png deve
+ * conter somente moldura, brasão e logomarca.
  */
-const diplomaFont =
-  '"Old English Text MT", "Cloister Black", "UnifrakturCook", "UnifrakturMaguntia", serif';
-const bodyFont = '"Arial Narrow", "Times New Roman", Times, serif';
-const registrationFont = '"Times New Roman", Times, serif';
-
 export function DiplomaUnip({
   state,
   onMecChange,
@@ -31,141 +47,211 @@ export function DiplomaUnip({
 
   return (
     <>
+      <style>{`
+        .du-page, .du-page * { box-sizing: border-box; }
+        .du-placeholder { color: #777; }
+        .du-nowrap { white-space: nowrap; }
+        .du-break { overflow-wrap: anywhere; word-break: break-word; }
+
+        @page {
+          size: A4 landscape;
+          margin: 0;
+        }
+
+        @media print {
+          html, body {
+            margin: 0 !important;
+            padding: 0 !important;
+            background: #fff !important;
+          }
+
+          .du-page {
+            width: 297mm !important;
+            height: 210mm !important;
+            margin: 0 !important;
+            box-shadow: none !important;
+            page-break-after: always;
+            break-after: page;
+          }
+
+          .du-page:last-of-type {
+            page-break-after: auto;
+            break-after: auto;
+          }
+        }
+      `}</style>
+
       {/* FOLHA 1, FRENTE */}
-      <section
-        className="doc-sheet a4-landscape relative overflow-hidden bg-white text-black"
-        style={{
-          WebkitPrintColorAdjust: "exact",
-          printColorAdjust: "exact",
-          fontFamily: bodyFont,
-        }}
-      >
+      <section className="du-page" style={pageStyle}>
         <img
           src="/images/fundo-unip.png"
           alt=""
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 z-0 h-full w-full select-none"
-          style={{ objectFit: "fill" }}
+          draggable={false}
+          style={{
+            position: "absolute",
+            inset: 0,
+            width: "297mm",
+            height: "210mm",
+            objectFit: "fill",
+            userSelect: "none",
+            pointerEvents: "none",
+            zIndex: 0,
+          }}
         />
 
+        {/* Cabeçalho */}
         <header
-          className="absolute z-10 whitespace-nowrap text-center"
           style={{
-            top: "8.8%",
-            left: "20%",
-            right: "20%",
-            fontFamily: diplomaFont,
-            fontSize: "42px",
-            lineHeight: 0.95,
-            fontWeight: 400,
-            letterSpacing: "-0.8px",
+            position: "absolute",
+            top: "16.5mm",
+            left: "62mm",
+            width: "173mm",
+            zIndex: 2,
+            textAlign: "center",
           }}
         >
-          Universidade Paulista
+          <div
+            className="du-nowrap"
+            style={{
+              fontFamily: gothicFont,
+              fontSize: "13.2mm",
+              lineHeight: 0.95,
+              fontWeight: 400,
+              letterSpacing: "-0.35mm",
+            }}
+          >
+            Universidade Paulista
+          </div>
         </header>
 
+        {/* Texto principal */}
         <main
-          className="absolute z-10 text-center"
           style={{
-            top: "24.5%",
-            left: "23%",
-            right: "23%",
-            fontFamily: bodyFont,
-            fontSize: "10px",
-            lineHeight: 1.23,
-            fontStretch: "condensed",
+            position: "absolute",
+            top: "52mm",
+            left: "59mm",
+            width: "179mm",
+            zIndex: 2,
+            textAlign: "center",
+            fontSize: "3.45mm",
+            lineHeight: 1.42,
           }}
         >
-          <p className="m-0">
-            A Reitora da Universidade Paulista, no uso de suas atribuições
+          <p style={{ margin: 0 }}>
+            A Reitora da Universidade Paulista, no uso de suas atribuições,
           </p>
-
-          <p className="m-0 mt-[2px]">
-            e tendo em vista a conclusão do Curso Superior de {ph(state.cursoSuperior)},
+          <p style={{ margin: "1.2mm 0 0" }}>
+            tendo em vista a conclusão do Curso Superior de{" "}
+            {ph(state.cursoSuperior)},
           </p>
-
-          <p className="m-0 mt-[2px]">
-            na data de {ph(state.dataColacao)}, e a Colação de Grau na data de{" "}
-            {ph(state.dataColacao)}, confere o título de
+          <p style={{ margin: "1.2mm 0 0" }}>
+            na data de {ph(state.dataColacao)}, e a Colação de Grau realizada na
+            mesma data,
           </p>
+          <p style={{ margin: "1.2mm 0 0" }}>confere o título de</p>
 
           <div
-            className="mt-[11px]"
             style={{
-              fontFamily: diplomaFont,
-              fontSize: "23px",
+              marginTop: "3.2mm",
+              minHeight: "11mm",
+              fontFamily: gothicFont,
+              fontSize: "8.1mm",
               lineHeight: 1,
-              letterSpacing: "-0.25px",
+              letterSpacing: "-0.16mm",
             }}
           >
             {ph(state.titulo)} em {ph(state.cursoSuperior)} a
           </div>
 
           <div
-            className="mt-[9px]"
             style={{
-              fontFamily: diplomaFont,
-              fontSize: "29px",
-              lineHeight: 1,
-              letterSpacing: "-0.4px",
+              marginTop: "3.3mm",
+              minHeight: "10mm",
+              fontFamily: bodyFont,
+              fontSize: "7mm",
+              fontWeight: 700,
+              lineHeight: 1.05,
+              textTransform: "uppercase",
+              letterSpacing: "0.12mm",
             }}
           >
             {ph(state.nomeAluno)}
           </div>
 
-          <p className="m-0 mt-[12px]">
+          <p style={{ margin: "4.1mm 0 0" }}>
             {ph(state.nacionalidade, "brasileiro(a)")}, natural de{" "}
             {naturalidade || "-"}, nascido(a) em {ph(state.dataNasc)},
           </p>
-
-          <p className="m-0 mt-[2px]">
+          <p style={{ margin: "1mm 0 0" }}>
             RG nº {ph(state.rg)} e CPF nº {ph(state.cpf)},
           </p>
-
-          <p className="m-0 mt-[10px]">e outorga-lhe o presente Diploma,</p>
-
-          <p className="m-0 mt-[2px]">
-            a fim de que possa gozar de todos os direitos e prerrogativas legais.
+          <p style={{ margin: "3.4mm 0 0" }}>
+            e outorga-lhe o presente Diploma,
           </p>
-
-          <p className="m-0 mt-[12px]">
+          <p style={{ margin: "1mm 0 0" }}>
+            a fim de que possa gozar de todos os direitos e prerrogativas
+            legais.
+          </p>
+          <p style={{ margin: "3.7mm 0 0" }}>
             {ph(state.cidadeEmissao, "São Paulo")}, {ph(state.dataEmissao)}.
           </p>
         </main>
 
+        {/* Assinatura da reitoria */}
         <div
-          className="absolute z-10 text-center"
           style={{
-            left: "37.2%",
-            width: "25.6%",
-            top: "72.2%",
-            fontFamily: registrationFont,
+            position: "absolute",
+            top: "153mm",
+            left: "103.5mm",
+            width: "90mm",
+            zIndex: 2,
+            textAlign: "center",
+            fontFamily: bodyFont,
           }}
         >
-          <div className="mx-auto h-[28px] w-[82%] border-b border-black" />
-          <div className="mt-[4px] text-[8px] font-bold uppercase leading-none">
+          <div style={{ height: "10mm", borderBottom: "0.25mm solid #111" }} />
+          <div
+            style={{
+              marginTop: "1.5mm",
+              fontSize: "2.65mm",
+              lineHeight: 1.05,
+              fontWeight: 700,
+              textTransform: "uppercase",
+            }}
+          >
             {state.reitor || "SANDRA REJANE GOMES MIESSA"}
           </div>
-          <div className="mt-[2px] text-[7.5px] leading-none">Reitora</div>
+          <div style={{ marginTop: "0.7mm", fontSize: "2.5mm", lineHeight: 1 }}>
+            Reitora
+          </div>
         </div>
 
-        <div
-          className="absolute z-10 text-left"
+        {/* Validação */}
+        <aside
           style={{
-            right: "9.6%",
-            bottom: "10.2%",
-            width: "19.5%",
-            fontFamily: registrationFont,
-            fontSize: "6.6px",
-            lineHeight: 1.12,
+            position: "absolute",
+            right: "30mm",
+            bottom: "21mm",
+            width: "54mm",
+            zIndex: 2,
+            fontSize: "2.15mm",
+            lineHeight: 1.2,
+            textAlign: "left",
           }}
         >
           <div>Documento digital</div>
-          <div className="mt-[1px]">Código de validação:</div>
-          <div className="break-all font-bold">{ph(state.codigoUnico)}</div>
-        </div>
+          <div style={{ marginTop: "0.8mm" }}>Código de validação:</div>
+          <div
+            className="du-break"
+            style={{ marginTop: "0.5mm", fontWeight: 700 }}
+          >
+            {ph(state.codigoUnico)}
+          </div>
+        </aside>
 
-        <div className="hidden" aria-hidden="true">
+        {/* Integração preservada */}
+        <div hidden aria-hidden="true">
           <MecStampBlock
             mec={state.mec}
             onChange={onMecChange}
@@ -176,110 +262,223 @@ export function DiplomaUnip({
 
       {/* FOLHA 2, VERSO */}
       <section
-        className="doc-sheet a4-landscape relative overflow-hidden bg-white text-black"
+        className="du-page"
         style={{
+          ...pageStyle,
           pageBreakBefore: "always",
           breakBefore: "page",
-          WebkitPrintColorAdjust: "exact",
-          printColorAdjust: "exact",
-          fontFamily: registrationFont,
+          padding: "13mm 15mm",
         }}
       >
         <div
-          className="absolute text-center"
           style={{
-            left: "9.2%",
-            top: "25.5%",
-            width: "45%",
-            fontSize: "10px",
-            lineHeight: 1.42,
+            position: "absolute",
+            inset: "8mm",
+            border: "0.45mm solid #6b521f",
+            pointerEvents: "none",
           }}
-        >
-          <div className="font-bold uppercase">{state.mantenedora || "ASSUPERO - ENSINO SUPERIOR LTDA"}</div>
-          <div>CNPJ {state.cnpj || "06.099.229/0001-01"}</div>
-
-          <div className="mt-[26px]">Universidade Paulista - UNIP e-MEC 322</div>
-
-          <div className="mt-[26px]">
-            Recredenciada pela Portaria MEC nº {ph(state.portariaMec)}, publicada no Diário Oficial da União.
-          </div>
-
-          <div className="mt-[34px]">Curso Superior de {ph(state.cursoSuperior)}</div>
-
-          <div className="mt-[26px]">e-MEC {ph(state.resolucao)}</div>
-        </div>
+        />
+        <div
+          style={{
+            position: "absolute",
+            inset: "10mm",
+            border: "0.18mm solid #6b521f",
+            pointerEvents: "none",
+          }}
+        />
 
         <div
-          className="absolute"
           style={{
-            right: "8.2%",
-            top: "21.5%",
-            width: "36.8%",
-            height: "57.5%",
-            border: "1.4px solid #111",
-            fontSize: "9px",
-            lineHeight: 1.22,
-            padding: "12px 14px",
+            position: "relative",
+            zIndex: 1,
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "11mm",
+            height: "100%",
+            padding: "6mm 7mm",
           }}
         >
-          <div className="flex justify-between text-[9px] font-bold">
-            <span>RA: {ph(state.raCode)}</span>
-            <span>LOTE: {ph(state.lote)}</span>
-          </div>
+          <div style={{ fontSize: "3mm", lineHeight: 1.45 }}>
+            <SectionTitle>Mantenedora</SectionTitle>
+            <InfoLine label="Razão Social" value={state.mantenedora} />
+            <InfoLine label="CNPJ" value={state.cnpj} />
+            <InfoLine
+              label="Recredenciamento"
+              value={`Portaria MEC nº ${state.portariaMec || "-"}`}
+            />
+            <InfoLine label="Resolução CNE/CP" value={state.resolucao} />
+            <InfoLine label="Endereço" value={state.enderecoPolo} />
 
-          <div className="mt-[8px] text-center font-bold uppercase">
-            {state.mantenedora || "ASSUPERO - ENSINO SUPERIOR LTDA"}
-          </div>
-          <div className="text-center">CNPJ {state.cnpj || "06.099.229/0001-01"}</div>
-          <div className="mt-[7px] text-center font-bold">UNIVERSIDADE PAULISTA - UNIP e-MEC 322</div>
+            <div style={{ height: "7mm" }} />
+            <SectionTitle>Dados do Diplomado</SectionTitle>
+            <InfoLine label="Nome" value={state.nomeAluno} />
+            <InfoLine label="CPF" value={state.cpf} />
+            <InfoLine label="RG" value={state.rg} />
+            <InfoLine label="Naturalidade" value={naturalidade} />
+            <InfoLine label="Nascimento" value={state.dataNasc} />
+            <InfoLine label="Nacionalidade" value={state.nacionalidade} />
+            <InfoLine label="Curso" value={state.cursoSuperior} />
+            <InfoLine label="Título" value={state.titulo} />
+            <InfoLine label="Colação de grau" value={state.dataColacao} />
 
-          <p className="mt-[10px] text-center">
-            Recredenciada pela Portaria MEC nº {ph(state.portariaMec)}, publicada no Diário Oficial da União.
-          </p>
-
-          <div className="mt-[14px] text-center font-bold">
-            Secretaria Geral
-            <br />
-            Departamento de Registro de Diplomas
-          </div>
-
-          <p className="mt-[14px]">
-            Diploma registrado sob nº {ph(state.folhaLivro)}, Livro {ph(state.livro)}, em{" "}
-            {ph(state.dataEmissao)}, por delegação de competência do Ministério da Educação,
-            nos termos da legislação vigente.
-          </p>
-
-          <p className="mt-[10px]">Processo nº {ph(state.codigoUnico)}</p>
-
-          <p className="mt-[12px] text-center">
-            {ph(state.cidadeEmissao, "São Paulo")}, {ph(state.dataEmissao)}.
-          </p>
-
-          <div className="absolute bottom-[24px] left-[18%] right-[18%] text-center">
-            <div className="h-[34px] border-b border-black" />
-            <div className="mt-[3px] text-[8px] font-bold uppercase">
-              {ph(state.secretarioAdjunto)}
+            <div
+              style={{
+                marginTop: "10mm",
+                width: "34mm",
+                height: "34mm",
+                border: "1mm double #6b521f",
+                borderRadius: "50%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                textAlign: "center",
+                fontSize: "2.7mm",
+                lineHeight: 1.15,
+                fontWeight: 700,
+                color: "#6b521f",
+              }}
+            >
+              UNIVERSIDADE
+              <br />
+              PAULISTA
+              <br />
+              UNIP
             </div>
-            <div className="text-[7.5px]">Secretário Geral Adjunto</div>
           </div>
-        </div>
 
-        <div
-          className="absolute text-center"
-          style={{
-            right: "9.5%",
-            bottom: "7.2%",
-            width: "12%",
-            fontSize: "7px",
-            lineHeight: 1.15,
-          }}
-        >
-          <div className="mx-auto flex h-[70px] w-[70px] items-center justify-center border border-black text-[7px]">
-            QR CODE
+          <div
+            style={{
+              height: "100%",
+              border: "0.45mm solid #6b521f",
+              padding: "7mm",
+              fontSize: "3mm",
+              lineHeight: 1.4,
+            }}
+          >
+            <div
+              style={{
+                textAlign: "center",
+                color: "#6b521f",
+                fontWeight: 700,
+                textTransform: "uppercase",
+                fontSize: "4mm",
+              }}
+            >
+              Secretaria Geral
+            </div>
+            <div
+              style={{
+                textAlign: "center",
+                marginTop: "1mm",
+                fontSize: "2.8mm",
+                color: "#6b521f",
+              }}
+            >
+              Departamento de Registro de Diplomas
+            </div>
+
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: "3mm",
+                marginTop: "8mm",
+              }}
+            >
+              <Box label="RA" value={state.raCode} />
+              <Box label="LOTE" value={state.lote} />
+              <Box label="LIVRO" value={state.livro} />
+              <Box label="FOLHA" value={state.folhaLivro} />
+            </div>
+
+            <p style={{ margin: "10mm 0 0" }}>
+              Registrado sob as condições acima, nos termos da legislação
+              vigente e do Regimento Geral desta Universidade.
+            </p>
+            <p style={{ margin: "4mm 0 0" }}>
+              {ph(state.cidadeEmissao)} - {ph(state.uf)},{" "}
+              {ph(state.dataEmissao)}.
+            </p>
+
+            <div style={{ marginTop: "25mm", textAlign: "center" }}>
+              <div style={{ borderTop: "0.25mm solid #111" }} />
+              <div
+                style={{
+                  marginTop: "1.5mm",
+                  fontWeight: 700,
+                  textTransform: "uppercase",
+                }}
+              >
+                {ph(state.secretarioAdjunto)}
+              </div>
+              <div
+                style={{
+                  marginTop: "0.8mm",
+                  fontSize: "2.6mm",
+                  textTransform: "uppercase",
+                }}
+              >
+                Secretário(a) Geral Adjunto(a)
+              </div>
+            </div>
           </div>
-          <div className="mt-[3px] break-all">{ph(state.codigoUnico)}</div>
         </div>
       </section>
     </>
+  );
+}
+
+function SectionTitle({ children }: { children: ReactNode }) {
+  return (
+    <div
+      style={{
+        marginBottom: "3mm",
+        paddingBottom: "1.2mm",
+        borderBottom: "0.45mm solid #6b521f",
+        color: "#6b521f",
+        fontSize: "3.6mm",
+        fontWeight: 700,
+        textTransform: "uppercase",
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+function InfoLine({ label, value }: { label: string; value?: string | null }) {
+  return (
+    <div style={{ marginTop: "1.3mm" }}>
+      <strong>{label}:</strong> {value?.trim() || "-"}
+    </div>
+  );
+}
+
+function Box({ label, value }: { label: string; value?: string | null }) {
+  return (
+    <div
+      style={{
+        minHeight: "16mm",
+        border: "0.25mm solid #6b521f",
+        padding: "3mm",
+      }}
+    >
+      <div
+        style={{
+          color: "#6b521f",
+          fontSize: "2.4mm",
+          fontWeight: 700,
+          textTransform: "uppercase",
+        }}
+      >
+        {label}
+      </div>
+      <div
+        className="du-break"
+        style={{ marginTop: "1mm", fontSize: "3mm", fontWeight: 600 }}
+      >
+        {value?.trim() || "-"}
+      </div>
+    </div>
   );
 }

@@ -62,6 +62,13 @@ const centerText: CSSProperties = {
   whiteSpace: "nowrap",
 };
 
+const oldEnglishBase: CSSProperties = {
+  fontWeight: 400,
+  fontStyle: "normal",
+  fontSynthesis: "none",
+  transformOrigin: "center top",
+};
+
 /**
  * Diploma UNIP reconstruído em coordenadas fixas de milímetros.
  *
@@ -144,9 +151,11 @@ export function DiplomaUnip({
             top: MM(POS.front.titleTop),
             left: MM(POS.front.titleLeft),
             width: MM(POS.front.titleWidth),
-            fontSize: "15.5mm",
-            lineHeight: 0.94,
-            fontWeight: 400,
+            ...oldEnglishBase,
+            fontSize: "14mm",
+            lineHeight: 1,
+            letterSpacing: "-0.15mm",
+            transform: "scaleX(1.06) scaleY(0.78)",
           }}
         >
           Universidade Paulista
@@ -181,8 +190,11 @@ export function DiplomaUnip({
             top: MM(POS.front.degreeTop),
             left: MM(POS.front.degreeLeft),
             width: MM(POS.front.degreeWidth),
-            fontSize: "7mm",
+            ...oldEnglishBase,
+            fontSize: "6.4mm",
             lineHeight: 1,
+            letterSpacing: "-0.05mm",
+            transform: "scaleX(1.04) scaleY(0.82)",
           }}
         >
           {ph(state.titulo)} em {ph(state.cursoSuperior)} a
@@ -196,8 +208,11 @@ export function DiplomaUnip({
             top: MM(POS.front.studentTop),
             left: MM(POS.front.studentLeft),
             width: MM(POS.front.studentWidth),
-            fontSize: "8.8mm",
+            ...oldEnglishBase,
+            fontSize: "8mm",
             lineHeight: 1,
+            letterSpacing: "-0.08mm",
+            transform: "scaleX(1.04) scaleY(0.82)",
           }}
         >
           {ph(state.nomeAluno)}
@@ -247,8 +262,11 @@ export function DiplomaUnip({
             top: MM(POS.front.dateTop),
             left: MM(POS.front.dateLeft),
             width: MM(POS.front.dateWidth),
-            fontSize: "5mm",
+            ...oldEnglishBase,
+            fontSize: "4.6mm",
             lineHeight: 1,
+            letterSpacing: "-0.03mm",
+            transform: "scaleX(1.03) scaleY(0.84)",
           }}
         >
           {cidadeEmissao}, {ph(state.dataEmissao)}.

@@ -37,15 +37,26 @@ export function DiplomaUnip({ state, onMecChange, draggableMec = true }: Props) 
           style={{
             left: "9%",
             right: "9%",
-            top: "17%",
+            top: "7.2%",
+            fontFamily: '"Cinzel", "Times New Roman", serif',
           }}
         >
-          <p className="text-[12px] leading-[1.8]">
+          <div
+            className="text-[38px] leading-none text-black"
+            style={{ fontFamily: '"UnifrakturMaguntia", cursive' }}
+          >
+            Universidade Paulista
+          </div>
+
+          <p className="mt-7 text-[11px] leading-[1.65]">
             O Magnífico Reitor da Universidade Paulista, no uso de suas atribuições,
             confere a
           </p>
 
-          <div className="my-5 font-vibes text-[38px] leading-none text-[#5a3e0a]">
+          <div
+            className="my-4 text-[27px] leading-none text-black"
+            style={{ fontFamily: '"UnifrakturMaguntia", cursive' }}
+          >
             {ph(state.nomeAluno)}
           </div>
 
@@ -54,22 +65,31 @@ export function DiplomaUnip({ state, onMecChange, draggableMec = true }: Props) 
             havendo concluído o Curso Superior de
           </p>
 
-          <div className="mt-3 font-cinzel text-[18px] font-bold uppercase tracking-wide text-[#5a3e0a]">
-            {ph(state.cursoSuperior)}
+          <div
+            className="mt-3 text-[21px] leading-none text-black"
+            style={{ fontFamily: '"UnifrakturMaguntia", cursive' }}
+          >
+            {ph(state.titulo)} em {ph(state.cursoSuperior)}
           </div>
 
-          <p className="mt-3 text-[11px] leading-[1.8]">
-            o título de <b className="uppercase">{ph(state.titulo)}</b>, nos termos da
-            legislação vigente, Portaria MEC nº {ph(state.portariaMec)}, Resolução
-            CNE/CP nº {ph(state.resolucao)}.
+          <p className="mt-4 text-[10px] leading-[1.65]">
+            brasileiro(a), natural de {ph(state.cidadeNasc)} - {ph(state.estadoNasc)},
+            nascido(a) em {ph(state.dataNasc)}, portador(a) do RG nº {ph(state.rg)}
+            e CPF nº {ph(state.cpf)}.
           </p>
 
-          <p className="mt-3 text-[10px] italic leading-[1.7]">
+          <p className="mt-3 text-[10px] leading-[1.65]">
+            E outorga-lhe o presente Diploma, a fim de que possa gozar de todos os
+            direitos e prerrogativas legais.
+          </p>
+
+          <p className="mt-3 text-[9.5px] leading-[1.55]">
             Colação de grau em {ph(state.dataColacao)}, período letivo de{" "}
-            {ph(state.periodoInicio)} a {ph(state.periodoFim)}.
+            {ph(state.periodoInicio)} a {ph(state.periodoFim)}. Portaria MEC nº{" "}
+            {ph(state.portariaMec)}, Resolução CNE/CP nº {ph(state.resolucao)}.
           </p>
 
-          <p className="mt-4 text-[10px] font-bold">
+          <p className="mt-4 text-[10px]">
             {ph(state.cidadeEmissao)} - {ph(state.uf)}, {ph(state.dataEmissao)}.
           </p>
         </div>
@@ -79,6 +99,7 @@ export function DiplomaUnip({ state, onMecChange, draggableMec = true }: Props) 
           className="absolute z-10 text-[8.5px] leading-tight text-black"
           style={{
             left: "5.3%",
+            fontFamily: '"Times New Roman", serif',
             top: "62.2%",
             width: "43.5%",
           }}
@@ -107,6 +128,7 @@ export function DiplomaUnip({ state, onMecChange, draggableMec = true }: Props) 
           className="absolute z-10 flex items-center justify-center p-5 text-center text-[8.5px] leading-relaxed text-black"
           style={{
             right: "5.3%",
+            fontFamily: '"Times New Roman", serif',
             top: "61.4%",
             width: "39.1%",
             height: "27.5%",

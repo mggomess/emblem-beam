@@ -9,39 +9,30 @@ type Props = {
 };
 
 const ph = (value?: string | null, fallback = "-"): ReactNode =>
-  value?.trim() ? value : <span style={{ color: "#777" }}>{fallback}</span>;
+  value?.trim() ? value : <span style={{ opacity: 0.55 }}>{fallback}</span>;
 
-const FONT_GOTHIC = '"Old English Text MT", "Cloister Black", "UnifrakturMaguntia", serif';
-const FONT_BODY = '"Times New Roman", Times, serif';
-
-const PAGE = {
-  width: 297,
-  height: 210,
-};
+const FONT = '"Old English Text MT", "Cloister Black", serif';
 
 const POS = {
-  title: { top: 16.5, left: 54, width: 189, size: 15.5 },
-  body: { top: 55.5, left: 57, width: 183, size: 3.1 },
-  degree: { top: 78.2, left: 48, width: 201, size: 7.1 },
-  student: { top: 91.5, left: 42, width: 213, size: 8.3 },
-  identity: { top: 109.5, left: 55, width: 187, size: 3.2 },
-  grant: { top: 126.3, left: 54, width: 189, size: 3.2 },
-  date: { top: 144.3, left: 62, width: 173, size: 4.7 },
-  signature: { top: 158.5, left: 104, width: 89 },
-  validation: { top: 169.5, left: 211, width: 53 },
+  titulo: { top: 8.2, left: 21, width: 58, size: 5.8 },
+  introducao: { top: 28.6, left: 22, width: 56, size: 1.82 },
+  curso: { top: 40.2, left: 19, width: 62, size: 3.8 },
+  aluno: { top: 46.8, left: 16, width: 68, size: 4.9 },
+  dados: { top: 55.4, left: 20, width: 60, size: 1.9 },
+  outorga: { top: 64.0, left: 20, width: 60, size: 1.9 },
+  data: { top: 72.7, left: 25, width: 50, size: 2.55 },
+  assinatura: { top: 79.0, left: 36, width: 28 },
+  validacao: { top: 84.0, left: 73.2, width: 17.2 },
 };
 
-const mm = (value: number): string => `${value}mm`;
-
-function absoluteStyle(top: number, left: number, width: number): CSSProperties {
-  return {
-    position: "absolute",
-    top: mm(top),
-    left: mm(left),
-    width: mm(width),
-    zIndex: 2,
-  };
-}
+const abs = (top: number, left: number, width: number): CSSProperties => ({
+  position: "absolute",
+  top: `${top}%`,
+  left: `${left}%`,
+  width: `${width}%`,
+  zIndex: 2,
+  boxSizing: "border-box",
+});
 
 export function DiplomaUnip({
   state,
@@ -60,6 +51,28 @@ export function DiplomaUnip({
           margin: 0;
         }
 
+        .unip-page-wrap {
+          width: 100%;
+          display: flex;
+          justify-content: center;
+          background: #ececec;
+          padding: 12px;
+          box-sizing: border-box;
+        }
+
+        .unip-diploma-page {
+          width: min(100%, 1086px);
+          aspect-ratio: 1086 / 850;
+          position: relative;
+          overflow: hidden;
+          background: white;
+          box-shadow: 0 2px 10px rgba(0,0,0,.18);
+          color: #000;
+          font-family: ${FONT};
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+
         @media print {
           html, body {
             margin: 0 !important;
@@ -67,204 +80,180 @@ export function DiplomaUnip({
             background: #fff !important;
           }
 
+          .unip-page-wrap {
+            width: 297mm !important;
+            height: 210mm !important;
+            padding: 0 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            background: #fff !important;
+          }
+
           .unip-diploma-page {
-            margin: 0 !important;
+            width: 267mm !important;
+            height: 209mm !important;
+            max-width: none !important;
             box-shadow: none !important;
-            break-after: page;
-            page-break-after: always;
           }
         }
       `}</style>
 
-      <section
-        className="unip-diploma-page"
-        style={{
-          position: "relative",
-          width: mm(PAGE.width),
-          height: mm(PAGE.height),
-          overflow: "hidden",
-          background: "#fff",
-          color: "#000",
-          fontFamily: FONT_BODY,
-          WebkitPrintColorAdjust: "exact",
-          printColorAdjust: "exact",
-          boxSizing: "border-box",
-        }}
-      >
-        <img
-          src="/images/fundo-unip.png"
-          alt=""
-          aria-hidden="true"
-          style={{
-            position: "absolute",
-            inset: 0,
-            zIndex: 0,
-            width: "100%",
-            height: "100%",
-            objectFit: "contain",
-            objectPosition: "center",
-            pointerEvents: "none",
-            userSelect: "none",
-          }}
-        />
-
-        <header
-          style={{
-            ...absoluteStyle(POS.title.top, POS.title.left, POS.title.width),
-            fontFamily: FONT_GOTHIC,
-            fontSize: mm(POS.title.size),
-            lineHeight: 0.92,
-            fontWeight: 400,
-            textAlign: "center",
-            whiteSpace: "nowrap",
-          }}
-        >
-          Universidade Paulista
-        </header>
-
-        <main
-          style={{
-            ...absoluteStyle(POS.body.top, POS.body.left, POS.body.width),
-            fontFamily: FONT_BODY,
-            fontSize: mm(POS.body.size),
-            lineHeight: 1.32,
-            textAlign: "center",
-          }}
-        >
-          <p style={{ margin: 0 }}>
-            A Reitora da Universidade Paulista, no uso de suas atribuições
-          </p>
-          <p style={{ margin: "1.1mm 0 0" }}>
-            e tendo em vista a conclusão do Curso Superior de {ph(state.cursoSuperior)},
-          </p>
-          <p style={{ margin: "1.1mm 0 0" }}>
-            na data de {ph(state.dataConclusao || state.dataColacao)}, e a Colação de Grau na data de {ph(state.dataColacao)}, confere o título de
-          </p>
-        </main>
-
-        <div
-          style={{
-            ...absoluteStyle(POS.degree.top, POS.degree.left, POS.degree.width),
-            fontFamily: FONT_GOTHIC,
-            fontSize: mm(POS.degree.size),
-            lineHeight: 1,
-            textAlign: "center",
-            whiteSpace: "nowrap",
-          }}
-        >
-          {ph(state.titulo)} em {ph(state.cursoSuperior)} a
-        </div>
-
-        <div
-          style={{
-            ...absoluteStyle(POS.student.top, POS.student.left, POS.student.width),
-            fontFamily: FONT_GOTHIC,
-            fontSize: mm(POS.student.size),
-            lineHeight: 1,
-            textAlign: "center",
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}
-        >
-          {ph(state.nomeAluno)}
-        </div>
-
-        <div
-          style={{
-            ...absoluteStyle(POS.identity.top, POS.identity.left, POS.identity.width),
-            fontSize: mm(POS.identity.size),
-            lineHeight: 1.35,
-            textAlign: "center",
-          }}
-        >
-          <p style={{ margin: 0 }}>
-            {ph(state.nacionalidade, "brasileiro(a)")}, natural de {naturalidade || "-"}, nascido(a) em {ph(state.dataNasc)},
-          </p>
-          <p style={{ margin: "1.1mm 0 0" }}>
-            RG nº {ph(state.rg)} e CPF nº {ph(state.cpf)}
-          </p>
-        </div>
-
-        <div
-          style={{
-            ...absoluteStyle(POS.grant.top, POS.grant.left, POS.grant.width),
-            fontSize: mm(POS.grant.size),
-            lineHeight: 1.4,
-            textAlign: "center",
-          }}
-        >
-          <p style={{ margin: 0 }}>e outorga-lhe o presente Diploma,</p>
-          <p style={{ margin: "1.2mm 0 0" }}>
-            a fim de que possa gozar de todos os direitos e prerrogativas legais.
-          </p>
-        </div>
-
-        <div
-          style={{
-            ...absoluteStyle(POS.date.top, POS.date.left, POS.date.width),
-            fontFamily: FONT_GOTHIC,
-            fontSize: mm(POS.date.size),
-            lineHeight: 1,
-            textAlign: "center",
-          }}
-        >
-          {ph(state.cidadeEmissao, "São Paulo")}, {ph(state.dataEmissao)}.
-        </div>
-
-        <div
-          style={{
-            ...absoluteStyle(POS.signature.top, POS.signature.left, POS.signature.width),
-            textAlign: "center",
-            fontFamily: FONT_BODY,
-          }}
-        >
-          <div
+      <div className="unip-page-wrap">
+        <section className="unip-diploma-page">
+          <img
+            src="/images/fundo-unip.png"
+            alt=""
             aria-hidden="true"
             style={{
-              height: "12mm",
-              borderBottom: "0.25mm solid #000",
+              position: "absolute",
+              inset: 0,
+              zIndex: 0,
+              width: "100%",
+              height: "100%",
+              objectFit: "contain",
+              objectPosition: "center",
+              pointerEvents: "none",
+              userSelect: "none",
             }}
           />
+
           <div
             style={{
-              marginTop: "1.2mm",
-              fontSize: "2.45mm",
-              fontWeight: 700,
-              textTransform: "uppercase",
-              lineHeight: 1,
+              ...abs(POS.titulo.top, POS.titulo.left, POS.titulo.width),
+              fontSize: `${POS.titulo.size}cqw`,
+              lineHeight: 0.9,
+              textAlign: "center",
+              whiteSpace: "nowrap",
+              fontWeight: 400,
             }}
           >
-            {state.reitor || "SANDRA REJANE GOMES MIESSA"}
+            Universidade Paulista
           </div>
-          <div style={{ marginTop: "0.7mm", fontSize: "2.25mm", lineHeight: 1 }}>
-            Reitora
-          </div>
-        </div>
 
-        <aside
-          style={{
-            ...absoluteStyle(POS.validation.top, POS.validation.left, POS.validation.width),
-            fontSize: "2.1mm",
-            lineHeight: 1.25,
-            textAlign: "left",
-          }}
-        >
-          <div>Documento digital</div>
-          <div style={{ marginTop: "0.8mm" }}>Código de validação:</div>
-          <div style={{ fontWeight: 700, overflowWrap: "anywhere" }}>
-            {ph(state.codigoUnico)}
+          <div
+            style={{
+              ...abs(POS.introducao.top, POS.introducao.left, POS.introducao.width),
+              fontSize: `${POS.introducao.size}cqw`,
+              lineHeight: 1.28,
+              textAlign: "center",
+            }}
+          >
+            <div>A Reitora da Universidade Paulista, no uso de suas atribuições</div>
+            <div style={{ marginTop: "0.55%" }}>
+              e tendo em vista a conclusão do Curso Superior de {ph(state.cursoSuperior)},
+            </div>
+            <div style={{ marginTop: "0.55%" }}>
+              na data de {ph(state.dataConclusao || state.dataColacao)}, e a Colação de Grau na data de {ph(state.dataColacao)}, confere o título de
+            </div>
           </div>
-        </aside>
 
-        <div style={{ display: "none" }} aria-hidden="true">
-          <MecStampBlock
-            mec={state.mec}
-            onChange={onMecChange}
-            draggable={draggableMec}
-          />
-        </div>
-      </section>
+          <div
+            style={{
+              ...abs(POS.curso.top, POS.curso.left, POS.curso.width),
+              fontSize: `${POS.curso.size}cqw`,
+              lineHeight: 1,
+              textAlign: "center",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {ph(state.titulo)} em {ph(state.cursoSuperior)} a
+          </div>
+
+          <div
+            style={{
+              ...abs(POS.aluno.top, POS.aluno.left, POS.aluno.width),
+              fontSize: `${POS.aluno.size}cqw`,
+              lineHeight: 1,
+              textAlign: "center",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
+            {ph(state.nomeAluno)}
+          </div>
+
+          <div
+            style={{
+              ...abs(POS.dados.top, POS.dados.left, POS.dados.width),
+              fontSize: `${POS.dados.size}cqw`,
+              lineHeight: 1.25,
+              textAlign: "center",
+            }}
+          >
+            <div>
+              {ph(state.nacionalidade, "brasileiro(a)")}, natural de {naturalidade || "-"}, nascido(a) em {ph(state.dataNasc)},
+            </div>
+            <div style={{ marginTop: "0.65%" }}>
+              RG nº {ph(state.rg)} e CPF nº {ph(state.cpf)}
+            </div>
+          </div>
+
+          <div
+            style={{
+              ...abs(POS.outorga.top, POS.outorga.left, POS.outorga.width),
+              fontSize: `${POS.outorga.size}cqw`,
+              lineHeight: 1.25,
+              textAlign: "center",
+            }}
+          >
+            <div>e outorga-lhe o presente Diploma,</div>
+            <div style={{ marginTop: "0.65%" }}>
+              a fim de que possa gozar de todos os direitos e prerrogativas legais.
+            </div>
+          </div>
+
+          <div
+            style={{
+              ...abs(POS.data.top, POS.data.left, POS.data.width),
+              fontSize: `${POS.data.size}cqw`,
+              lineHeight: 1,
+              textAlign: "center",
+            }}
+          >
+            {ph(state.cidadeEmissao, "São Paulo")}, {ph(state.dataEmissao)}.
+          </div>
+
+          <div
+            style={{
+              ...abs(POS.assinatura.top, POS.assinatura.left, POS.assinatura.width),
+              textAlign: "center",
+            }}
+          >
+            <div style={{ height: "5.2cqw", borderBottom: "1px solid #000" }} />
+            <div style={{ marginTop: "0.55cqw", fontSize: "1.35cqw", lineHeight: 1 }}>
+              {state.reitor || "SANDRA REJANE GOMES MIESSA"}
+            </div>
+            <div style={{ marginTop: "0.22cqw", fontSize: "1.15cqw", lineHeight: 1 }}>
+              Reitora
+            </div>
+          </div>
+
+          <div
+            style={{
+              ...abs(POS.validacao.top, POS.validacao.left, POS.validacao.width),
+              fontSize: "0.92cqw",
+              lineHeight: 1.1,
+              textAlign: "left",
+            }}
+          >
+            <div>Documento digital</div>
+            <div style={{ marginTop: "0.2cqw" }}>Código de validação:</div>
+            <div style={{ fontWeight: 700, overflowWrap: "anywhere" }}>
+              {ph(state.codigoUnico)}
+            </div>
+          </div>
+
+          <div style={{ display: "none" }} aria-hidden="true">
+            <MecStampBlock
+              mec={state.mec}
+              onChange={onMecChange}
+              draggable={draggableMec}
+            />
+          </div>
+        </section>
+      </div>
     </>
   );
 }

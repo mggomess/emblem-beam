@@ -30,9 +30,9 @@ const valueStyle: CSSProperties = {
 };
 
 const POS = {
-  nome: { top: 27.1, left: 53.5, width: 121.2, height: 7.2 },
-  folhas: { top: 12.5, left: 179.2, width: 20.6, height: 8.1 },
-  dataEmissao: { top: 26.0, left: 179.0, width: 21.0, height: 8.0 },
+  nome: { top: 27.1, left: 53.5, width: 121.2 },
+  folhas: { top: 12.5, left: 179.2, width: 20.6 },
+  dataEmissao: { top: 26.0, left: 179.0, width: 21.0 },
 
   matricula: { top: 42.6, left: 7.4, width: 31.7 },
   dataNascimento: { top: 42.6, left: 41.7, width: 29.4 },

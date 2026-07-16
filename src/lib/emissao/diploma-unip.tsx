@@ -51,56 +51,41 @@ export function DiplomaUnip({
           margin: 0;
         }
 
-        .unip-page-wrap {
-          width: 100%;
-          display: flex;
-          justify-content: center;
-          background: #ececec;
-          padding: 12px;
-          box-sizing: border-box;
-        }
-
         .unip-diploma-page {
-          width: min(100%, 1086px);
+          height: 100%;
+          width: auto;
+          max-width: 100%;
           aspect-ratio: 1086 / 850;
           position: relative;
           overflow: hidden;
+          margin: 0 auto;
           background: white;
-          box-shadow: 0 2px 10px rgba(0,0,0,.18);
           color: #000;
           font-family: ${FONT};
+          container-type: inline-size;
           -webkit-print-color-adjust: exact;
           print-color-adjust: exact;
         }
 
         @media print {
-          html, body {
-            margin: 0 !important;
-            padding: 0 !important;
-            background: #fff !important;
-          }
-
-          .unip-page-wrap {
-            width: 297mm !important;
-            height: 210mm !important;
-            padding: 0 !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            background: #fff !important;
-          }
-
           .unip-diploma-page {
-            width: 267mm !important;
-            height: 209mm !important;
-            max-width: none !important;
+            height: 100% !important;
+            width: auto !important;
+            max-width: 100% !important;
             box-shadow: none !important;
           }
         }
       `}</style>
 
-      <div className="unip-page-wrap">
-        <section className="unip-diploma-page">
+      <section
+        className="doc-sheet a4-landscape relative overflow-hidden bg-white"
+        style={{
+          WebkitPrintColorAdjust: "exact",
+          printColorAdjust: "exact",
+          fontFamily: FONT,
+        }}
+      >
+        <div className="unip-diploma-page">
           <img
             src="/images/fundo-unip.png"
             alt=""
@@ -252,8 +237,8 @@ export function DiplomaUnip({
               draggable={draggableMec}
             />
           </div>
-        </section>
-      </div>
+        </div>
+      </section>
     </>
   );
 }

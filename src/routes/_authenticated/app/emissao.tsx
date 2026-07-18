@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Plus, Printer, Trash2, RefreshCw, Palette } from "lucide-react";
+import { Plus, Printer, Trash2, RefreshCw, Palette, ArrowUp, ArrowDown, ArrowDownAZ } from "lucide-react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/common/PageHeader";
 import { Button } from "@/components/ui/button";
@@ -16,14 +16,14 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { UFSelect } from "@/components/common/UFSelect";
 import { toast } from "sonner";
 
-import { defaultState, type EmissaoState, type NivelEnsino, type TemplateSuperior, type DisciplinaSuperior } from "@/lib/emissao/types";
+import { defaultState, SITUACOES, type EmissaoState, type NivelEnsino, type TemplateSuperior, type DisciplinaSuperior } from "@/lib/emissao/types";
 import { CertificadoMedio } from "@/lib/emissao/certificado-medio";
 import { UnipCertidao } from "@/lib/emissao/unip-certidao";
 import { DiplomaUnip } from "@/lib/emissao/diploma-unip";
 import { EstacioCertidaoRetrato, EstacioDiplomaPaisagem } from "@/lib/emissao/estacio-templates";
 import { HistoricoMedio } from "@/lib/emissao/historico-medio";
-import { HistoricoSuperior } from "@/lib/emissao/historico-superior";
-import { EstacioHistoricoSuperior } from "@/lib/emissao/estacio-historico";
+import { HistoricoSuperior, HISTORICO_UNIP_LINHAS_POR_FOLHA } from "@/lib/emissao/historico-superior";
+import { EstacioHistoricoSuperior, HISTORICO_ESTACIO_LINHAS_POR_FOLHA } from "@/lib/emissao/estacio-historico";
 
 export const Route = createFileRoute("/_authenticated/app/emissao")({
   head: () => ({ meta: [{ title: "Emissão ao vivo — Certifica" }] }),
@@ -78,6 +78,47 @@ function EmissaoLivePage() {
 
   const isEstacio = s.templateSuperior.startsWith("estacio");
   const isUnipCertidao = s.templateSuperior === "unip-certidao";
+
+  // Paginação do histórico superior — quebra em folhas conforme o layout.
+  const linhasPorFolha = s.nivel === "superior"
+    ? (isEstacio ? HISTORICO_ESTACIO_LINHAS_POR_FOLHA : HISTORICO_UNIP_LINHAS_POR_FOLHA)
+    : 0;
+  const totalFolhasHist = s.nivel === "superior"
+    ? Math.max(1, Math.ceil((s.disciplinasSuperior.length || 0) / linhasPorFolha) || 1)
+    : 1;
+
+  // Manipulação da tabela de disciplinas (superior).
+  const updateDisc = (i: number, patchRow: Partial<DisciplinaSuperior>) => {
+    const arr = [...s.disciplinasSuperior];
+    arr[i] = { ...arr[i], ...patchRow };
+    patch({ disciplinasSuperior: arr });
+  };
+  const addDisc = () => patch({
+    disciplinasSuperior: [
+      ...s.disciplinasSuperior,
+      { periodo: "", codigo: "", descricao: "", ch: "", perLetivo: "", media: "", frequencia: "", situacao: "AP" },
+    ],
+  });
+  const removeDisc = (i: number) =>
+    patch({ disciplinasSuperior: s.disciplinasSuperior.filter((_, j) => j !== i) });
+  const moveDisc = (i: number, dir: -1 | 1) => {
+    const j = i + dir;
+    if (j < 0 || j >= s.disciplinasSuperior.length) return;
+    const arr = [...s.disciplinasSuperior];
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+    patch({ disciplinasSuperior: arr });
+  };
+  const sortByPeriodo = () => {
+    const arr = [...s.disciplinasSuperior].sort((a, b) => {
+      const pa = parseInt(a.periodo, 10);
+      const pb = parseInt(b.periodo, 10);
+      if (isNaN(pa) && isNaN(pb)) return a.periodo.localeCompare(b.periodo);
+      if (isNaN(pa)) return 1;
+      if (isNaN(pb)) return -1;
+      return pa - pb;
+    });
+    patch({ disciplinasSuperior: arr });
+  };
 
   return (
     <AppLayout title="Emissão ao vivo">
@@ -271,38 +312,92 @@ function EmissaoLivePage() {
                       <Input className="rounded-xl" value={s.corTemaHistorico} onChange={(e) => patch({ corTemaHistorico: e.target.value })} />
                     </div>
                   </div>
-                  <div className="space-y-1.5">
-                    <div className="flex items-center justify-between">
-                      <Label>Disciplinas</Label>
-                      <Button size="sm" variant="outline" className="rounded-lg h-7 text-xs"
-                        onClick={() => patch({ disciplinasSuperior: [...s.disciplinasSuperior, { periodo: "", codigo: "", descricao: "", ch: "", perLetivo: "", media: "", situacao: "AP" }] })}>
-                        <Plus className="size-3" /> Linha
-                      </Button>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between gap-2">
+                      <Label className="text-sm">
+                        Disciplinas ({s.disciplinasSuperior.length})
+                        {s.disciplinasSuperior.length > linhasPorFolha && (
+                          <span className="ml-1 text-[10px] text-muted-foreground">
+                            — {totalFolhasHist} folha(s), {linhasPorFolha}/folha
+                          </span>
+                        )}
+                      </Label>
+                      <div className="flex gap-1">
+                        <Button size="sm" variant="outline" className="rounded-lg h-7 text-xs"
+                          onClick={sortByPeriodo}
+                          title="Ordenar por período">
+                          <ArrowDownAZ className="size-3" />
+                        </Button>
+                        <Button size="sm" variant="outline" className="rounded-lg h-7 text-xs"
+                          onClick={addDisc}>
+                          <Plus className="size-3" /> Disciplina
+                        </Button>
+                      </div>
                     </div>
+
+                    {s.disciplinasSuperior.length === 0 && (
+                      <div className="rounded-lg border border-dashed p-3 text-center text-xs text-muted-foreground">
+                        Nenhuma disciplina cadastrada. Clique em "Disciplina" para adicionar.
+                      </div>
+                    )}
+
                     {s.disciplinasSuperior.map((d, i) => (
-                      <div key={i} className="rounded-lg border p-2 space-y-1">
-                        <div className="grid grid-cols-4 gap-1">
-                          {(["periodo", "codigo", "ch", "situacao"] as const).map((k) => (
-                            <Input key={k} placeholder={k} className="rounded text-xs" value={d[k]}
-                              onChange={(e) => {
-                                const arr = [...s.disciplinasSuperior]; arr[i] = { ...d, [k]: e.target.value } as DisciplinaSuperior; patch({ disciplinasSuperior: arr });
-                              }} />
-                          ))}
+                      <div key={i} className="rounded-lg border p-2 space-y-1.5 bg-muted/30">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-medium text-muted-foreground">#{i + 1}</span>
+                          <div className="flex gap-0.5">
+                            <Button size="icon" variant="ghost" className="h-6 w-6"
+                              disabled={i === 0}
+                              onClick={() => moveDisc(i, -1)} title="Mover para cima">
+                              <ArrowUp className="size-3" />
+                            </Button>
+                            <Button size="icon" variant="ghost" className="h-6 w-6"
+                              disabled={i === s.disciplinasSuperior.length - 1}
+                              onClick={() => moveDisc(i, 1)} title="Mover para baixo">
+                              <ArrowDown className="size-3" />
+                            </Button>
+                            <Button size="icon" variant="ghost" className="h-6 w-6 text-destructive"
+                              onClick={() => removeDisc(i)} title="Excluir">
+                              <Trash2 className="size-3" />
+                            </Button>
+                          </div>
                         </div>
-                        <Input placeholder="descrição" className="rounded text-xs" value={d.descricao}
-                          onChange={(e) => {
-                            const arr = [...s.disciplinasSuperior]; arr[i] = { ...d, descricao: e.target.value }; patch({ disciplinasSuperior: arr });
-                          }} />
-                        <div className="grid grid-cols-[1fr_1fr_auto] gap-1">
-                          <Input placeholder="per. letivo" className="rounded text-xs" value={d.perLetivo}
-                            onChange={(e) => { const arr = [...s.disciplinasSuperior]; arr[i] = { ...d, perLetivo: e.target.value }; patch({ disciplinasSuperior: arr }); }} />
-                          <Input placeholder="média" className="rounded text-xs" value={d.media}
-                            onChange={(e) => { const arr = [...s.disciplinasSuperior]; arr[i] = { ...d, media: e.target.value }; patch({ disciplinasSuperior: arr }); }} />
-                          <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive"
-                            onClick={() => patch({ disciplinasSuperior: s.disciplinasSuperior.filter((_, j) => j !== i) })}>
-                            <Trash2 className="size-3.5" />
-                          </Button>
+
+                        <div className="grid grid-cols-[70px_1fr] gap-1">
+                          <Input placeholder="Período" className="rounded text-xs h-8" value={d.periodo}
+                            onChange={(e) => updateDisc(i, { periodo: e.target.value })} />
+                          <Input placeholder="Código" className="rounded text-xs h-8" value={d.codigo}
+                            onChange={(e) => updateDisc(i, { codigo: e.target.value })} />
                         </div>
+
+                        <Input placeholder="Nome da disciplina" className="rounded text-xs h-8" value={d.descricao}
+                          onChange={(e) => updateDisc(i, { descricao: e.target.value })} />
+
+                        <div className="grid grid-cols-2 gap-1">
+                          <Input placeholder="C.H." className="rounded text-xs h-8" value={d.ch}
+                            onChange={(e) => updateDisc(i, { ch: e.target.value })} />
+                          <Input placeholder="Ano/Semestre" className="rounded text-xs h-8" value={d.perLetivo}
+                            onChange={(e) => updateDisc(i, { perLetivo: e.target.value })} />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-1">
+                          <Input placeholder="Nota" className="rounded text-xs h-8" value={d.media}
+                            onChange={(e) => updateDisc(i, { media: e.target.value })} />
+                          <Input placeholder="Frequência %" className="rounded text-xs h-8" value={d.frequencia ?? ""}
+                            onChange={(e) => updateDisc(i, { frequencia: e.target.value })} />
+                        </div>
+
+                        <Select value={d.situacao || "AP"}
+                          onValueChange={(v) => updateDisc(i, { situacao: v })}>
+                          <SelectTrigger className="rounded text-xs h-8"><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            {SITUACOES.map((o) => (
+                              <SelectItem key={o.value} value={o.value} className="text-xs">
+                                {o.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </div>
                     ))}
                   </div>
@@ -366,21 +461,27 @@ function EmissaoLivePage() {
             </div>
           </div>
 
-          <div className="mt-6 mb-2 text-xs uppercase tracking-wider text-muted-foreground">
-            Folha 2 — Histórico Escolar
-          </div>
-          <div className="overflow-auto">
-            <div className="origin-top-left" style={{ transform: "scale(0.62)", width: "fit-content" }}>
-              <HistComponent state={s} />
+          {Array.from({ length: totalFolhasHist }, (_, i) => (
+            <div key={`hist-preview-${i}`}>
+              <div className="mt-6 mb-2 text-xs uppercase tracking-wider text-muted-foreground">
+                Folha {i + 2} — Histórico Escolar {totalFolhasHist > 1 ? `(${i + 1}/${totalFolhasHist})` : ""}
+              </div>
+              <div className="overflow-auto">
+                <div className="origin-top-left" style={{ transform: "scale(0.62)", width: "fit-content" }}>
+                  <HistComponent state={s} page={i} totalPages={totalFolhasHist} />
+                </div>
+              </div>
             </div>
-          </div>
+          ))}
         </div>
       </div>
 
       {/* Somente para impressão */}
       <div className="print-root">
         <CertComponent state={s} onMecChange={() => {}} draggableMec={false} />
-        <HistComponent state={s} />
+        {Array.from({ length: totalFolhasHist }, (_, i) => (
+          <HistComponent key={`hist-print-${i}`} state={s} page={i} totalPages={totalFolhasHist} />
+        ))}
       </div>
     </AppLayout>
   );

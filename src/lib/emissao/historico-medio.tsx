@@ -2,7 +2,7 @@ import type { EmissaoState } from "./types";
 import { QrBlock } from "./qr-block";
 
 /** Histórico Escolar — Ensino Médio (Modelo SP com matriz BNCC). */
-export function HistoricoMedio({ state }: { state: EmissaoState }) {
+export function HistoricoMedio({ state }: { state: EmissaoState; page?: number; totalPages?: number }) {
   const brasaoUf = `/estados/brasoes/${state.uf.toLowerCase()}.png`;
 
   return (

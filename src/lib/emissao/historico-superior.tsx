@@ -2,7 +2,9 @@ import type { CSSProperties } from "react";
 import type { EmissaoState } from "./types";
 import { QrBlock } from "./qr-block";
 
-type Props = { state: EmissaoState };
+type Props = { state: EmissaoState; page?: number; totalPages?: number };
+
+export const HISTORICO_UNIP_LINHAS_POR_FOLHA = 27;
 
 const MM = (v: number) => `${v}mm`;
 
@@ -119,9 +121,14 @@ function T({
   );
 }
 
-export function HistoricoSuperior({ state }: Props) {
-  const disciplinas = state.disciplinasSuperior ?? [];
+export function HistoricoSuperior({ state, page = 0, totalPages }: Props) {
   const P = POS_UNIP;
+  const all = state.disciplinasSuperior ?? [];
+  const per = P.maxLinhas;
+  const computedTotal = Math.max(1, Math.ceil(all.length / per) || 1);
+  const total = totalPages ?? computedTotal;
+  const offset = page * per;
+  const disciplinas = all.slice(offset, offset + per);
 
   return (
     <div
@@ -156,7 +163,7 @@ export function HistoricoSuperior({ state }: Props) {
         }}
       />
 
-      <T value="1" {...P.folhas} fontSize="2.2mm" bold />
+      <T value={`${page + 1}/${total}`} {...P.folhas} fontSize="2.2mm" bold />
       <T value={state.dataEmissao} {...P.dataEmissao} fontSize="1.95mm" />
 
       <T value={state.nomeAluno} {...P.nome} fontSize="2.6mm" bold />
@@ -228,10 +235,11 @@ export function HistoricoSuperior({ state }: Props) {
         <div>&nbsp;</div>
       </div>
 
-      {disciplinas.slice(0, P.maxLinhas).map((d, i) => {
+      {disciplinas.map((d, i) => {
+        const idx = offset + i;
         const top = P.tabelaTop + i * P.linhaAltura;
         return (
-          <div key={`${d.codigo}-${i}`}>
+          <div key={`${d.codigo}-${idx}`}>
             <T value={d.periodo}   top={top} {...P.colunas.periodo}   fontSize="1.85mm" />
             <T value={d.codigo}    top={top} {...P.colunas.codigo}    fontSize="1.85mm" />
             <T value={d.descricao} top={top} {...P.colunas.descricao} fontSize="1.85mm" align="left" />

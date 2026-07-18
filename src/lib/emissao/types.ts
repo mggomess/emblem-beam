@@ -19,13 +19,31 @@ export type DisciplinaBNCC = {
   s3: string;
 };
 
+export type SituacaoDisciplina =
+  | "AP" | "RM" | "RF" | "DP" | "DS" | "AE" | "EX" | "AC" | "NC";
+
+export const SITUACOES: { value: SituacaoDisciplina; label: string }[] = [
+  { value: "AP", label: "AP — Aprovado" },
+  { value: "RM", label: "RM — Reprovado por Média" },
+  { value: "RF", label: "RF — Reprovado por Falta" },
+  { value: "DP", label: "DP — Dependência" },
+  { value: "DS", label: "DS — Dispensado" },
+  { value: "AE", label: "AE — Aproveitamento de Estudos" },
+  { value: "EX", label: "EX — Extracurricular" },
+  { value: "AC", label: "AC — Aguardando Complementação" },
+  { value: "NC", label: "NC — Não Cursada" },
+];
+
 export type DisciplinaSuperior = {
   periodo: string;
   codigo: string;
   descricao: string;
   ch: string;
   perLetivo: string;
+  /** Média/Nota final exibida na coluna "MÉDIA" do histórico. */
   media: string;
+  /** Frequência em % — armazenada para relatórios internos. */
+  frequencia?: string;
   situacao: string;
 };
 

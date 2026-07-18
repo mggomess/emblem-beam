@@ -2,7 +2,9 @@ import type { CSSProperties } from "react";
 import type { EmissaoState } from "./types";
 import { QrBlock } from "./qr-block";
 
-type Props = { state: EmissaoState };
+type Props = { state: EmissaoState; page?: number; totalPages?: number };
+
+export const HISTORICO_ESTACIO_LINHAS_POR_FOLHA = 40;
 
 const MM = (v: number) => `${v}mm`;
 
@@ -120,9 +122,14 @@ function T({
   );
 }
 
-export function EstacioHistoricoSuperior({ state }: Props) {
-  const disciplinas = state.disciplinasSuperior ?? [];
+export function EstacioHistoricoSuperior({ state, page = 0, totalPages }: Props) {
   const P = POS_ESTACIO;
+  const all = state.disciplinasSuperior ?? [];
+  const per = P.maxLinhas;
+  const computedTotal = Math.max(1, Math.ceil(all.length / per) || 1);
+  const total = totalPages ?? computedTotal;
+  const offset = page * per;
+  const disciplinas = all.slice(offset, offset + per);
 
   return (
     <div
@@ -157,7 +164,7 @@ export function EstacioHistoricoSuperior({ state }: Props) {
         }}
       />
 
-      <T value="1/1" {...P.folha} align="center" fontSize="2.0mm" />
+      <T value={`${page + 1}/${total}`} {...P.folha} align="center" fontSize="2.0mm" />
 
       <T value={state.nomeAluno} {...P.nome} bold />
       <T value={state.matricula} {...P.matricula} />
@@ -190,10 +197,11 @@ export function EstacioHistoricoSuperior({ state }: Props) {
       />
       <T value={state.periodoInicio} {...P.inicio} align="center" />
 
-      {disciplinas.slice(0, P.maxLinhas).map((d, i) => {
+      {disciplinas.map((d, i) => {
+        const idx = offset + i;
         const top = P.tabelaTop + i * P.linhaAltura;
         return (
-          <div key={`${d.codigo}-${i}`}>
+          <div key={`${d.codigo}-${idx}`}>
             <T value={d.periodo}   top={top} {...P.colunas.periodo}   align="center" fontSize="1.75mm" />
             <T value={d.codigo}    top={top} {...P.colunas.codigo}    align="center" fontSize="1.75mm" />
             <T value={d.descricao} top={top} {...P.colunas.descricao} align="left"   fontSize="1.75mm" />

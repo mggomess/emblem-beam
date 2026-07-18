@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
-import { Plus, Printer, Trash2, RefreshCw, Palette, ArrowUp, ArrowDown, ArrowDownAZ } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Plus, Printer, Trash2, RefreshCw, Palette, ArrowUp, ArrowDown, ArrowDownAZ, Loader2 } from "lucide-react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/common/PageHeader";
 import { Button } from "@/components/ui/button";
@@ -16,7 +16,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { UFSelect } from "@/components/common/UFSelect";
 import { toast } from "sonner";
 
-import { defaultState, SITUACOES, type EmissaoState, type NivelEnsino, type TemplateSuperior, type DisciplinaSuperior } from "@/lib/emissao/types";
+import { defaultState, SITUACOES, type EmissaoState, type NivelEnsino, type TemplateSuperior, type DisciplinaSuperior, type UniversidadeHist } from "@/lib/emissao/types";
 import { CertificadoMedio } from "@/lib/emissao/certificado-medio";
 import { UnipCertidao } from "@/lib/emissao/unip-certidao";
 import { DiplomaUnip } from "@/lib/emissao/diploma-unip";
@@ -24,6 +24,7 @@ import { EstacioCertidaoRetrato, EstacioDiplomaPaisagem } from "@/lib/emissao/es
 import { HistoricoMedio } from "@/lib/emissao/historico-medio";
 import { HistoricoSuperior, HISTORICO_UNIP_LINHAS_POR_FOLHA } from "@/lib/emissao/historico-superior";
 import { EstacioHistoricoSuperior, HISTORICO_ESTACIO_LINHAS_POR_FOLHA } from "@/lib/emissao/estacio-historico";
+import { useMatrices, fetchDisciplinesForMatrix, calcularChCumprida } from "@/lib/emissao/use-curriculum";
 
 export const Route = createFileRoute("/_authenticated/app/emissao")({
   head: () => ({ meta: [{ title: "Emissão ao vivo — Certifica" }] }),

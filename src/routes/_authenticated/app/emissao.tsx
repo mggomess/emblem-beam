@@ -250,6 +250,25 @@ function EmissaoLivePage() {
                   </div>
                   <F label="Portaria MEC" val={s.portariaMec} on={(v) => patch({ portariaMec: v })} />
                   <F label="Resolução CNE/CP" val={s.resolucao} on={(v) => patch({ resolucao: v })} />
+                  <div className="grid grid-cols-2 gap-2">
+                    <F label="Código e-MEC" val={s.codigoEmec} on={(v) => patch({ codigoEmec: v })} />
+                    <F label="Reconhecimento (Portaria)" val={s.reconhecimentoPortaria} on={(v) => patch({ reconhecimentoPortaria: v })} />
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <F label="Publicação DOU" val={s.publicacaoDou} on={(v) => patch({ publicacaoDou: v })} />
+                    <F label="Forma de ingresso" val={s.formaIngresso} on={(v) => patch({ formaIngresso: v })} />
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <F label="Disciplinas do vestibular" val={s.disciplinasVestibular} on={(v) => patch({ disciplinasVestibular: v })} />
+                    <F label="Mês/Ano do vestibular" val={s.mesAnoVestibular} on={(v) => patch({ mesAnoVestibular: v })} />
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <F label="C.H. Exigida" val={s.chExigida} on={(v) => patch({ chExigida: v })} />
+                    <div>
+                      <Label className="text-xs">C.H. Cumprida (auto)</Label>
+                      <Input readOnly className="rounded-xl bg-muted/40" value={`${chCumprida} h`} />
+                    </div>
+                  </div>
                   <F label="Reitor(a)" val={s.reitor} on={(v) => patch({ reitor: v })} />
                   <F label="Secretário(a) Geral" val={s.secretarioGeral} on={(v) => patch({ secretarioGeral: v })} />
                   <F label="Endereço do polo (rodapé)" val={s.enderecoPolo} on={(v) => patch({ enderecoPolo: v })} />

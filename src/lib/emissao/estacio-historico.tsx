@@ -197,10 +197,11 @@ export function EstacioHistoricoSuperior({ state, page = 0, totalPages }: Props)
       />
       <T value={state.periodoInicio} {...P.inicio} align="center" />
 
-      {disciplinas.slice(0, P.maxLinhas).map((d, i) => {
+      {disciplinas.map((d, i) => {
+        const idx = offset + i;
         const top = P.tabelaTop + i * P.linhaAltura;
         return (
-          <div key={`${d.codigo}-${i}`}>
+          <div key={`${d.codigo}-${idx}`}>
             <T value={d.periodo}   top={top} {...P.colunas.periodo}   align="center" fontSize="1.75mm" />
             <T value={d.codigo}    top={top} {...P.colunas.codigo}    align="center" fontSize="1.75mm" />
             <T value={d.descricao} top={top} {...P.colunas.descricao} align="left"   fontSize="1.75mm" />

@@ -461,21 +461,27 @@ function EmissaoLivePage() {
             </div>
           </div>
 
-          <div className="mt-6 mb-2 text-xs uppercase tracking-wider text-muted-foreground">
-            Folha 2 — Histórico Escolar
-          </div>
-          <div className="overflow-auto">
-            <div className="origin-top-left" style={{ transform: "scale(0.62)", width: "fit-content" }}>
-              <HistComponent state={s} />
+          {Array.from({ length: totalFolhasHist }, (_, i) => (
+            <div key={`hist-preview-${i}`}>
+              <div className="mt-6 mb-2 text-xs uppercase tracking-wider text-muted-foreground">
+                Folha {i + 2} — Histórico Escolar {totalFolhasHist > 1 ? `(${i + 1}/${totalFolhasHist})` : ""}
+              </div>
+              <div className="overflow-auto">
+                <div className="origin-top-left" style={{ transform: "scale(0.62)", width: "fit-content" }}>
+                  <HistComponent state={s} page={i} totalPages={totalFolhasHist} />
+                </div>
+              </div>
             </div>
-          </div>
+          ))}
         </div>
       </div>
 
       {/* Somente para impressão */}
       <div className="print-root">
         <CertComponent state={s} onMecChange={() => {}} draggableMec={false} />
-        <HistComponent state={s} />
+        {Array.from({ length: totalFolhasHist }, (_, i) => (
+          <HistComponent key={`hist-print-${i}`} state={s} page={i} totalPages={totalFolhasHist} />
+        ))}
       </div>
     </AppLayout>
   );

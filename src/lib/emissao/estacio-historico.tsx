@@ -2,7 +2,9 @@ import type { CSSProperties } from "react";
 import type { EmissaoState } from "./types";
 import { QrBlock } from "./qr-block";
 
-type Props = { state: EmissaoState };
+type Props = { state: EmissaoState; page?: number; totalPages?: number };
+
+export const HISTORICO_ESTACIO_LINHAS_POR_FOLHA = 40;
 
 const MM = (v: number) => `${v}mm`;
 

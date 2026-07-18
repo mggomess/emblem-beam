@@ -163,7 +163,7 @@ export function HistoricoSuperior({ state, page = 0, totalPages }: Props) {
         }}
       />
 
-      <T value="1" {...P.folhas} fontSize="2.2mm" bold />
+      <T value={`${page + 1}/${total}`} {...P.folhas} fontSize="2.2mm" bold />
       <T value={state.dataEmissao} {...P.dataEmissao} fontSize="1.95mm" />
 
       <T value={state.nomeAluno} {...P.nome} fontSize="2.6mm" bold />

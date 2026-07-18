@@ -120,33 +120,122 @@ export type Database = {
       courses: {
         Row: {
           active: boolean
+          ch_exigida: number | null
+          codigo_emec: string | null
           created_at: string
           description: string | null
+          forma_ingresso: string | null
           id: string
           name: string
           owner_id: string
+          publicacao_dou: string | null
+          reconhecimento_portaria: string | null
+          universidade: string | null
           updated_at: string
           workload: number
         }
         Insert: {
           active?: boolean
+          ch_exigida?: number | null
+          codigo_emec?: string | null
           created_at?: string
           description?: string | null
+          forma_ingresso?: string | null
           id?: string
           name: string
           owner_id: string
+          publicacao_dou?: string | null
+          reconhecimento_portaria?: string | null
+          universidade?: string | null
           updated_at?: string
           workload?: number
         }
         Update: {
           active?: boolean
+          ch_exigida?: number | null
+          codigo_emec?: string | null
           created_at?: string
           description?: string | null
+          forma_ingresso?: string | null
           id?: string
           name?: string
           owner_id?: string
+          publicacao_dou?: string | null
+          reconhecimento_portaria?: string | null
+          universidade?: string | null
           updated_at?: string
           workload?: number
+        }
+        Relationships: []
+      }
+      curriculum_disciplines: {
+        Row: {
+          carga_horaria: number
+          codigo: string
+          created_at: string
+          id: string
+          matrix_id: string
+          nome: string
+          ordem: number
+          periodo: string
+        }
+        Insert: {
+          carga_horaria?: number
+          codigo: string
+          created_at?: string
+          id?: string
+          matrix_id: string
+          nome: string
+          ordem?: number
+          periodo: string
+        }
+        Update: {
+          carga_horaria?: number
+          codigo?: string
+          created_at?: string
+          id?: string
+          matrix_id?: string
+          nome?: string
+          ordem?: number
+          periodo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "curriculum_disciplines_matrix_id_fkey"
+            columns: ["matrix_id"]
+            isOneToOne: false
+            referencedRelation: "curriculum_matrices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      curriculum_matrices: {
+        Row: {
+          carga_horaria: number
+          created_at: string
+          curso: string
+          id: string
+          universidade: string
+          updated_at: string
+          versao: string
+        }
+        Insert: {
+          carga_horaria?: number
+          created_at?: string
+          curso: string
+          id?: string
+          universidade: string
+          updated_at?: string
+          versao?: string
+        }
+        Update: {
+          carga_horaria?: number
+          created_at?: string
+          curso?: string
+          id?: string
+          universidade?: string
+          updated_at?: string
+          versao?: string
         }
         Relationships: []
       }

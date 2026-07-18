@@ -45,7 +45,11 @@ export type DisciplinaSuperior = {
   /** Frequência em % — armazenada para relatórios internos. */
   frequencia?: string;
   situacao: string;
+  /** Marca disciplinas vindas da matriz curricular (metadados travados). */
+  fromMatrix?: boolean;
 };
+
+export type UniversidadeHist = "UNIP" | "ESTACIO";
 
 export type EmissaoState = {
   nivel: NivelEnsino;
@@ -111,6 +115,22 @@ export type EmissaoState = {
   observacoesHistorico: string;
   legendaNotas: string;
   corTemaHistorico: string;
+
+  // Novos — histórico universitário completo
+  universidadeHist: UniversidadeHist;
+  matrixId: string;
+  matrixVersao: string;
+  codigoEmec: string;
+  reconhecimentoPortaria: string;
+  publicacaoDou: string;
+  formaIngresso: string;
+  disciplinasVestibular: string;
+  mesAnoVestibular: string;
+  chExigida: string;
+  certificadoMilitar: string;
+  tituloEleitor: string;
+  zonaEleitoral: string;
+  secaoEleitoral: string;
 };
 
 export const defaultState: EmissaoState = {
@@ -178,4 +198,18 @@ export const defaultState: EmissaoState = {
   observacoesHistorico: "",
   legendaNotas: "AP - Aprovado | DS - Dispensado | RF - Reprovado por Falta | RM - Reprovado por Média",
   corTemaHistorico: "#1D3557",
+  universidadeHist: "UNIP",
+  matrixId: "",
+  matrixVersao: "2024",
+  codigoEmec: "",
+  reconhecimentoPortaria: "",
+  publicacaoDou: "",
+  formaIngresso: "Vestibular",
+  disciplinasVestibular: "",
+  mesAnoVestibular: "",
+  chExigida: "3200",
+  certificadoMilitar: "",
+  tituloEleitor: "",
+  zonaEleitoral: "",
+  secaoEleitoral: "",
 };

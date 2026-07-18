@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
-import { Plus, Printer, Trash2, RefreshCw, Palette, ArrowUp, ArrowDown, ArrowDownAZ } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Plus, Printer, Trash2, RefreshCw, Palette, ArrowUp, ArrowDown, ArrowDownAZ, Loader2 } from "lucide-react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/common/PageHeader";
 import { Button } from "@/components/ui/button";
@@ -16,7 +16,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { UFSelect } from "@/components/common/UFSelect";
 import { toast } from "sonner";
 
-import { defaultState, SITUACOES, type EmissaoState, type NivelEnsino, type TemplateSuperior, type DisciplinaSuperior } from "@/lib/emissao/types";
+import { defaultState, SITUACOES, type EmissaoState, type NivelEnsino, type TemplateSuperior, type DisciplinaSuperior, type UniversidadeHist } from "@/lib/emissao/types";
 import { CertificadoMedio } from "@/lib/emissao/certificado-medio";
 import { UnipCertidao } from "@/lib/emissao/unip-certidao";
 import { DiplomaUnip } from "@/lib/emissao/diploma-unip";
@@ -24,6 +24,7 @@ import { EstacioCertidaoRetrato, EstacioDiplomaPaisagem } from "@/lib/emissao/es
 import { HistoricoMedio } from "@/lib/emissao/historico-medio";
 import { HistoricoSuperior, HISTORICO_UNIP_LINHAS_POR_FOLHA } from "@/lib/emissao/historico-superior";
 import { EstacioHistoricoSuperior, HISTORICO_ESTACIO_LINHAS_POR_FOLHA } from "@/lib/emissao/estacio-historico";
+import { useMatrices, fetchDisciplinesForMatrix, calcularChCumprida } from "@/lib/emissao/use-curriculum";
 
 export const Route = createFileRoute("/_authenticated/app/emissao")({
   head: () => ({ meta: [{ title: "Emissão ao vivo — Certifica" }] }),
@@ -119,6 +120,37 @@ function EmissaoLivePage() {
     });
     patch({ disciplinasSuperior: arr });
   };
+
+  // Sincroniza universidadeHist com o template escolhido.
+  useEffect(() => {
+    const uni: UniversidadeHist = s.templateSuperior.startsWith("estacio") ? "ESTACIO" : "UNIP";
+    if (uni !== s.universidadeHist) patch({ universidadeHist: uni, matrixId: "" });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [s.templateSuperior]);
+
+  const { matrices, loading: loadingMatrices } = useMatrices(s.universidadeHist);
+  const [loadingDisc, setLoadingDisc] = useState(false);
+
+  const carregarMatriz = async (matrixId: string) => {
+    const matrix = matrices.find((m) => m.id === matrixId);
+    if (!matrix) return;
+    setLoadingDisc(true);
+    const disciplinas = await fetchDisciplinesForMatrix(matrixId);
+    setLoadingDisc(false);
+    patch({
+      matrixId,
+      matrixVersao: matrix.versao,
+      cursoSuperior: matrix.curso,
+      chExigida: String(matrix.carga_horaria || ""),
+      disciplinasSuperior: disciplinas,
+    });
+    toast.success(`Matriz carregada: ${disciplinas.length} disciplinas`);
+  };
+
+  const chCumprida = useMemo(
+    () => calcularChCumprida(s.disciplinasSuperior),
+    [s.disciplinasSuperior],
+  );
 
   return (
     <AppLayout title="Emissão ao vivo">
@@ -218,6 +250,25 @@ function EmissaoLivePage() {
                   </div>
                   <F label="Portaria MEC" val={s.portariaMec} on={(v) => patch({ portariaMec: v })} />
                   <F label="Resolução CNE/CP" val={s.resolucao} on={(v) => patch({ resolucao: v })} />
+                  <div className="grid grid-cols-2 gap-2">
+                    <F label="Código e-MEC" val={s.codigoEmec} on={(v) => patch({ codigoEmec: v })} />
+                    <F label="Reconhecimento (Portaria)" val={s.reconhecimentoPortaria} on={(v) => patch({ reconhecimentoPortaria: v })} />
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <F label="Publicação DOU" val={s.publicacaoDou} on={(v) => patch({ publicacaoDou: v })} />
+                    <F label="Forma de ingresso" val={s.formaIngresso} on={(v) => patch({ formaIngresso: v })} />
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <F label="Disciplinas do vestibular" val={s.disciplinasVestibular} on={(v) => patch({ disciplinasVestibular: v })} />
+                    <F label="Mês/Ano do vestibular" val={s.mesAnoVestibular} on={(v) => patch({ mesAnoVestibular: v })} />
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <F label="C.H. Exigida" val={s.chExigida} on={(v) => patch({ chExigida: v })} />
+                    <div>
+                      <Label className="text-xs">C.H. Cumprida (auto)</Label>
+                      <Input readOnly className="rounded-xl bg-muted/40" value={`${chCumprida} h`} />
+                    </div>
+                  </div>
                   <F label="Reitor(a)" val={s.reitor} on={(v) => patch({ reitor: v })} />
                   <F label="Secretário(a) Geral" val={s.secretarioGeral} on={(v) => patch({ secretarioGeral: v })} />
                   <F label="Endereço do polo (rodapé)" val={s.enderecoPolo} on={(v) => patch({ enderecoPolo: v })} />
@@ -270,6 +321,12 @@ function EmissaoLivePage() {
                 <F label="Estado de nasc." val={s.estadoNasc} on={(v) => patch({ estadoNasc: v })} />
               </div>
               <F label="Data de nascimento" val={s.dataNasc} on={(v) => patch({ dataNasc: v })} />
+              <F label="Certificado Militar" val={s.certificadoMilitar} on={(v) => patch({ certificadoMilitar: v })} />
+              <div className="grid grid-cols-3 gap-2">
+                <F label="Título de Eleitor" val={s.tituloEleitor} on={(v) => patch({ tituloEleitor: v })} />
+                <F label="Zona" val={s.zonaEleitoral} on={(v) => patch({ zonaEleitoral: v })} />
+                <F label="Seção" val={s.secaoEleitoral} on={(v) => patch({ secaoEleitoral: v })} />
+              </div>
             </TabsContent>
 
             <TabsContent value="hist" className="mt-4 space-y-3">
@@ -303,6 +360,50 @@ function EmissaoLivePage() {
                 </>
               ) : (
                 <>
+                  <div className="rounded-lg border p-3 space-y-2 bg-muted/20">
+                    <Label className="text-xs font-semibold">Matriz Curricular</Label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <Label className="text-[10px]">Universidade</Label>
+                        <Select
+                          value={s.universidadeHist}
+                          onValueChange={(v: UniversidadeHist) => patch({
+                            universidadeHist: v,
+                            matrixId: "",
+                            templateSuperior: v === "ESTACIO" ? "estacio-certidao" : "unip-certidao",
+                          })}
+                        >
+                          <SelectTrigger className="rounded-lg h-8 text-xs"><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="UNIP">UNIP</SelectItem>
+                            <SelectItem value="ESTACIO">ESTÁCIO</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label className="text-[10px]">Curso</Label>
+                        <Select
+                          value={s.matrixId}
+                          onValueChange={(v) => carregarMatriz(v)}
+                          disabled={loadingMatrices || matrices.length === 0}
+                        >
+                          <SelectTrigger className="rounded-lg h-8 text-xs">
+                            <SelectValue placeholder={loadingMatrices ? "Carregando…" : "Selecionar…"} />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {matrices.map((m) => (
+                              <SelectItem key={m.id} value={m.id} className="text-xs">{m.curso}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between text-[10px] text-muted-foreground">
+                      <span>C.H. cumprida: <strong className="text-foreground">{chCumprida}h</strong> / {s.chExigida || "?"}h</span>
+                      {loadingDisc && <Loader2 className="size-3 animate-spin" />}
+                    </div>
+                  </div>
+
                   <div>
                     <Label className="flex items-center gap-1.5"><Palette className="size-3.5" /> Cor temática (só UNIP genérico)</Label>
                     <div className="flex items-center gap-2">
@@ -337,9 +438,10 @@ function EmissaoLivePage() {
 
                     {s.disciplinasSuperior.length === 0 && (
                       <div className="rounded-lg border border-dashed p-3 text-center text-xs text-muted-foreground">
-                        Nenhuma disciplina cadastrada. Clique em "Disciplina" para adicionar.
+                        Selecione uma matriz curricular acima, ou clique em "Disciplina" para adicionar manualmente.
                       </div>
                     )}
+
 
                     {s.disciplinasSuperior.map((d, i) => (
                       <div key={i} className="rounded-lg border p-2 space-y-1.5 bg-muted/30">
@@ -367,14 +469,17 @@ function EmissaoLivePage() {
                           <Input placeholder="Período" className="rounded text-xs h-8" value={d.periodo}
                             onChange={(e) => updateDisc(i, { periodo: e.target.value })} />
                           <Input placeholder="Código" className="rounded text-xs h-8" value={d.codigo}
+                            readOnly={d.fromMatrix}
                             onChange={(e) => updateDisc(i, { codigo: e.target.value })} />
                         </div>
 
                         <Input placeholder="Nome da disciplina" className="rounded text-xs h-8" value={d.descricao}
+                          readOnly={d.fromMatrix}
                           onChange={(e) => updateDisc(i, { descricao: e.target.value })} />
 
                         <div className="grid grid-cols-2 gap-1">
                           <Input placeholder="C.H." className="rounded text-xs h-8" value={d.ch}
+                            readOnly={d.fromMatrix}
                             onChange={(e) => updateDisc(i, { ch: e.target.value })} />
                           <Input placeholder="Ano/Semestre" className="rounded text-xs h-8" value={d.perLetivo}
                             onChange={(e) => updateDisc(i, { perLetivo: e.target.value })} />

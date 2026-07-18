@@ -15,6 +15,13 @@ const saveSchema = z.object({
   data_conclusao: z.string().nullish(),
   carga_horaria: z.string().nullish(),
   numero_registro: z.string().nullish(),
+  // Campos extras espelhados na tabela `certificados` (compat. verificação pública)
+  data_nascimento: z.string().nullish(),
+  ano_conclusao: z.union([z.string(), z.number()]).nullish(),
+  estado: z.string().nullish(),
+  cidade: z.string().nullish(),
+  endereco: z.string().nullish(),
+  nivel_label: z.string().nullish(),
 });
 
 async function sha256(text: string): Promise<string> {
@@ -23,6 +30,16 @@ async function sha256(text: string): Promise<string> {
   return Array.from(new Uint8Array(hash))
     .map((b) => b.toString(16).padStart(2, "0"))
     .join("");
+}
+
+function toIsoDate(v?: string | null): string | null {
+  if (!v) return null;
+  const s = v.trim();
+  const br = s.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  if (br) return `${br[3]}-${br[2]}-${br[1]}`;
+  const iso = s.match(/^\d{4}-\d{2}-\d{2}/);
+  if (iso) return s.slice(0, 10);
+  return null;
 }
 
 export const saveHistorico = createServerFn({ method: "POST" })
@@ -52,8 +69,37 @@ export const saveHistorico = createServerFn({ method: "POST" })
       { onConflict: "verification_uuid" },
     );
     if (error) throw new Error(error.message);
+
+    // Espelho para o app de verificação pública (check-my-cred → tabela `certificados`).
+    const anoNum = Number(data.ano_conclusao ?? (data.data_conclusao ? String(data.data_conclusao).match(/\d{4}/)?.[0] : "")) || new Date().getFullYear();
+    const nascimento = toIsoDate(data.data_nascimento) ?? new Date().toISOString().slice(0, 10);
+    const nivelLabel = data.nivel_label ?? (data.nivel === "medio" ? "Ensino Médio" : "Ensino Superior");
+
+    const certPayload = {
+      codigo: data.verification_uuid,
+      nome: data.nome_aluno,
+      cpf: data.cpf ?? "",
+      data_nascimento: nascimento,
+      curso: data.curso ?? "",
+      nivel: nivelLabel,
+      ano_conclusao: anoNum,
+      instituicao: data.instituicao ?? (data.universidade ?? ""),
+      estado: data.estado ?? "",
+      cidade: data.cidade ?? "",
+      endereco: data.endereco ?? "",
+      registro: data.numero_registro ?? "",
+      data_emissao: new Date().toISOString().slice(0, 10),
+      ativo: true,
+      owner_id: context.userId,
+    };
+    const { error: certErr } = await context.supabase
+      .from("certificados" as never)
+      .upsert(certPayload as never, { onConflict: "codigo" });
+    if (certErr) console.error("[certificados upsert]", certErr.message);
+
     return { ok: true, hash };
   });
+
 
 function maskCpf(cpf: string | null): string | null {
   if (!cpf) return null;

@@ -44,6 +44,69 @@ export type Database = {
         }
         Relationships: []
       }
+      certificados: {
+        Row: {
+          ano_conclusao: number
+          ativo: boolean
+          cidade: string
+          codigo: string
+          cpf: string
+          created_at: string
+          curso: string
+          data_emissao: string
+          data_nascimento: string
+          endereco: string
+          estado: string
+          id: string
+          instituicao: string
+          nivel: string
+          nome: string
+          owner_id: string | null
+          registro: string
+          updated_at: string
+        }
+        Insert: {
+          ano_conclusao?: number
+          ativo?: boolean
+          cidade?: string
+          codigo: string
+          cpf?: string
+          created_at?: string
+          curso?: string
+          data_emissao?: string
+          data_nascimento?: string
+          endereco?: string
+          estado?: string
+          id?: string
+          instituicao?: string
+          nivel?: string
+          nome?: string
+          owner_id?: string | null
+          registro?: string
+          updated_at?: string
+        }
+        Update: {
+          ano_conclusao?: number
+          ativo?: boolean
+          cidade?: string
+          codigo?: string
+          cpf?: string
+          created_at?: string
+          curso?: string
+          data_emissao?: string
+          data_nascimento?: string
+          endereco?: string
+          estado?: string
+          id?: string
+          instituicao?: string
+          nivel?: string
+          nome?: string
+          owner_id?: string | null
+          registro?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       certificates: {
         Row: {
           code: string

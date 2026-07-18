@@ -239,7 +239,7 @@ export function HistoricoSuperior({ state, page = 0, totalPages }: Props) {
         const idx = offset + i;
         const top = P.tabelaTop + i * P.linhaAltura;
         return (
-          <div key={`${d.codigo}-${i}`}>
+          <div key={`${d.codigo}-${idx}`}>
             <T value={d.periodo}   top={top} {...P.colunas.periodo}   fontSize="1.85mm" />
             <T value={d.codigo}    top={top} {...P.colunas.codigo}    fontSize="1.85mm" />
             <T value={d.descricao} top={top} {...P.colunas.descricao} fontSize="1.85mm" align="left" />

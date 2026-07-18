@@ -45,7 +45,11 @@ export type DisciplinaSuperior = {
   /** Frequência em % — armazenada para relatórios internos. */
   frequencia?: string;
   situacao: string;
+  /** Marca disciplinas vindas da matriz curricular (metadados travados). */
+  fromMatrix?: boolean;
 };
+
+export type UniversidadeHist = "UNIP" | "ESTACIO";
 
 export type EmissaoState = {
   nivel: NivelEnsino;

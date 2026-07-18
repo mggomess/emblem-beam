@@ -115,6 +115,22 @@ export type EmissaoState = {
   observacoesHistorico: string;
   legendaNotas: string;
   corTemaHistorico: string;
+
+  // Novos — histórico universitário completo
+  universidadeHist: UniversidadeHist;
+  matrixId: string;
+  matrixVersao: string;
+  codigoEmec: string;
+  reconhecimentoPortaria: string;
+  publicacaoDou: string;
+  formaIngresso: string;
+  disciplinasVestibular: string;
+  mesAnoVestibular: string;
+  chExigida: string;
+  certificadoMilitar: string;
+  tituloEleitor: string;
+  zonaEleitoral: string;
+  secaoEleitoral: string;
 };
 
 export const defaultState: EmissaoState = {

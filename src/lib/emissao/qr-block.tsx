@@ -13,7 +13,7 @@ export function QrBlock({
   const origin =
     typeof window !== "undefined" && window.location?.origin
       ? window.location.origin
-      : (sedUrlBase || "https://check-my-cred.lovable.app/").replace(/\/+$/, "");
+      : (sedUrlBase || "https://emblem-beam.lovable.app").replace(/\/+$/, "");
   const value = code ? `${origin}/verificar/${encodeURIComponent(code)}` : origin;
   return (
     <div className="flex flex-col items-center gap-1">

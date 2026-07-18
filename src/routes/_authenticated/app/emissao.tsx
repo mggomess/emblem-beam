@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Plus, Printer, Trash2, RefreshCw, Palette } from "lucide-react";
+import { Plus, Printer, Trash2, RefreshCw, Palette, ArrowUp, ArrowDown, ArrowDownAZ } from "lucide-react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/common/PageHeader";
 import { Button } from "@/components/ui/button";

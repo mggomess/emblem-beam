@@ -36,29 +36,58 @@ function EmissaoLivePage() {
   const patch = (p: Partial<EmissaoState>) => setS((prev) => ({ ...prev, ...p }));
 
   const gerarCodigo = () => {
-    const prefix =
-      s.nivel === "medio" ? "SEDU-MED" :
-      s.templateSuperior.startsWith("unip") ? "UNIP" : "ESTACIO";
-    const rnd = Math.random().toString(36).slice(2, 7).toUpperCase();
-    const code = `${prefix}-${Date.now().toString(36).toUpperCase()}-${rnd}`;
-    patch({ codigoUnico: code });
-    toast.success(`Código gerado: ${code}`);
-    return code;
+    // UUID v4 é o identificador público usado no QRCode e na página /verificar/{uuid}.
+    const uuid =
+      typeof crypto !== "undefined" && "randomUUID" in crypto
+        ? crypto.randomUUID()
+        : `${Date.now().toString(16)}-${Math.random().toString(16).slice(2, 10)}-4xxx-yxxx-xxxxxxxxxxxx`.replace(
+            /[xy]/g,
+            (c) => {
+              const r = (Math.random() * 16) | 0;
+              return (c === "x" ? r : (r & 0x3) | 0x8).toString(16);
+            },
+          );
+    patch({ codigoUnico: uuid });
+    toast.success(`Código gerado: ${uuid.slice(0, 8)}…`);
+    return uuid;
   };
 
-  const salvarEEmitir = () => {
-    if (!s.codigoUnico) gerarCodigo();
-    toast.success("Documento pronto. Use 'Imprimir / Salvar PDF'.");
-  };
-
-  const imprimir = () => {
-    if (!s.codigoUnico) {
-      gerarCodigo();
-      setTimeout(() => window.print(), 200);
-    } else {
-      window.print();
+  const persistirHistorico = async (uuid: string) => {
+    try {
+      const { saveHistorico } = await import("@/lib/historicos.functions");
+      await saveHistorico({
+        data: {
+          verification_uuid: uuid,
+          nivel: s.nivel,
+          universidade: s.nivel === "superior" ? (s.templateSuperior.startsWith("unip") ? "UNIP" : "ESTACIO") : null,
+          nome_aluno: s.nomeAluno || "—",
+          cpf: s.cpf || null,
+          curso: s.nivel === "superior" ? s.cursoSuperior : null,
+          instituicao: s.nomeColegio || null,
+          data_conclusao: s.anoConclusao || null,
+          carga_horaria: s.chExigida || null,
+          numero_registro: s.matricula || s.raCode || null,
+        },
+      });
+    } catch (err) {
+      console.error(err);
+      toast.error("Não foi possível registrar o histórico para verificação pública.");
     }
   };
+
+  const salvarEEmitir = async () => {
+    const uuid = s.codigoUnico || gerarCodigo();
+    await persistirHistorico(uuid);
+    toast.success("Histórico registrado. QR pronto para verificação pública.");
+  };
+
+  const imprimir = async () => {
+    const uuid = s.codigoUnico || gerarCodigo();
+    await persistirHistorico(uuid);
+    setTimeout(() => window.print(), 200);
+  };
+
+
 
   // Par institucional trancado: certificado + histórico da mesma bandeira
   const { CertComponent, HistComponent } = useMemo(() => {

@@ -164,7 +164,7 @@ export function EstacioHistoricoSuperior({ state, page = 0, totalPages }: Props)
         }}
       />
 
-      <T value="1/1" {...P.folha} align="center" fontSize="2.0mm" />
+      <T value={`${page + 1}/${total}`} {...P.folha} align="center" fontSize="2.0mm" />
 
       <T value={state.nomeAluno} {...P.nome} bold />
       <T value={state.matricula} {...P.matricula} />

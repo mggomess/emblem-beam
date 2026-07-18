@@ -79,6 +79,47 @@ function EmissaoLivePage() {
   const isEstacio = s.templateSuperior.startsWith("estacio");
   const isUnipCertidao = s.templateSuperior === "unip-certidao";
 
+  // Paginação do histórico superior — quebra em folhas conforme o layout.
+  const linhasPorFolha = s.nivel === "superior"
+    ? (isEstacio ? HISTORICO_ESTACIO_LINHAS_POR_FOLHA : HISTORICO_UNIP_LINHAS_POR_FOLHA)
+    : 0;
+  const totalFolhasHist = s.nivel === "superior"
+    ? Math.max(1, Math.ceil((s.disciplinasSuperior.length || 0) / linhasPorFolha) || 1)
+    : 1;
+
+  // Manipulação da tabela de disciplinas (superior).
+  const updateDisc = (i: number, patchRow: Partial<DisciplinaSuperior>) => {
+    const arr = [...s.disciplinasSuperior];
+    arr[i] = { ...arr[i], ...patchRow };
+    patch({ disciplinasSuperior: arr });
+  };
+  const addDisc = () => patch({
+    disciplinasSuperior: [
+      ...s.disciplinasSuperior,
+      { periodo: "", codigo: "", descricao: "", ch: "", perLetivo: "", media: "", frequencia: "", situacao: "AP" },
+    ],
+  });
+  const removeDisc = (i: number) =>
+    patch({ disciplinasSuperior: s.disciplinasSuperior.filter((_, j) => j !== i) });
+  const moveDisc = (i: number, dir: -1 | 1) => {
+    const j = i + dir;
+    if (j < 0 || j >= s.disciplinasSuperior.length) return;
+    const arr = [...s.disciplinasSuperior];
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+    patch({ disciplinasSuperior: arr });
+  };
+  const sortByPeriodo = () => {
+    const arr = [...s.disciplinasSuperior].sort((a, b) => {
+      const pa = parseInt(a.periodo, 10);
+      const pb = parseInt(b.periodo, 10);
+      if (isNaN(pa) && isNaN(pb)) return a.periodo.localeCompare(b.periodo);
+      if (isNaN(pa)) return 1;
+      if (isNaN(pb)) return -1;
+      return pa - pb;
+    });
+    patch({ disciplinasSuperior: arr });
+  };
+
   return (
     <AppLayout title="Emissão ao vivo">
       <div className="no-print">

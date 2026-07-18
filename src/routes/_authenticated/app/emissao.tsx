@@ -321,6 +321,12 @@ function EmissaoLivePage() {
                 <F label="Estado de nasc." val={s.estadoNasc} on={(v) => patch({ estadoNasc: v })} />
               </div>
               <F label="Data de nascimento" val={s.dataNasc} on={(v) => patch({ dataNasc: v })} />
+              <F label="Certificado Militar" val={s.certificadoMilitar} on={(v) => patch({ certificadoMilitar: v })} />
+              <div className="grid grid-cols-3 gap-2">
+                <F label="Título de Eleitor" val={s.tituloEleitor} on={(v) => patch({ tituloEleitor: v })} />
+                <F label="Zona" val={s.zonaEleitoral} on={(v) => patch({ zonaEleitoral: v })} />
+                <F label="Seção" val={s.secaoEleitoral} on={(v) => patch({ secaoEleitoral: v })} />
+              </div>
             </TabsContent>
 
             <TabsContent value="hist" className="mt-4 space-y-3">

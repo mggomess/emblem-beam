@@ -67,6 +67,12 @@ function EmissaoLivePage() {
           data_conclusao: s.anoConclusao || null,
           carga_horaria: s.chExigida || null,
           numero_registro: s.matricula || s.raCode || null,
+          data_nascimento: s.dataNasc || null,
+          ano_conclusao: s.anoConclusao || null,
+          estado: s.estadoNasc || null,
+          cidade: s.cidadeEmissao || s.cidadeNasc || null,
+          endereco: s.enderecoPolo || null,
+          nivel_label: s.nivel === "medio" ? "Ensino Médio" : "Ensino Superior",
         },
       });
     } catch (err) {
@@ -74,6 +80,7 @@ function EmissaoLivePage() {
       toast.error("Não foi possível registrar o histórico para verificação pública.");
     }
   };
+
 
   const salvarEEmitir = async () => {
     const uuid = s.codigoUnico || gerarCodigo();

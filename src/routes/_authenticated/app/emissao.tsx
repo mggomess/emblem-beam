@@ -312,38 +312,92 @@ function EmissaoLivePage() {
                       <Input className="rounded-xl" value={s.corTemaHistorico} onChange={(e) => patch({ corTemaHistorico: e.target.value })} />
                     </div>
                   </div>
-                  <div className="space-y-1.5">
-                    <div className="flex items-center justify-between">
-                      <Label>Disciplinas</Label>
-                      <Button size="sm" variant="outline" className="rounded-lg h-7 text-xs"
-                        onClick={() => patch({ disciplinasSuperior: [...s.disciplinasSuperior, { periodo: "", codigo: "", descricao: "", ch: "", perLetivo: "", media: "", situacao: "AP" }] })}>
-                        <Plus className="size-3" /> Linha
-                      </Button>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between gap-2">
+                      <Label className="text-sm">
+                        Disciplinas ({s.disciplinasSuperior.length})
+                        {s.disciplinasSuperior.length > linhasPorFolha && (
+                          <span className="ml-1 text-[10px] text-muted-foreground">
+                            — {totalFolhasHist} folha(s), {linhasPorFolha}/folha
+                          </span>
+                        )}
+                      </Label>
+                      <div className="flex gap-1">
+                        <Button size="sm" variant="outline" className="rounded-lg h-7 text-xs"
+                          onClick={sortByPeriodo}
+                          title="Ordenar por período">
+                          <ArrowDownAZ className="size-3" />
+                        </Button>
+                        <Button size="sm" variant="outline" className="rounded-lg h-7 text-xs"
+                          onClick={addDisc}>
+                          <Plus className="size-3" /> Disciplina
+                        </Button>
+                      </div>
                     </div>
+
+                    {s.disciplinasSuperior.length === 0 && (
+                      <div className="rounded-lg border border-dashed p-3 text-center text-xs text-muted-foreground">
+                        Nenhuma disciplina cadastrada. Clique em "Disciplina" para adicionar.
+                      </div>
+                    )}
+
                     {s.disciplinasSuperior.map((d, i) => (
-                      <div key={i} className="rounded-lg border p-2 space-y-1">
-                        <div className="grid grid-cols-4 gap-1">
-                          {(["periodo", "codigo", "ch", "situacao"] as const).map((k) => (
-                            <Input key={k} placeholder={k} className="rounded text-xs" value={d[k]}
-                              onChange={(e) => {
-                                const arr = [...s.disciplinasSuperior]; arr[i] = { ...d, [k]: e.target.value } as DisciplinaSuperior; patch({ disciplinasSuperior: arr });
-                              }} />
-                          ))}
+                      <div key={i} className="rounded-lg border p-2 space-y-1.5 bg-muted/30">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-medium text-muted-foreground">#{i + 1}</span>
+                          <div className="flex gap-0.5">
+                            <Button size="icon" variant="ghost" className="h-6 w-6"
+                              disabled={i === 0}
+                              onClick={() => moveDisc(i, -1)} title="Mover para cima">
+                              <ArrowUp className="size-3" />
+                            </Button>
+                            <Button size="icon" variant="ghost" className="h-6 w-6"
+                              disabled={i === s.disciplinasSuperior.length - 1}
+                              onClick={() => moveDisc(i, 1)} title="Mover para baixo">
+                              <ArrowDown className="size-3" />
+                            </Button>
+                            <Button size="icon" variant="ghost" className="h-6 w-6 text-destructive"
+                              onClick={() => removeDisc(i)} title="Excluir">
+                              <Trash2 className="size-3" />
+                            </Button>
+                          </div>
                         </div>
-                        <Input placeholder="descrição" className="rounded text-xs" value={d.descricao}
-                          onChange={(e) => {
-                            const arr = [...s.disciplinasSuperior]; arr[i] = { ...d, descricao: e.target.value }; patch({ disciplinasSuperior: arr });
-                          }} />
-                        <div className="grid grid-cols-[1fr_1fr_auto] gap-1">
-                          <Input placeholder="per. letivo" className="rounded text-xs" value={d.perLetivo}
-                            onChange={(e) => { const arr = [...s.disciplinasSuperior]; arr[i] = { ...d, perLetivo: e.target.value }; patch({ disciplinasSuperior: arr }); }} />
-                          <Input placeholder="média" className="rounded text-xs" value={d.media}
-                            onChange={(e) => { const arr = [...s.disciplinasSuperior]; arr[i] = { ...d, media: e.target.value }; patch({ disciplinasSuperior: arr }); }} />
-                          <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive"
-                            onClick={() => patch({ disciplinasSuperior: s.disciplinasSuperior.filter((_, j) => j !== i) })}>
-                            <Trash2 className="size-3.5" />
-                          </Button>
+
+                        <div className="grid grid-cols-[70px_1fr] gap-1">
+                          <Input placeholder="Período" className="rounded text-xs h-8" value={d.periodo}
+                            onChange={(e) => updateDisc(i, { periodo: e.target.value })} />
+                          <Input placeholder="Código" className="rounded text-xs h-8" value={d.codigo}
+                            onChange={(e) => updateDisc(i, { codigo: e.target.value })} />
                         </div>
+
+                        <Input placeholder="Nome da disciplina" className="rounded text-xs h-8" value={d.descricao}
+                          onChange={(e) => updateDisc(i, { descricao: e.target.value })} />
+
+                        <div className="grid grid-cols-2 gap-1">
+                          <Input placeholder="C.H." className="rounded text-xs h-8" value={d.ch}
+                            onChange={(e) => updateDisc(i, { ch: e.target.value })} />
+                          <Input placeholder="Ano/Semestre" className="rounded text-xs h-8" value={d.perLetivo}
+                            onChange={(e) => updateDisc(i, { perLetivo: e.target.value })} />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-1">
+                          <Input placeholder="Nota" className="rounded text-xs h-8" value={d.media}
+                            onChange={(e) => updateDisc(i, { media: e.target.value })} />
+                          <Input placeholder="Frequência %" className="rounded text-xs h-8" value={d.frequencia ?? ""}
+                            onChange={(e) => updateDisc(i, { frequencia: e.target.value })} />
+                        </div>
+
+                        <Select value={d.situacao || "AP"}
+                          onValueChange={(v) => updateDisc(i, { situacao: v })}>
+                          <SelectTrigger className="rounded text-xs h-8"><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            {SITUACOES.map((o) => (
+                              <SelectItem key={o.value} value={o.value} className="text-xs">
+                                {o.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </div>
                     ))}
                   </div>

@@ -235,7 +235,8 @@ export function HistoricoSuperior({ state, page = 0, totalPages }: Props) {
         <div>&nbsp;</div>
       </div>
 
-      {disciplinas.slice(0, P.maxLinhas).map((d, i) => {
+      {disciplinas.map((d, i) => {
+        const idx = offset + i;
         const top = P.tabelaTop + i * P.linhaAltura;
         return (
           <div key={`${d.codigo}-${i}`}>

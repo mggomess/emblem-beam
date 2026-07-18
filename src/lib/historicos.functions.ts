@@ -67,11 +67,18 @@ export const verifyHistorico = createServerFn({ method: "GET" })
   .handler(async ({ data }) => {
     // Admin client used for read-only public verification (bypasses RLS).
     // Only a fixed, safe projection is returned; CPF is masked.
-    const supabase = createClient<Database>(
-      process.env.SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!,
-      { auth: { persistSession: false, autoRefreshToken: false } },
-    );
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+    const supabase = createClient<Database>(process.env.SUPABASE_URL!, key, {
+      auth: { persistSession: false, autoRefreshToken: false },
+      global: {
+        fetch: (input, init) => {
+          const h = new Headers(init?.headers);
+          if (key.startsWith("sb_") && h.get("Authorization") === `Bearer ${key}`) h.delete("Authorization");
+          h.set("apikey", key);
+          return fetch(input, { ...init, headers: h });
+        },
+      },
+    });
     const { data: row } = await supabase
       .from("historicos")
       .select("verification_uuid, nome_aluno, cpf, curso, instituicao, data_conclusao, carga_horaria, numero_registro, issued_at, verified, hash, nivel, universidade")

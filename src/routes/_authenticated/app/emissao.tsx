@@ -469,14 +469,17 @@ function EmissaoLivePage() {
                           <Input placeholder="Período" className="rounded text-xs h-8" value={d.periodo}
                             onChange={(e) => updateDisc(i, { periodo: e.target.value })} />
                           <Input placeholder="Código" className="rounded text-xs h-8" value={d.codigo}
+                            readOnly={d.fromMatrix}
                             onChange={(e) => updateDisc(i, { codigo: e.target.value })} />
                         </div>
 
                         <Input placeholder="Nome da disciplina" className="rounded text-xs h-8" value={d.descricao}
+                          readOnly={d.fromMatrix}
                           onChange={(e) => updateDisc(i, { descricao: e.target.value })} />
 
                         <div className="grid grid-cols-2 gap-1">
                           <Input placeholder="C.H." className="rounded text-xs h-8" value={d.ch}
+                            readOnly={d.fromMatrix}
                             onChange={(e) => updateDisc(i, { ch: e.target.value })} />
                           <Input placeholder="Ano/Semestre" className="rounded text-xs h-8" value={d.perLetivo}
                             onChange={(e) => updateDisc(i, { perLetivo: e.target.value })} />

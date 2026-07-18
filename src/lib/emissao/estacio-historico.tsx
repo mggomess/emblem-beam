@@ -122,9 +122,14 @@ function T({
   );
 }
 
-export function EstacioHistoricoSuperior({ state }: Props) {
-  const disciplinas = state.disciplinasSuperior ?? [];
+export function EstacioHistoricoSuperior({ state, page = 0, totalPages }: Props) {
   const P = POS_ESTACIO;
+  const all = state.disciplinasSuperior ?? [];
+  const per = P.maxLinhas;
+  const computedTotal = Math.max(1, Math.ceil(all.length / per) || 1);
+  const total = totalPages ?? computedTotal;
+  const offset = page * per;
+  const disciplinas = all.slice(offset, offset + per);
 
   return (
     <div

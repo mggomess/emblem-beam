@@ -239,6 +239,66 @@ export type Database = {
         }
         Relationships: []
       }
+      historicos: {
+        Row: {
+          carga_horaria: string | null
+          cpf: string | null
+          created_at: string
+          curso: string | null
+          data_conclusao: string | null
+          hash: string
+          id: string
+          instituicao: string | null
+          issued_at: string
+          nivel: string
+          nome_aluno: string
+          numero_registro: string | null
+          owner_id: string
+          universidade: string | null
+          updated_at: string
+          verification_uuid: string
+          verified: boolean
+        }
+        Insert: {
+          carga_horaria?: string | null
+          cpf?: string | null
+          created_at?: string
+          curso?: string | null
+          data_conclusao?: string | null
+          hash: string
+          id?: string
+          instituicao?: string | null
+          issued_at?: string
+          nivel?: string
+          nome_aluno: string
+          numero_registro?: string | null
+          owner_id: string
+          universidade?: string | null
+          updated_at?: string
+          verification_uuid?: string
+          verified?: boolean
+        }
+        Update: {
+          carga_horaria?: string | null
+          cpf?: string | null
+          created_at?: string
+          curso?: string | null
+          data_conclusao?: string | null
+          hash?: string
+          id?: string
+          instituicao?: string | null
+          issued_at?: string
+          nivel?: string
+          nome_aluno?: string
+          numero_registro?: string | null
+          owner_id?: string
+          universidade?: string | null
+          updated_at?: string
+          verification_uuid?: string
+          verified?: boolean
+        }
+        Relationships: []
+      }
       institutions: {
         Row: {
           address: string | null

@@ -31,70 +31,66 @@ const valueStyle: CSSProperties = {
 
 // Posições precisas baseadas no layout UNIP (em milímetros)
 const POS = {
-  // Topo direito
-  folhas: { top: 12.5, left: 179.2, width: 20.6 },
-  dataEmissao: { top: 26.0, left: 179.0, width: 21.0 },
+  folhas: { top: 13.2, left: 179.6, width: 19.8 },
+  dataEmissao: { top: 26.9, left: 178.9, width: 21.2 },
 
-  // Bloco NOME (centralizado)
-  nome: { top: 27.1, left: 53.5, width: 121.2 },
+  nome: { top: 27.6, left: 52.8, width: 123.4 },
 
-  // Seção 1: Dados Básicos
-  matricula: { top: 42.6, left: 7.4, width: 31.7 },
-  dataNascimento: { top: 42.6, left: 41.7, width: 29.4 },
-  cidadeNascimento: { top: 42.6, left: 74.1, width: 61.5 },
-  estadoNascimento: { top: 42.6, left: 137.2, width: 11.5 },
-  nacionalidade: { top: 42.6, left: 151.0, width: 49.0 },
+  matricula: { top: 43.8, left: 7.2, width: 30.4 },
+  dataNascimento: { top: 43.8, left: 40.8, width: 28.7 },
+  cidadeNascimento: { top: 43.8, left: 73.0, width: 63.0 },
+  estadoNascimento: { top: 43.8, left: 138.3, width: 10.8 },
+  nacionalidade: { top: 43.8, left: 151.0, width: 48.0 },
 
-  // Seção 2: Documentos
-  rg: { top: 55.2, left: 7.3, width: 42.5 },
-  certificadoMilitar: { top: 55.2, left: 52.2, width: 28.7 },
-  cpf: { top: 55.2, left: 83.5, width: 28.7 },
-  tituloEleitor: { top: 55.2, left: 114.9, width: 30.3 },
-  zona: { top: 55.2, left: 147.7, width: 19.2 },
-  secao: { top: 55.2, left: 169.5, width: 30.3 },
+  rg: { top: 56.4, left: 7.1, width: 42.6 },
+  certificadoMilitar: { top: 56.4, left: 52.0, width: 28.5 },
+  cpf: { top: 56.4, left: 83.3, width: 28.3 },
+  tituloEleitor: { top: 56.4, left: 114.8, width: 30.0 },
+  zona: { top: 56.4, left: 147.5, width: 18.8 },
+  secao: { top: 56.4, left: 169.1, width: 29.7 },
 
-  // Seção 3: Ingresso
-  disciplinasVestibular: { top: 69.4, left: 7.5, width: 126.4 },
-  formaIngresso: { top: 69.4, left: 137.0, width: 31.9 },
-  realizacao: { top: 69.4, left: 172.0, width: 27.7 },
+  disciplinasVestibular: { top: 70.7, left: 7.2, width: 126.5 },
+  formaIngresso: { top: 70.7, left: 137.1, width: 31.5 },
+  realizacao: { top: 70.7, left: 171.8, width: 27.4 },
 
-  // Seção 4: Curso
-  curso: { top: 86.9, left: 7.5, width: 88.7 },
-  codigoEmec: { top: 86.9, left: 98.8, width: 20.6 },
-  reconhecimento: { top: 86.9, left: 122.0, width: 41.4 },
-  cargaHoraria: { top: 86.9, left: 166.2, width: 33.8 },
+  curso: { top: 87.9, left: 7.4, width: 88.0 },
+  codigoEmec: { top: 87.9, left: 98.5, width: 19.8 },
+  reconhecimento: { top: 87.9, left: 121.2, width: 42.0 },
+  cargaHoraria: { top: 87.9, left: 166.0, width: 33.0 },
 
-  // Tabela de Disciplinas
-  tabelaTop: 108.1,
-  linhaAltura: 4.75,
+  tabelaTop: 109.2,
+  linhaAltura: 4.55,
+
   colunas: {
-    periodo: { left: 3.9, width: 17.7 },
-    codigo: { left: 21.6, width: 17.6 },
-    descricao: { left: 39.2, width: 94.4 },
-    ch: { left: 133.6, width: 13.0 },
-    perLetivo: { left: 146.6, width: 18.5 },
-    media: { left: 165.1, width: 17.8 },
-    situacao: { left: 182.9, width: 23.0 },
+    periodo: { left: 3.8, width: 17.5 },
+    codigo: { left: 21.5, width: 17.5 },
+    descricao: { left: 39.1, width: 94.8 },
+    ch: { left: 133.8, width: 12.6 },
+    perLetivo: { left: 146.5, width: 18.3 },
+    media: { left: 164.8, width: 17.4 },
+    situacao: { left: 182.3, width: 22.5 },
   },
 
-  // Observações
-  observacoes: { top: 232.5, left: 4.3, width: 201.5, height: 17.0 },
+  observacoes: {
+    top: 233.7,
+    left: 4.0,
+    width: 201.2,
+    height: 16.2,
+  },
 
-  // Rodapé
-  dataColacao: { top: 259.1, left: 3.8, width: 26.1 },
-  dataExpDiploma: { top: 259.1, left: 30.1, width: 25.2 },
-  codigoCurso: { top: 259.1, left: 55.7, width: 20.6 },
-  dataConclusao: { top: 259.1, left: 76.5, width: 22.4 },
-  titulo: { top: 259.1, left: 99.2, width: 26.7 },
-  validacao: { top: 259.1, left: 126.3, width: 79.2 },
+  dataColacao: { top: 259.9, left: 3.7, width: 26.0 },
+  dataExpDiploma: { top: 259.9, left: 30.0, width: 25.0 },
+  codigoCurso: { top: 259.9, left: 55.6, width: 20.0 },
+  dataConclusao: { top: 259.9, left: 76.3, width: 22.0 },
+  titulo: { top: 259.9, left: 99.0, width: 26.4 },
+  validacao: { top: 259.7, left: 126.0, width: 79.0 },
 
-  // Assinaturas e QR
-  vistos: { top: 270.3, left: 78.0, width: 47.0 },
-  secretario: { top: 283.4, left: 119.0, width: 38.0 },
-  reitor: { top: 283.4, left: 158.0, width: 38.0 },
-  qr: { top: 247.2, left: 176.6, size: 19.5 },
+  vistos: { top: 270.9, left: 78.0, width: 47.0 },
+  secretario: { top: 283.0, left: 118.6, width: 38.0 },
+  reitor: { top: 283.0, left: 157.8, width: 38.0 },
+
+  qr: { top: 247.4, left: 176.2, size: 19.2 },
 };
-
 function TextValue({
   value,
   top,

@@ -121,6 +121,37 @@ function EmissaoLivePage() {
     patch({ disciplinasSuperior: arr });
   };
 
+  // Sincroniza universidadeHist com o template escolhido.
+  useEffect(() => {
+    const uni: UniversidadeHist = s.templateSuperior.startsWith("estacio") ? "ESTACIO" : "UNIP";
+    if (uni !== s.universidadeHist) patch({ universidadeHist: uni, matrixId: "" });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [s.templateSuperior]);
+
+  const { matrices, loading: loadingMatrices } = useMatrices(s.universidadeHist);
+  const [loadingDisc, setLoadingDisc] = useState(false);
+
+  const carregarMatriz = async (matrixId: string) => {
+    const matrix = matrices.find((m) => m.id === matrixId);
+    if (!matrix) return;
+    setLoadingDisc(true);
+    const disciplinas = await fetchDisciplinesForMatrix(matrixId);
+    setLoadingDisc(false);
+    patch({
+      matrixId,
+      matrixVersao: matrix.versao,
+      cursoSuperior: matrix.curso,
+      chExigida: String(matrix.carga_horaria || ""),
+      disciplinasSuperior: disciplinas,
+    });
+    toast.success(`Matriz carregada: ${disciplinas.length} disciplinas`);
+  };
+
+  const chCumprida = useMemo(
+    () => calcularChCumprida(s.disciplinasSuperior),
+    [s.disciplinasSuperior],
+  );
+
   return (
     <AppLayout title="Emissão ao vivo">
       <div className="no-print">

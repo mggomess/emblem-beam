@@ -360,6 +360,50 @@ function EmissaoLivePage() {
                 </>
               ) : (
                 <>
+                  <div className="rounded-lg border p-3 space-y-2 bg-muted/20">
+                    <Label className="text-xs font-semibold">Matriz Curricular</Label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <Label className="text-[10px]">Universidade</Label>
+                        <Select
+                          value={s.universidadeHist}
+                          onValueChange={(v: UniversidadeHist) => patch({
+                            universidadeHist: v,
+                            matrixId: "",
+                            templateSuperior: v === "ESTACIO" ? "estacio-certidao" : "unip-certidao",
+                          })}
+                        >
+                          <SelectTrigger className="rounded-lg h-8 text-xs"><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="UNIP">UNIP</SelectItem>
+                            <SelectItem value="ESTACIO">ESTÁCIO</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label className="text-[10px]">Curso</Label>
+                        <Select
+                          value={s.matrixId}
+                          onValueChange={(v) => carregarMatriz(v)}
+                          disabled={loadingMatrices || matrices.length === 0}
+                        >
+                          <SelectTrigger className="rounded-lg h-8 text-xs">
+                            <SelectValue placeholder={loadingMatrices ? "Carregando…" : "Selecionar…"} />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {matrices.map((m) => (
+                              <SelectItem key={m.id} value={m.id} className="text-xs">{m.curso}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between text-[10px] text-muted-foreground">
+                      <span>C.H. cumprida: <strong className="text-foreground">{chCumprida}h</strong> / {s.chExigida || "?"}h</span>
+                      {loadingDisc && <Loader2 className="size-3 animate-spin" />}
+                    </div>
+                  </div>
+
                   <div>
                     <Label className="flex items-center gap-1.5"><Palette className="size-3.5" /> Cor temática (só UNIP genérico)</Label>
                     <div className="flex items-center gap-2">
@@ -394,9 +438,10 @@ function EmissaoLivePage() {
 
                     {s.disciplinasSuperior.length === 0 && (
                       <div className="rounded-lg border border-dashed p-3 text-center text-xs text-muted-foreground">
-                        Nenhuma disciplina cadastrada. Clique em "Disciplina" para adicionar.
+                        Selecione uma matriz curricular acima, ou clique em "Disciplina" para adicionar manualmente.
                       </div>
                     )}
+
 
                     {s.disciplinasSuperior.map((d, i) => (
                       <div key={i} className="rounded-lg border p-2 space-y-1.5 bg-muted/30">

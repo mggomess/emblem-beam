@@ -42,6 +42,7 @@ const NAV: { section: string; items: Item[] }[] = [
     section: "Documentação",
     items: [
       { to: "/app/emissao", label: "Emissão (Live)", icon: FileCheck2 },
+      { to: "/app/ensino-medio", label: "Ensino Médio", icon: ScrollText },
       { to: "/app/certificados", label: "Certificados", icon: FileCheck2 },
       { to: "/app/carteirinhas", label: "Carteirinhas", icon: IdCard },
     ],

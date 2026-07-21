@@ -3,11 +3,14 @@ import { QRCodeCanvas } from "qrcode.react";
 export function QrBlock({
   code,
   size = 110,
+  sedUrlBase,
 }: {
   code: string;
   size?: number;
+  sedUrlBase?: string;
 }) {
-  const value = `https://check-my-cred.lovable.app/certificado/${encodeURIComponent(code)}`;
+  const base = sedUrlBase?.replace(/\/+$/, "") || "https://check-my-cred.lovable.app/certificado";
+  const value = `${base}/${encodeURIComponent(code)}`;
 
   return (
     <div className="flex flex-col items-center gap-1">

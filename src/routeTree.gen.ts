@@ -18,6 +18,7 @@ import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedAppUsuariosRouteImport } from './routes/_authenticated/app/usuarios'
 import { Route as AuthenticatedAppLogsRouteImport } from './routes/_authenticated/app/logs'
 import { Route as AuthenticatedAppFaturamentoRouteImport } from './routes/_authenticated/app/faturamento'
+import { Route as AuthenticatedAppEnsinoMedioRouteImport } from './routes/_authenticated/app/ensino-medio'
 import { Route as AuthenticatedAppEmissaoRouteImport } from './routes/_authenticated/app/emissao'
 import { Route as AuthenticatedAppDocentesRouteImport } from './routes/_authenticated/app/docentes'
 import { Route as AuthenticatedAppCursosRouteImport } from './routes/_authenticated/app/cursos'
@@ -72,6 +73,12 @@ const AuthenticatedAppFaturamentoRoute =
     path: '/app/faturamento',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAppEnsinoMedioRoute =
+  AuthenticatedAppEnsinoMedioRouteImport.update({
+    id: '/app/ensino-medio',
+    path: '/app/ensino-medio',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAppEmissaoRoute = AuthenticatedAppEmissaoRouteImport.update({
   id: '/app/emissao',
   path: '/app/emissao',
@@ -124,6 +131,7 @@ export interface FileRoutesByFullPath {
   '/app/cursos': typeof AuthenticatedAppCursosRoute
   '/app/docentes': typeof AuthenticatedAppDocentesRoute
   '/app/emissao': typeof AuthenticatedAppEmissaoRoute
+  '/app/ensino-medio': typeof AuthenticatedAppEnsinoMedioRoute
   '/app/faturamento': typeof AuthenticatedAppFaturamentoRoute
   '/app/logs': typeof AuthenticatedAppLogsRoute
   '/app/usuarios': typeof AuthenticatedAppUsuariosRoute
@@ -141,6 +149,7 @@ export interface FileRoutesByTo {
   '/app/cursos': typeof AuthenticatedAppCursosRoute
   '/app/docentes': typeof AuthenticatedAppDocentesRoute
   '/app/emissao': typeof AuthenticatedAppEmissaoRoute
+  '/app/ensino-medio': typeof AuthenticatedAppEnsinoMedioRoute
   '/app/faturamento': typeof AuthenticatedAppFaturamentoRoute
   '/app/logs': typeof AuthenticatedAppLogsRoute
   '/app/usuarios': typeof AuthenticatedAppUsuariosRoute
@@ -160,6 +169,7 @@ export interface FileRoutesById {
   '/_authenticated/app/cursos': typeof AuthenticatedAppCursosRoute
   '/_authenticated/app/docentes': typeof AuthenticatedAppDocentesRoute
   '/_authenticated/app/emissao': typeof AuthenticatedAppEmissaoRoute
+  '/_authenticated/app/ensino-medio': typeof AuthenticatedAppEnsinoMedioRoute
   '/_authenticated/app/faturamento': typeof AuthenticatedAppFaturamentoRoute
   '/_authenticated/app/logs': typeof AuthenticatedAppLogsRoute
   '/_authenticated/app/usuarios': typeof AuthenticatedAppUsuariosRoute
@@ -179,6 +189,7 @@ export interface FileRouteTypes {
     | '/app/cursos'
     | '/app/docentes'
     | '/app/emissao'
+    | '/app/ensino-medio'
     | '/app/faturamento'
     | '/app/logs'
     | '/app/usuarios'
@@ -196,6 +207,7 @@ export interface FileRouteTypes {
     | '/app/cursos'
     | '/app/docentes'
     | '/app/emissao'
+    | '/app/ensino-medio'
     | '/app/faturamento'
     | '/app/logs'
     | '/app/usuarios'
@@ -214,6 +226,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/cursos'
     | '/_authenticated/app/docentes'
     | '/_authenticated/app/emissao'
+    | '/_authenticated/app/ensino-medio'
     | '/_authenticated/app/faturamento'
     | '/_authenticated/app/logs'
     | '/_authenticated/app/usuarios'
@@ -293,6 +306,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppFaturamentoRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/app/ensino-medio': {
+      id: '/_authenticated/app/ensino-medio'
+      path: '/app/ensino-medio'
+      fullPath: '/app/ensino-medio'
+      preLoaderRoute: typeof AuthenticatedAppEnsinoMedioRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/app/emissao': {
       id: '/_authenticated/app/emissao'
       path: '/app/emissao'
@@ -353,6 +373,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAppCursosRoute: typeof AuthenticatedAppCursosRoute
   AuthenticatedAppDocentesRoute: typeof AuthenticatedAppDocentesRoute
   AuthenticatedAppEmissaoRoute: typeof AuthenticatedAppEmissaoRoute
+  AuthenticatedAppEnsinoMedioRoute: typeof AuthenticatedAppEnsinoMedioRoute
   AuthenticatedAppFaturamentoRoute: typeof AuthenticatedAppFaturamentoRoute
   AuthenticatedAppLogsRoute: typeof AuthenticatedAppLogsRoute
   AuthenticatedAppUsuariosRoute: typeof AuthenticatedAppUsuariosRoute
@@ -367,6 +388,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAppCursosRoute: AuthenticatedAppCursosRoute,
   AuthenticatedAppDocentesRoute: AuthenticatedAppDocentesRoute,
   AuthenticatedAppEmissaoRoute: AuthenticatedAppEmissaoRoute,
+  AuthenticatedAppEnsinoMedioRoute: AuthenticatedAppEnsinoMedioRoute,
   AuthenticatedAppFaturamentoRoute: AuthenticatedAppFaturamentoRoute,
   AuthenticatedAppLogsRoute: AuthenticatedAppLogsRoute,
   AuthenticatedAppUsuariosRoute: AuthenticatedAppUsuariosRoute,
@@ -386,13 +408,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

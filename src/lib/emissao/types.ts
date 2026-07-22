@@ -146,6 +146,8 @@ export type EmissaoState = {
   tituloEleitor: string;
   zonaEleitoral: string;
   secaoEleitoral: string;
+
+  overlays: DocOverlay[];
 };
 
 export const defaultState: EmissaoState = {

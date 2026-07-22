@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
-import { Printer, RefreshCw } from "lucide-react";
+import { useRef, useState } from "react";
+import { Printer, RefreshCw, Stamp, PenLine, RotateCw, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/common/PageHeader";
 import { Button } from "@/components/ui/button";
@@ -9,10 +10,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { UFSelect } from "@/components/common/UFSelect";
-import { defaultState, type EmissaoState } from "@/lib/emissao/types";
+import { defaultState, type EmissaoState, type DocOverlay, type DocOverlayKind, type DocOverlayTarget } from "@/lib/emissao/types";
 import { CertificadoMedio } from "@/lib/emissao/certificado-medio";
 import { HistoricoMedio } from "@/lib/emissao/historico-medio";
+import { OverlayLayer } from "@/lib/emissao/overlays";
 
 export const Route = createFileRoute("/_authenticated/app/ensino-medio")({
   head: () => ({ meta: [{ title: "Ensino Médio — Certificado + Histórico" }] }),

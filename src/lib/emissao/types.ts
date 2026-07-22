@@ -229,4 +229,5 @@ export const defaultState: EmissaoState = {
   tituloEleitor: "",
   zonaEleitoral: "",
   secaoEleitoral: "",
+  overlays: [],
 };

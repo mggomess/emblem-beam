@@ -51,6 +51,21 @@ export type DisciplinaSuperior = {
 
 export type UniversidadeHist = "UNIP" | "ESTACIO";
 
+export type DocOverlayKind = "assinatura" | "carimbo";
+export type DocOverlayTarget = "cert" | "hist" | "both";
+
+export type DocOverlay = {
+  id: string;
+  src: string;
+  kind: DocOverlayKind;
+  target: DocOverlayTarget;
+  label: string;
+  x: number;
+  y: number;
+  widthMm: number;
+  rotation: number;
+};
+
 export type EmissaoState = {
   nivel: NivelEnsino;
   templateSuperior: TemplateSuperior;

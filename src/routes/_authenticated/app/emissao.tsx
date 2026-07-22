@@ -738,7 +738,10 @@ function EmissaoLivePage() {
           </div>
           <div className="overflow-auto">
             <div className="origin-top-left" style={{ transform: "scale(0.62)", width: "fit-content" }}>
-              <CertComponent state={s} onMecChange={(m) => patch({ mec: m })} draggableMec />
+              <div style={{ position: "relative", width: "210mm" }}>
+                <CertComponent state={s} onMecChange={(m) => patch({ mec: m })} draggableMec />
+                <OverlayLayer overlays={s.overlays} target="cert" editable onChange={updateOverlay} />
+              </div>
             </div>
           </div>
 
@@ -749,7 +752,10 @@ function EmissaoLivePage() {
               </div>
               <div className="overflow-auto">
                 <div className="origin-top-left" style={{ transform: "scale(0.62)", width: "fit-content" }}>
-                  <HistComponent state={s} page={i} totalPages={totalFolhasHist} />
+                  <div style={{ position: "relative", width: "210mm" }}>
+                    <HistComponent state={s} page={i} totalPages={totalFolhasHist} />
+                    <OverlayLayer overlays={s.overlays} target="hist" editable onChange={updateOverlay} />
+                  </div>
                 </div>
               </div>
             </div>
@@ -759,9 +765,15 @@ function EmissaoLivePage() {
 
       {/* Somente para impressão */}
       <div className="print-root">
-        <CertComponent state={s} onMecChange={() => {}} draggableMec={false} />
+        <div style={{ position: "relative", width: "210mm" }}>
+          <CertComponent state={s} onMecChange={() => {}} draggableMec={false} />
+          <OverlayLayer overlays={s.overlays} target="cert" />
+        </div>
         {Array.from({ length: totalFolhasHist }, (_, i) => (
-          <HistComponent key={`hist-print-${i}`} state={s} page={i} totalPages={totalFolhasHist} />
+          <div key={`hist-print-${i}`} style={{ position: "relative", width: "210mm" }}>
+            <HistComponent state={s} page={i} totalPages={totalFolhasHist} />
+            <OverlayLayer overlays={s.overlays} target="hist" />
+          </div>
         ))}
       </div>
     </AppLayout>

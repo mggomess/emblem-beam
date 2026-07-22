@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
-import { Printer, RefreshCw } from "lucide-react";
+import { useRef, useState } from "react";
+import { Printer, RefreshCw, Stamp, PenLine, RotateCw, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/common/PageHeader";
 import { Button } from "@/components/ui/button";
@@ -9,10 +10,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { UFSelect } from "@/components/common/UFSelect";
-import { defaultState, type EmissaoState } from "@/lib/emissao/types";
+import { defaultState, type EmissaoState, type DocOverlay, type DocOverlayKind, type DocOverlayTarget } from "@/lib/emissao/types";
 import { CertificadoMedio } from "@/lib/emissao/certificado-medio";
 import { HistoricoMedio } from "@/lib/emissao/historico-medio";
+import { OverlayLayer } from "@/lib/emissao/overlays";
 
 export const Route = createFileRoute("/_authenticated/app/ensino-medio")({
   head: () => ({ meta: [{ title: "Ensino Médio — Certificado + Histórico" }] }),
@@ -22,6 +25,28 @@ export const Route = createFileRoute("/_authenticated/app/ensino-medio")({
 function EnsinoMedioPage() {
   const [s, setS] = useState<EmissaoState>({ ...defaultState, nivel: "medio" });
   const patch = (p: Partial<EmissaoState>) => setS((prev) => ({ ...prev, ...p }));
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [pendingKind, setPendingKind] = useState<DocOverlayKind>("assinatura");
+  const addOverlayFile = (file: File, kind: DocOverlayKind) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const src = String(reader.result || "");
+      if (!src) return;
+      const overlay: DocOverlay = {
+        id: crypto.randomUUID(),
+        src, kind, target: "both", label: file.name,
+        x: 120, y: 900, widthMm: kind === "carimbo" ? 45 : 60, rotation: 0,
+      };
+      patch({ overlays: [...s.overlays, overlay] });
+      toast.success(`${kind === "carimbo" ? "Carimbo" : "Assinatura"} adicionado`);
+    };
+    reader.readAsDataURL(file);
+  };
+  const updateOverlay = (id: string, p: Partial<DocOverlay>) =>
+    patch({ overlays: s.overlays.map((o) => (o.id === id ? { ...o, ...p } : o)) });
+  const removeOverlay = (id: string) =>
+    patch({ overlays: s.overlays.filter((o) => o.id !== id) });
 
   return (
     <AppLayout title="Ensino Médio">
@@ -45,10 +70,11 @@ function EnsinoMedioPage() {
       <div className="grid gap-4 screen-only lg:grid-cols-[minmax(0,420px)_1fr]">
         <Card className="no-print border-border/60 p-4 shadow-soft lg:sticky lg:top-4 lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto">
           <Tabs defaultValue="inst">
-            <TabsList className="grid w-full grid-cols-3 rounded-xl">
-              <TabsTrigger value="inst">Instituição</TabsTrigger>
-              <TabsTrigger value="aluno">Aluno</TabsTrigger>
-              <TabsTrigger value="hist">Histórico</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-4 rounded-xl">
+              <TabsTrigger value="inst" className="text-xs">Inst.</TabsTrigger>
+              <TabsTrigger value="aluno" className="text-xs">Aluno</TabsTrigger>
+              <TabsTrigger value="hist" className="text-xs">Hist.</TabsTrigger>
+              <TabsTrigger value="selos" className="text-xs">Selos</TabsTrigger>
             </TabsList>
 
             <TabsContent value="inst" className="mt-4 space-y-3">
@@ -112,6 +138,87 @@ function EnsinoMedioPage() {
                   onChange={(e) => patch({ observacoesHistorico: e.target.value })} />
               </div>
             </TabsContent>
+
+            <TabsContent value="selos" className="mt-4 space-y-3">
+              <div className="rounded-lg border p-3 space-y-2 bg-muted/20">
+                <Label className="text-xs font-semibold flex items-center gap-1.5">
+                  <Stamp className="size-3.5" /> Assinaturas & Carimbos
+                </Label>
+                <p className="text-[11px] text-muted-foreground">
+                  Envie PNG (fundo transparente). Arraste no preview para posicionar.
+                </p>
+                <div className="flex gap-2">
+                  <Button type="button" size="sm" variant="outline" className="rounded-lg flex-1"
+                    onClick={() => { setPendingKind("assinatura"); fileInputRef.current?.click(); }}>
+                    <PenLine className="size-3.5 mr-1" /> Assinatura
+                  </Button>
+                  <Button type="button" size="sm" variant="outline" className="rounded-lg flex-1"
+                    onClick={() => { setPendingKind("carimbo"); fileInputRef.current?.click(); }}>
+                    <Stamp className="size-3.5 mr-1" /> Carimbo
+                  </Button>
+                </div>
+                <input ref={fileInputRef} type="file" accept="image/*" className="hidden"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) addOverlayFile(f, pendingKind);
+                    e.target.value = "";
+                  }} />
+              </div>
+
+              {s.overlays.length === 0 && (
+                <div className="rounded-lg border border-dashed p-3 text-center text-xs text-muted-foreground">
+                  Nenhum selo adicionado.
+                </div>
+              )}
+
+              {s.overlays.map((o) => (
+                <div key={o.id} className="rounded-lg border p-2 space-y-2 bg-muted/30">
+                  <div className="flex items-center gap-2">
+                    <img src={o.src} alt="" className="h-10 w-10 rounded border object-contain bg-white" />
+                    <div className="flex-1 min-w-0">
+                      <div className="text-xs font-medium truncate">{o.label}</div>
+                      <div className="text-[10px] text-muted-foreground uppercase">
+                        {o.kind === "carimbo" ? "Carimbo" : "Assinatura"} · {o.rotation}°
+                      </div>
+                    </div>
+                    <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive"
+                      onClick={() => removeOverlay(o.id)}>
+                      <Trash2 className="size-3.5" />
+                    </Button>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <Label className="text-[10px]">Aplicar em</Label>
+                      <Select value={o.target}
+                        onValueChange={(v: DocOverlayTarget) => updateOverlay(o.id, { target: v })}>
+                        <SelectTrigger className="rounded-lg h-8 text-xs"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="both" className="text-xs">Ambos</SelectItem>
+                          <SelectItem value="cert" className="text-xs">Certificado</SelectItem>
+                          <SelectItem value="hist" className="text-xs">Histórico</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label className="text-[10px]">Largura (mm)</Label>
+                      <Input type="number" min={10} max={200} className="rounded-lg h-8 text-xs"
+                        value={o.widthMm}
+                        onChange={(e) => updateOverlay(o.id, { widthMm: Number(e.target.value) || 40 })} />
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Button size="sm" variant="outline" className="rounded-lg h-7 text-xs flex-1"
+                      onClick={() => updateOverlay(o.id, { rotation: (o.rotation + 15) % 360 })}>
+                      <RotateCw className="size-3 mr-1" /> +15°
+                    </Button>
+                    <Button size="sm" variant="outline" className="rounded-lg h-7 text-xs"
+                      onClick={() => updateOverlay(o.id, { rotation: 0 })}>
+                      Reset
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </TabsContent>
           </Tabs>
         </Card>
 
@@ -119,21 +226,33 @@ function EnsinoMedioPage() {
           <div className="mb-2 text-xs uppercase tracking-wider text-muted-foreground">Folha 1 — Certificado</div>
           <div className="overflow-auto">
             <div className="origin-top-left" style={{ transform: "scale(0.62)", width: "fit-content" }}>
-              <CertificadoMedio state={s} onMecChange={() => {}} draggableMec={false} />
+              <div style={{ position: "relative", width: "210mm" }}>
+                <CertificadoMedio state={s} onMecChange={() => {}} draggableMec={false} />
+                <OverlayLayer overlays={s.overlays} target="cert" editable onChange={updateOverlay} />
+              </div>
             </div>
           </div>
           <div className="mt-6 mb-2 text-xs uppercase tracking-wider text-muted-foreground">Folha 2 — Histórico Escolar</div>
           <div className="overflow-auto">
             <div className="origin-top-left" style={{ transform: "scale(0.62)", width: "fit-content" }}>
-              <HistoricoMedio state={s} />
+              <div style={{ position: "relative", width: "210mm" }}>
+                <HistoricoMedio state={s} />
+                <OverlayLayer overlays={s.overlays} target="hist" editable onChange={updateOverlay} />
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       <div className="print-root">
-        <CertificadoMedio state={s} onMecChange={() => {}} draggableMec={false} />
-        <HistoricoMedio state={s} />
+        <div style={{ position: "relative", width: "210mm" }}>
+          <CertificadoMedio state={s} onMecChange={() => {}} draggableMec={false} />
+          <OverlayLayer overlays={s.overlays} target="cert" />
+        </div>
+        <div style={{ position: "relative", width: "210mm" }}>
+          <HistoricoMedio state={s} />
+          <OverlayLayer overlays={s.overlays} target="hist" />
+        </div>
       </div>
     </AppLayout>
   );

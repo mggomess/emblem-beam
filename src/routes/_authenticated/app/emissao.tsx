@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
-import { Plus, Printer, Trash2, RefreshCw, Palette, ArrowUp, ArrowDown, ArrowDownAZ, Loader2 } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Plus, Printer, Trash2, RefreshCw, Palette, ArrowUp, ArrowDown, ArrowDownAZ, Loader2, Upload, RotateCw, Stamp, PenLine } from "lucide-react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/common/PageHeader";
 import { Button } from "@/components/ui/button";
@@ -16,7 +16,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { UFSelect } from "@/components/common/UFSelect";
 import { toast } from "sonner";
 
-import { defaultState, SITUACOES, type EmissaoState, type NivelEnsino, type TemplateSuperior, type DisciplinaSuperior, type UniversidadeHist } from "@/lib/emissao/types";
+import { defaultState, SITUACOES, type EmissaoState, type NivelEnsino, type TemplateSuperior, type DisciplinaSuperior, type UniversidadeHist, type DocOverlay, type DocOverlayKind, type DocOverlayTarget } from "@/lib/emissao/types";
 import { CertificadoMedio } from "@/lib/emissao/certificado-medio";
 import { UnipCertidao } from "@/lib/emissao/unip-certidao";
 import { DiplomaUnip } from "@/lib/emissao/diploma-unip";
@@ -24,6 +24,7 @@ import { EstacioCertidaoRetrato, EstacioDiplomaPaisagem } from "@/lib/emissao/es
 import { HistoricoMedio } from "@/lib/emissao/historico-medio";
 import { HistoricoSuperior, HISTORICO_UNIP_LINHAS_POR_FOLHA } from "@/lib/emissao/historico-superior";
 import { EstacioHistoricoSuperior, HISTORICO_ESTACIO_LINHAS_POR_FOLHA } from "@/lib/emissao/estacio-historico";
+import { OverlayLayer } from "@/lib/emissao/overlays";
 import { useMatrices, fetchDisciplinesForMatrix, calcularChCumprida } from "@/lib/emissao/use-curriculum";
 
 export const Route = createFileRoute("/_authenticated/app/emissao")({
@@ -188,6 +189,35 @@ function EmissaoLivePage() {
     [s.disciplinasSuperior],
   );
 
+  // Overlays (assinaturas / carimbos)
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [pendingKind, setPendingKind] = useState<DocOverlayKind>("assinatura");
+  const addOverlayFile = (file: File, kind: DocOverlayKind) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const src = String(reader.result || "");
+      if (!src) return;
+      const overlay: DocOverlay = {
+        id: crypto.randomUUID(),
+        src,
+        kind,
+        target: "both",
+        label: file.name,
+        x: 120,
+        y: 900,
+        widthMm: kind === "carimbo" ? 45 : 60,
+        rotation: 0,
+      };
+      patch({ overlays: [...s.overlays, overlay] });
+      toast.success(`${kind === "carimbo" ? "Carimbo" : "Assinatura"} adicionado`);
+    };
+    reader.readAsDataURL(file);
+  };
+  const updateOverlay = (id: string, p: Partial<DocOverlay>) =>
+    patch({ overlays: s.overlays.map((o) => (o.id === id ? { ...o, ...p } : o)) });
+  const removeOverlay = (id: string) =>
+    patch({ overlays: s.overlays.filter((o) => o.id !== id) });
+
   return (
     <AppLayout title="Emissão ao vivo">
       <div className="no-print">
@@ -216,11 +246,12 @@ function EmissaoLivePage() {
       <div className="grid gap-4 screen-only lg:grid-cols-[minmax(0,420px)_1fr]">
         <Card className="no-print border-border/60 p-4 shadow-soft lg:sticky lg:top-4 lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto">
           <Tabs defaultValue="doc">
-            <TabsList className="grid w-full grid-cols-4 rounded-xl">
-              <TabsTrigger value="doc" className="rounded-lg">Doc</TabsTrigger>
-              <TabsTrigger value="aluno" className="rounded-lg">Aluno</TabsTrigger>
-              <TabsTrigger value="hist" className="rounded-lg">Histórico</TabsTrigger>
-              <TabsTrigger value="qr" className="rounded-lg">QR/MEC</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-5 rounded-xl">
+              <TabsTrigger value="doc" className="rounded-lg text-xs">Doc</TabsTrigger>
+              <TabsTrigger value="aluno" className="rounded-lg text-xs">Aluno</TabsTrigger>
+              <TabsTrigger value="hist" className="rounded-lg text-xs">Hist.</TabsTrigger>
+              <TabsTrigger value="selos" className="rounded-lg text-xs">Selos</TabsTrigger>
+              <TabsTrigger value="qr" className="rounded-lg text-xs">QR</TabsTrigger>
             </TabsList>
 
             <TabsContent value="doc" className="mt-4 space-y-3">
@@ -552,6 +583,115 @@ function EmissaoLivePage() {
               )}
             </TabsContent>
 
+            <TabsContent value="selos" className="mt-4 space-y-3">
+              <div className="rounded-lg border p-3 space-y-2 bg-muted/20">
+                <Label className="text-xs font-semibold flex items-center gap-1.5">
+                  <Stamp className="size-3.5" /> Assinaturas & Carimbos
+                </Label>
+                <p className="text-[11px] text-muted-foreground">
+                  Envie PNG (fundo transparente recomendado). Arraste no preview para posicionar sobre o certificado e/ou histórico.
+                </p>
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    className="rounded-lg flex-1"
+                    onClick={() => { setPendingKind("assinatura"); fileInputRef.current?.click(); }}
+                  >
+                    <PenLine className="size-3.5 mr-1" /> Assinatura
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    className="rounded-lg flex-1"
+                    onClick={() => { setPendingKind("carimbo"); fileInputRef.current?.click(); }}
+                  >
+                    <Stamp className="size-3.5 mr-1" /> Carimbo
+                  </Button>
+                </div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                  className="hidden"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) addOverlayFile(f, pendingKind);
+                    e.target.value = "";
+                  }}
+                />
+              </div>
+
+              {s.overlays.length === 0 && (
+                <div className="rounded-lg border border-dashed p-3 text-center text-xs text-muted-foreground">
+                  Nenhum selo adicionado. Envie uma assinatura ou carimbo para começar.
+                </div>
+              )}
+
+              {s.overlays.map((o) => (
+                <div key={o.id} className="rounded-lg border p-2 space-y-2 bg-muted/30">
+                  <div className="flex items-center gap-2">
+                    <img
+                      src={o.src}
+                      alt=""
+                      className="h-10 w-10 rounded border object-contain bg-white"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="text-xs font-medium truncate">{o.label}</div>
+                      <div className="text-[10px] text-muted-foreground uppercase">
+                        {o.kind === "carimbo" ? "Carimbo" : "Assinatura"} · {o.rotation}°
+                      </div>
+                    </div>
+                    <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive"
+                      onClick={() => removeOverlay(o.id)}>
+                      <Trash2 className="size-3.5" />
+                    </Button>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <Label className="text-[10px]">Aplicar em</Label>
+                      <Select
+                        value={o.target}
+                        onValueChange={(v: DocOverlayTarget) => updateOverlay(o.id, { target: v })}
+                      >
+                        <SelectTrigger className="rounded-lg h-8 text-xs"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="both" className="text-xs">Ambos</SelectItem>
+                          <SelectItem value="cert" className="text-xs">Certificado</SelectItem>
+                          <SelectItem value="hist" className="text-xs">Histórico</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label className="text-[10px]">Largura (mm)</Label>
+                      <Input
+                        type="number"
+                        min={10}
+                        max={200}
+                        className="rounded-lg h-8 text-xs"
+                        value={o.widthMm}
+                        onChange={(e) => updateOverlay(o.id, { widthMm: Number(e.target.value) || 40 })}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-1">
+                    <Button size="sm" variant="outline" className="rounded-lg h-7 text-xs flex-1"
+                      onClick={() => updateOverlay(o.id, { rotation: (o.rotation + 15) % 360 })}>
+                      <RotateCw className="size-3 mr-1" /> +15°
+                    </Button>
+                    <Button size="sm" variant="outline" className="rounded-lg h-7 text-xs"
+                      onClick={() => updateOverlay(o.id, { rotation: 0 })}>
+                      Reset
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </TabsContent>
+
             <TabsContent value="qr" className="mt-4 space-y-3">
               <F label="URL base do Portal SEDU" val={s.sedUrlBase} on={(v) => patch({ sedUrlBase: v })} />
               <div>
@@ -598,7 +738,10 @@ function EmissaoLivePage() {
           </div>
           <div className="overflow-auto">
             <div className="origin-top-left" style={{ transform: "scale(0.62)", width: "fit-content" }}>
-              <CertComponent state={s} onMecChange={(m) => patch({ mec: m })} draggableMec />
+              <div style={{ position: "relative", width: "210mm" }}>
+                <CertComponent state={s} onMecChange={(m) => patch({ mec: m })} draggableMec />
+                <OverlayLayer overlays={s.overlays} target="cert" editable onChange={updateOverlay} />
+              </div>
             </div>
           </div>
 
@@ -609,7 +752,10 @@ function EmissaoLivePage() {
               </div>
               <div className="overflow-auto">
                 <div className="origin-top-left" style={{ transform: "scale(0.62)", width: "fit-content" }}>
-                  <HistComponent state={s} page={i} totalPages={totalFolhasHist} />
+                  <div style={{ position: "relative", width: "210mm" }}>
+                    <HistComponent state={s} page={i} totalPages={totalFolhasHist} />
+                    <OverlayLayer overlays={s.overlays} target="hist" editable onChange={updateOverlay} />
+                  </div>
                 </div>
               </div>
             </div>
@@ -619,9 +765,15 @@ function EmissaoLivePage() {
 
       {/* Somente para impressão */}
       <div className="print-root">
-        <CertComponent state={s} onMecChange={() => {}} draggableMec={false} />
+        <div style={{ position: "relative", width: "210mm" }}>
+          <CertComponent state={s} onMecChange={() => {}} draggableMec={false} />
+          <OverlayLayer overlays={s.overlays} target="cert" />
+        </div>
         {Array.from({ length: totalFolhasHist }, (_, i) => (
-          <HistComponent key={`hist-print-${i}`} state={s} page={i} totalPages={totalFolhasHist} />
+          <div key={`hist-print-${i}`} style={{ position: "relative", width: "210mm" }}>
+            <HistComponent state={s} page={i} totalPages={totalFolhasHist} />
+            <OverlayLayer overlays={s.overlays} target="hist" />
+          </div>
         ))}
       </div>
     </AppLayout>

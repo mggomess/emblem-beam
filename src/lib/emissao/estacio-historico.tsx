@@ -4,7 +4,7 @@ import { QrBlock } from "./qr-block";
 
 type Props = { state: EmissaoState; page?: number; totalPages?: number };
 
-export const HISTORICO_ESTACIO_LINHAS_POR_FOLHA = 40;
+export const HISTORICO_ESTACIO_LINHAS_POR_FOLHA = 32;
 
 const GRAY_BAR = "#d6d6d6";
 const HEAD_BAR = "#e8ecf5";
@@ -34,12 +34,13 @@ export function EstacioHistoricoSuperior({ state, page = 0, totalPages }: Props)
       style={{
         position: "relative",
         width: "210mm",
-        height: "297mm",
+        minHeight: "297mm",
+        maxHeight: "297mm",
         overflow: "hidden",
         background: "#fff",
         color: "#000",
         boxSizing: "border-box",
-        padding: "8mm 8mm",
+        padding: "7mm 8mm 6mm",
         fontFamily: "Arial, Helvetica, sans-serif",
         WebkitPrintColorAdjust: "exact",
         printColorAdjust: "exact",

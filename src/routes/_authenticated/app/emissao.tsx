@@ -189,6 +189,35 @@ function EmissaoLivePage() {
     [s.disciplinasSuperior],
   );
 
+  // Overlays (assinaturas / carimbos)
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [pendingKind, setPendingKind] = useState<DocOverlayKind>("assinatura");
+  const addOverlayFile = (file: File, kind: DocOverlayKind) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const src = String(reader.result || "");
+      if (!src) return;
+      const overlay: DocOverlay = {
+        id: crypto.randomUUID(),
+        src,
+        kind,
+        target: "both",
+        label: file.name,
+        x: 120,
+        y: 900,
+        widthMm: kind === "carimbo" ? 45 : 60,
+        rotation: 0,
+      };
+      patch({ overlays: [...s.overlays, overlay] });
+      toast.success(`${kind === "carimbo" ? "Carimbo" : "Assinatura"} adicionado`);
+    };
+    reader.readAsDataURL(file);
+  };
+  const updateOverlay = (id: string, p: Partial<DocOverlay>) =>
+    patch({ overlays: s.overlays.map((o) => (o.id === id ? { ...o, ...p } : o)) });
+  const removeOverlay = (id: string) =>
+    patch({ overlays: s.overlays.filter((o) => o.id !== id) });
+
   return (
     <AppLayout title="Emissão ao vivo">
       <div className="no-print">

@@ -4,7 +4,7 @@ import { QrBlock } from "./qr-block";
 
 type Props = { state: EmissaoState; page?: number; totalPages?: number };
 
-export const HISTORICO_ESTACIO_LINHAS_POR_FOLHA = 40;
+export const HISTORICO_ESTACIO_LINHAS_POR_FOLHA = 32;
 
 const GRAY_BAR = "#d6d6d6";
 const HEAD_BAR = "#e8ecf5";

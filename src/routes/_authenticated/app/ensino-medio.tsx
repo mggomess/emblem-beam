@@ -26,6 +26,28 @@ function EnsinoMedioPage() {
   const [s, setS] = useState<EmissaoState>({ ...defaultState, nivel: "medio" });
   const patch = (p: Partial<EmissaoState>) => setS((prev) => ({ ...prev, ...p }));
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [pendingKind, setPendingKind] = useState<DocOverlayKind>("assinatura");
+  const addOverlayFile = (file: File, kind: DocOverlayKind) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const src = String(reader.result || "");
+      if (!src) return;
+      const overlay: DocOverlay = {
+        id: crypto.randomUUID(),
+        src, kind, target: "both", label: file.name,
+        x: 120, y: 900, widthMm: kind === "carimbo" ? 45 : 60, rotation: 0,
+      };
+      patch({ overlays: [...s.overlays, overlay] });
+      toast.success(`${kind === "carimbo" ? "Carimbo" : "Assinatura"} adicionado`);
+    };
+    reader.readAsDataURL(file);
+  };
+  const updateOverlay = (id: string, p: Partial<DocOverlay>) =>
+    patch({ overlays: s.overlays.map((o) => (o.id === id ? { ...o, ...p } : o)) });
+  const removeOverlay = (id: string) =>
+    patch({ overlays: s.overlays.filter((o) => o.id !== id) });
+
   return (
     <AppLayout title="Ensino Médio">
       <div className="no-print">
@@ -48,10 +70,11 @@ function EnsinoMedioPage() {
       <div className="grid gap-4 screen-only lg:grid-cols-[minmax(0,420px)_1fr]">
         <Card className="no-print border-border/60 p-4 shadow-soft lg:sticky lg:top-4 lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto">
           <Tabs defaultValue="inst">
-            <TabsList className="grid w-full grid-cols-3 rounded-xl">
-              <TabsTrigger value="inst">Instituição</TabsTrigger>
-              <TabsTrigger value="aluno">Aluno</TabsTrigger>
-              <TabsTrigger value="hist">Histórico</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-4 rounded-xl">
+              <TabsTrigger value="inst" className="text-xs">Inst.</TabsTrigger>
+              <TabsTrigger value="aluno" className="text-xs">Aluno</TabsTrigger>
+              <TabsTrigger value="hist" className="text-xs">Hist.</TabsTrigger>
+              <TabsTrigger value="selos" className="text-xs">Selos</TabsTrigger>
             </TabsList>
 
             <TabsContent value="inst" className="mt-4 space-y-3">

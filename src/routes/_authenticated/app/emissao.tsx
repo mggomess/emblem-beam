@@ -246,11 +246,12 @@ function EmissaoLivePage() {
       <div className="grid gap-4 screen-only lg:grid-cols-[minmax(0,420px)_1fr]">
         <Card className="no-print border-border/60 p-4 shadow-soft lg:sticky lg:top-4 lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto">
           <Tabs defaultValue="doc">
-            <TabsList className="grid w-full grid-cols-4 rounded-xl">
-              <TabsTrigger value="doc" className="rounded-lg">Doc</TabsTrigger>
-              <TabsTrigger value="aluno" className="rounded-lg">Aluno</TabsTrigger>
-              <TabsTrigger value="hist" className="rounded-lg">Histórico</TabsTrigger>
-              <TabsTrigger value="qr" className="rounded-lg">QR/MEC</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-5 rounded-xl">
+              <TabsTrigger value="doc" className="rounded-lg text-xs">Doc</TabsTrigger>
+              <TabsTrigger value="aluno" className="rounded-lg text-xs">Aluno</TabsTrigger>
+              <TabsTrigger value="hist" className="rounded-lg text-xs">Hist.</TabsTrigger>
+              <TabsTrigger value="selos" className="rounded-lg text-xs">Selos</TabsTrigger>
+              <TabsTrigger value="qr" className="rounded-lg text-xs">QR</TabsTrigger>
             </TabsList>
 
             <TabsContent value="doc" className="mt-4 space-y-3">

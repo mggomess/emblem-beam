@@ -692,7 +692,7 @@ function EmissaoLivePage() {
               ))}
             </TabsContent>
 
-
+            <TabsContent value="qr" className="mt-4 space-y-3">
               <F label="URL base do Portal SEDU" val={s.sedUrlBase} on={(v) => patch({ sedUrlBase: v })} />
               <div>
                 <Label>Código único de rastreamento</Label>

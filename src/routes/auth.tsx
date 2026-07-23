@@ -1,31 +1,36 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Sparkles } from "lucide-react";
+import { Lock, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Entrar — Certifica" },
-      { name: "description", content: "Acesse sua conta para gerenciar alunos, cursos e certificados." },
-      { name: "robots", content: "noindex" },
+      { title: "Acesso restrito — Certifica" },
+      { name: "description", content: "Painel administrativo privado." },
+      { name: "robots", content: "noindex,nofollow" },
     ],
   }),
   component: AuthPage,
 });
 
+// Mapeia "usuário" simples para um email interno usado pelo Supabase Auth.
+// Aceita também email completo (contém "@").
+function resolveEmail(input: string): string {
+  const trimmed = input.trim().toLowerCase();
+  if (trimmed.includes("@")) return trimmed;
+  return `${trimmed}@admin.local`;
+}
+
 function AuthPage() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
+  const [usuario, setUsuario] = useState("admin");
   const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -36,34 +41,16 @@ function AuthPage() {
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!usuario || !password) return;
     setLoading(true);
+    const email = resolveEmail(usuario);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
-    if (error) return toast.error(error.message);
+    if (error) {
+      toast.error("Usuário ou senha inválidos.");
+      return;
+    }
     navigate({ to: "/app" });
-  };
-
-  const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: `${window.location.origin}/app`,
-        data: { full_name: name },
-      },
-    });
-    setLoading(false);
-    if (error) return toast.error(error.message);
-    toast.success("Conta criada! Verifique seu email.");
-  };
-
-  const handleGoogle = async () => {
-    const res = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
-    });
-    if (res.error) toast.error(res.error.message);
   };
 
   return (
@@ -71,69 +58,50 @@ function AuthPage() {
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md rounded-3xl border border-border/60 bg-card p-8 shadow-card"
+        className="w-full max-w-sm rounded-3xl border border-border/60 bg-card p-8 shadow-card"
       >
-        <div className="mb-6 flex items-center gap-2">
-          <div className="grid size-9 place-items-center rounded-xl bg-primary text-primary-foreground">
-            <Sparkles className="size-4" />
+        <div className="mb-6 flex items-center gap-3">
+          <div className="grid size-10 place-items-center rounded-xl bg-primary text-primary-foreground">
+            <ShieldCheck className="size-5" />
           </div>
           <div>
-            <div className="text-sm font-semibold">Certifica</div>
-            <div className="text-xs text-muted-foreground">Bem-vindo de volta</div>
+            <div className="text-sm font-semibold">Painel Administrativo</div>
+            <div className="text-xs text-muted-foreground">Acesso restrito</div>
           </div>
         </div>
 
-        <Tabs defaultValue="in">
-          <TabsList className="grid w-full grid-cols-2 rounded-xl">
-            <TabsTrigger value="in" className="rounded-lg">Entrar</TabsTrigger>
-            <TabsTrigger value="up" className="rounded-lg">Criar conta</TabsTrigger>
-          </TabsList>
+        <form onSubmit={handleSignIn} className="space-y-4">
+          <div className="space-y-1.5">
+            <Label>Usuário</Label>
+            <Input
+              required
+              autoComplete="username"
+              value={usuario}
+              onChange={(e) => setUsuario(e.target.value)}
+              className="rounded-xl"
+              placeholder="admin"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label>Senha</Label>
+            <Input
+              required
+              type="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="rounded-xl"
+            />
+          </div>
+          <Button type="submit" disabled={loading} className="w-full rounded-xl" size="lg">
+            <Lock className="mr-2 size-4" />
+            {loading ? "Entrando..." : "Entrar"}
+          </Button>
+        </form>
 
-          <TabsContent value="in">
-            <form onSubmit={handleSignIn} className="mt-5 space-y-4">
-              <div className="space-y-1.5">
-                <Label>Email</Label>
-                <Input required type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="rounded-xl" />
-              </div>
-              <div className="space-y-1.5">
-                <Label>Senha</Label>
-                <Input required type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="rounded-xl" />
-              </div>
-              <Button type="submit" disabled={loading} className="w-full rounded-xl" size="lg">
-                Entrar
-              </Button>
-            </form>
-          </TabsContent>
-
-          <TabsContent value="up">
-            <form onSubmit={handleSignUp} className="mt-5 space-y-4">
-              <div className="space-y-1.5">
-                <Label>Nome completo</Label>
-                <Input required value={name} onChange={(e) => setName(e.target.value)} className="rounded-xl" />
-              </div>
-              <div className="space-y-1.5">
-                <Label>Email</Label>
-                <Input required type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="rounded-xl" />
-              </div>
-              <div className="space-y-1.5">
-                <Label>Senha</Label>
-                <Input required minLength={6} type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="rounded-xl" />
-              </div>
-              <Button type="submit" disabled={loading} className="w-full rounded-xl" size="lg">
-                Criar conta
-              </Button>
-            </form>
-          </TabsContent>
-        </Tabs>
-
-        <div className="my-5 flex items-center gap-3">
-          <div className="h-px flex-1 bg-border" />
-          <span className="text-[10px] uppercase tracking-wider text-muted-foreground">ou</span>
-          <div className="h-px flex-1 bg-border" />
-        </div>
-        <Button variant="outline" onClick={handleGoogle} className="w-full rounded-xl" size="lg">
-          Continuar com Google
-        </Button>
+        <p className="mt-6 text-center text-[11px] text-muted-foreground">
+          Área privada. Todos os acessos são registrados.
+        </p>
       </motion.div>
     </div>
   );

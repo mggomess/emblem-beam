@@ -93,7 +93,7 @@ export const saveHistorico = createServerFn({ method: "POST" })
       owner_id: context.userId,
     };
     const { error: certErr } = await context.supabase
-      .from("certificados" as never)
+      .from("certificados_registros" as never)
       .upsert(certPayload as never, { onConflict: "codigo" });
     if (certErr) console.error("[certificados upsert]", certErr.message);
 

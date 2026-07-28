@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 import { Printer, RefreshCw, Stamp, PenLine, RotateCw, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { SignaturePad } from "@/components/emissao/signature-pad";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/common/PageHeader";
 import { Button } from "@/components/ui/button";
@@ -28,6 +29,16 @@ function EnsinoMedioPage() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [pendingKind, setPendingKind] = useState<DocOverlayKind>("assinatura");
+  const addOverlaySrc = (src: string, kind: DocOverlayKind, label: string) => {
+    if (!src) return;
+    const overlay: DocOverlay = {
+      id: crypto.randomUUID(),
+      src, kind, target: "both", label,
+      x: 120, y: 900, widthMm: kind === "carimbo" ? 45 : 60, rotation: 0,
+    };
+    patch({ overlays: [...s.overlays, overlay] });
+    toast.success(`${kind === "carimbo" ? "Carimbo" : "Assinatura"} adicionado`);
+  };
   const addOverlayFile = (file: File, kind: DocOverlayKind) => {
     const reader = new FileReader();
     reader.onload = () => {
@@ -157,6 +168,7 @@ function EnsinoMedioPage() {
                     <Stamp className="size-3.5 mr-1" /> Carimbo
                   </Button>
                 </div>
+                <SignaturePad onSave={(src: string) => addOverlaySrc(src, "assinatura", "Assinatura desenhada")} />
                 <input ref={fileInputRef} type="file" accept="image/*" className="hidden"
                   onChange={(e) => {
                     const f = e.target.files?.[0];

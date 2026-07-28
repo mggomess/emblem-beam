@@ -627,6 +627,8 @@ function EmissaoLivePage() {
                     <Stamp className="size-3.5 mr-1" /> Carimbo
                   </Button>
                 </div>
+                <SignaturePad onSave={(src) => addOverlaySrc(src, "assinatura", "Assinatura desenhada")} />
+
                 <input
                   ref={fileInputRef}
                   type="file"

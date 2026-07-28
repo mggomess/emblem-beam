@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Plus, Printer, Trash2, RefreshCw, Palette, ArrowUp, ArrowDown, ArrowDownAZ, Loader2, Upload, RotateCw, Stamp, PenLine } from "lucide-react";
+import { SignaturePad } from "@/components/emissao/signature-pad";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/common/PageHeader";
 import { Button } from "@/components/ui/button";
@@ -720,7 +721,7 @@ function EmissaoLivePage() {
                 </div>
                 {s.codigoUnico && (
                   <p className="mt-1 break-all text-[10px] text-muted-foreground">
-                    QR aponta: {s.sedUrlBase.replace(/\/+$/, "")}/validar/{s.codigoUnico}
+                    QR aponta: {s.sedUrlBase.replace(/\/+$/, "")}/{s.codigoUnico}
                   </p>
                 )}
               </div>

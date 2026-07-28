@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 import { Printer, RefreshCw, Stamp, PenLine, RotateCw, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { SignaturePad } from "@/components/emissao/signature-pad";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/common/PageHeader";
 import { Button } from "@/components/ui/button";

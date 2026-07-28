@@ -192,6 +192,22 @@ function EmissaoLivePage() {
   // Overlays (assinaturas / carimbos)
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [pendingKind, setPendingKind] = useState<DocOverlayKind>("assinatura");
+  const addOverlaySrc = (src: string, kind: DocOverlayKind, label: string) => {
+    if (!src) return;
+    const overlay: DocOverlay = {
+      id: crypto.randomUUID(),
+      src,
+      kind,
+      target: "both",
+      label,
+      x: 120,
+      y: 900,
+      widthMm: kind === "carimbo" ? 45 : 60,
+      rotation: 0,
+    };
+    patch({ overlays: [...s.overlays, overlay] });
+    toast.success(`${kind === "carimbo" ? "Carimbo" : "Assinatura"} adicionado`);
+  };
   const addOverlayFile = (file: File, kind: DocOverlayKind) => {
     const reader = new FileReader();
     reader.onload = () => {

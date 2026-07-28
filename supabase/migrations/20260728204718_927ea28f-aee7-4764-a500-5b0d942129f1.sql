@@ -1,0 +1,1 @@
+GRANT SELECT ON public.certificados TO anon, authenticated;

@@ -44,7 +44,7 @@ export type Database = {
         }
         Relationships: []
       }
-      certificados: {
+      certificados_registros: {
         Row: {
           ano_conclusao: number
           ativo: boolean
@@ -606,7 +606,51 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      certificados: {
+        Row: {
+          ano_conclusao: number | null
+          ativo: boolean | null
+          cidade: string | null
+          codigo: string | null
+          cpf: string | null
+          curso: string | null
+          data_emissao: string | null
+          estado: string | null
+          instituicao: string | null
+          nivel: string | null
+          nome: string | null
+          registro: string | null
+        }
+        Insert: {
+          ano_conclusao?: number | null
+          ativo?: boolean | null
+          cidade?: string | null
+          codigo?: string | null
+          cpf?: never
+          curso?: string | null
+          data_emissao?: string | null
+          estado?: string | null
+          instituicao?: string | null
+          nivel?: string | null
+          nome?: string | null
+          registro?: string | null
+        }
+        Update: {
+          ano_conclusao?: number | null
+          ativo?: boolean | null
+          cidade?: string | null
+          codigo?: string | null
+          cpf?: never
+          curso?: string | null
+          data_emissao?: string | null
+          estado?: string | null
+          instituicao?: string | null
+          nivel?: string | null
+          nome?: string | null
+          registro?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       has_role: {

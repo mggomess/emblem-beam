@@ -38,8 +38,8 @@ function Verificar() {
       (
         await supabase
           .from("certificados")
-          .select("codigo, estado, issued_at, status, students(full_name), courses(name, workload)")
-          .eq("code", code)
+          .select( "codigo,nome,cpf,data_nascimento,curso,nivel,ano_conclusao,instituicao,estado,cidade,endereco,registro,data_emissao,ativo",)
+          .eq("codigo", codigo)
           .maybeSingle()
       ).data,
   });

@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import type { EmissaoState } from "./types";
 import { QrBlock } from "./qr-block";
+import { EstacioLogo } from "./estacio-templates";
 
 type Props = { state: EmissaoState; page?: number; totalPages?: number };
 
@@ -54,26 +55,23 @@ export function EstacioHistoricoSuperior({ state, page = 0, totalPages }: Props)
           display: "grid",
           placeItems: "center",
           opacity: 0.08,
-          fontSize: "40mm",
-          color: "#1ea3d6",
-          fontWeight: 700,
-          fontStyle: "italic",
           pointerEvents: "none",
           userSelect: "none",
         }}
       >
-        Estácio
+        <div style={{ width: "150mm" }}>
+          <EstacioLogo className="w-full h-auto" />
+        </div>
       </div>
 
       {/* Header */}
-      <div style={{ display: "grid", gridTemplateColumns: "35mm 1fr 35mm", alignItems: "start" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "2mm" }}>
-          <div style={{ width: "14mm", height: "14mm", background: "#1ea3d6", transform: "rotate(45deg)", position: "relative" }}>
-            <div style={{ position: "absolute", inset: "3mm", background: "#fff" }} />
-            <div style={{ position: "absolute", inset: "5mm", background: "#1ea3d6" }} />
+      <div style={{ display: "grid", gridTemplateColumns: "45mm 1fr 35mm", alignItems: "start" }}>
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <div style={{ width: "42mm" }}>
+            <EstacioLogo className="w-full h-auto" />
           </div>
-          <div style={{ fontSize: "8mm", fontWeight: 700, fontStyle: "italic", color: "#111" }}>Estácio</div>
         </div>
+
         <div style={{ textAlign: "center", fontSize: "2.6mm", fontWeight: 700, paddingTop: "2mm" }}>
           <div>MINISTÉRIO DA EDUCAÇÃO</div>
           <div>SECRETARIA DE EDUCAÇÃO TECNOLÓGICA</div>

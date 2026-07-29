@@ -11,7 +11,7 @@ const ph = (v: string, fb = "—") =>
   v && v.trim() ? v : <span className="text-neutral-400">{fb}</span>;
 
 /** Logo Estácio, losango azul-marinho estilizado. */
-function EstacioLogo({ className = "h-14 w-auto" }: { className?: string }) {
+export function EstacioLogo({ className = "h-14 w-auto" }: { className?: string }) {
   return (
     <svg viewBox="0 0 200 70" className={className}>
       <g>

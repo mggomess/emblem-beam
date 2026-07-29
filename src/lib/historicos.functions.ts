@@ -21,6 +21,47 @@ const saveSchema = z.object({
   nivel_label: z.string().nullish(),
 });
 
+type SupabaseErrorLike = {
+  message: string;
+  code?: string;
+  details?: string | null;
+  hint?: string | null;
+};
+
+type RpcResult<T> = Promise<{
+  data: T | null;
+  error: SupabaseErrorLike | null;
+}>;
+
+type SupabaseRpcClient = {
+  rpc: <T = unknown>(
+    functionName: string,
+    args: Record<string, unknown>,
+  ) => RpcResult<T>;
+};
+
+type CertificadoRpcResult = {
+  codigo: string;
+  nome: string;
+  curso: string;
+  nivel: string;
+  ativo: boolean;
+};
+
+type CertificadoPublico = {
+  codigo: string;
+  nome: string;
+  cpf: string | null;
+  curso: string | null;
+  ano_conclusao: number | null;
+  instituicao: string | null;
+  estado: string | null;
+  cidade: string | null;
+  registro: string | null;
+  data_emissao: string;
+  ativo: boolean;
+};
+
 async function sha256(text: string): Promise<string> {
   const bytes = new TextEncoder().encode(text);
   const hash = await crypto.subtle.digest("SHA-256", bytes);
@@ -34,10 +75,10 @@ function toIsoDate(value?: string | null): string | null {
   if (!value) return null;
 
   const text = value.trim();
-  const br = text.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  const brDate = text.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
 
-  if (br) {
-    return `${br[3]}-${br[2]}-${br[1]}`;
+  if (brDate) {
+    return `${brDate[3]}-${brDate[2]}-${brDate[1]}`;
   }
 
   if (/^\d{4}-\d{2}-\d{2}/.test(text)) {
@@ -59,28 +100,17 @@ function maskCpf(cpf: string | null): string | null {
   return `***.${digits.slice(3, 6)}.${digits.slice(6, 9)}-**`;
 }
 
-function formatSupabaseError(error: unknown): string {
-  if (!error) {
-    return "Erro desconhecido.";
-  }
-
-  if (error instanceof Error) {
-    return JSON.stringify(
-      {
-        name: error.name,
-        message: error.message,
-        stack: error.stack,
-      },
-      null,
-      2,
-    );
-  }
-
-  try {
-    return JSON.stringify(error, null, 2);
-  } catch {
-    return String(error);
-  }
+function formatSupabaseError(error: SupabaseErrorLike): string {
+  return JSON.stringify(
+    {
+      code: error.code ?? null,
+      details: error.details ?? null,
+      hint: error.hint ?? null,
+      message: error.message,
+    },
+    null,
+    2,
+  );
 }
 
 export const saveHistorico = createServerFn({ method: "POST" })
@@ -121,14 +151,10 @@ export const saveHistorico = createServerFn({ method: "POST" })
       );
 
     if (historicoError) {
-      const detalhes = formatSupabaseError(historicoError);
-
-      console.error("===== ERRO HISTORICOS =====");
-      console.error(historicoError);
-      console.error("============================");
+      console.error("[historicos upsert]", historicoError);
 
       throw new Error(
-        `Não foi possível salvar o histórico.\n${detalhes}`,
+        `Não foi possível salvar o histórico: ${historicoError.message}`,
       );
     }
 
@@ -145,9 +171,7 @@ export const saveHistorico = createServerFn({ method: "POST" })
 
     const nivelLabel =
       data.nivel_label ??
-      (data.nivel === "medio"
-        ? "Ensino Médio"
-        : "Ensino Superior");
+      (data.nivel === "medio" ? "Ensino Médio" : "Ensino Superior");
 
     const certificado = {
       codigo: data.verification_uuid,
@@ -157,57 +181,45 @@ export const saveHistorico = createServerFn({ method: "POST" })
       curso: data.curso ?? "",
       nivel: nivelLabel,
       ano_conclusao: anoConclusao,
-      instituicao:
-        data.instituicao ??
-        data.universidade ??
-        "",
+      instituicao: data.instituicao ?? data.universidade ?? "",
       estado: data.estado ?? "",
       cidade: data.cidade ?? "",
       endereco: data.endereco ?? "",
       registro: data.numero_registro ?? "",
-      data_emissao: new Date()
-        .toISOString()
-        .slice(0, 10),
+      data_emissao: new Date().toISOString().slice(0, 10),
       ativo: true,
     };
 
-    console.log("===== INÍCIO UPSERT CERTIFICADO =====");
-    console.log("Tabela: certificados_registros");
-    console.log("Usuário:", context.userId);
-    console.log("Payload:", certificado);
-    console.log("=====================================");
+    const rpcClient = context.supabase as unknown as SupabaseRpcClient;
 
-    const { data: certificadoSalvo, error: certificadoError } =
-      await context.supabase
-        .from("certificados_registros" as never)
-        .upsert(certificado as never, {
-          onConflict: "codigo",
-        })
-        .select("codigo,nome,curso,nivel,ativo")
-        .maybeSingle();
+    const {
+      data: certificadoSalvo,
+      error: certificadoError,
+    } = await rpcClient.rpc<CertificadoRpcResult>(
+      "upsert_certificado_publico",
+      {
+        p_payload: certificado,
+      },
+    );
 
     if (certificadoError) {
-      const detalhes = formatSupabaseError(certificadoError);
-
       console.error(
-        "===== ERRO COMPLETO CERTIFICADOS_REGISTROS =====",
-      );
-      console.error(certificadoError);
-      console.error("Payload enviado:", certificado);
-      console.error("Usuário:", context.userId);
-      console.error(
-        "================================================",
+        "[upsert_certificado_publico]",
+        certificadoError,
       );
 
       throw new Error(
-        `ERRO COMPLETO AO SALVAR CERTIFICADO PÚBLICO:\n${detalhes}`,
+        `Não foi possível salvar o certificado público:\n${formatSupabaseError(
+          certificadoError,
+        )}`,
       );
     }
 
-    console.log(
-      "Certificado público salvo:",
-      certificadoSalvo,
-    );
+    if (!certificadoSalvo) {
+      throw new Error(
+        "O banco não retornou os dados do certificado público salvo.",
+      );
+    }
 
     return {
       ok: true,
@@ -244,7 +256,7 @@ export const verifyHistorico = createServerFn({ method: "GET" })
     const query =
       `${supabaseUrl}/rest/v1/certificados` +
       `?codigo=eq.${encodeURIComponent(data.uuid)}` +
-      "&select=codigo,nome,cpf,curso,nivel,ano_conclusao,instituicao,estado,cidade,registro,data_emissao,ativo" +
+      "&select=codigo,nome,cpf,curso,ano_conclusao,instituicao,estado,cidade,registro,data_emissao,ativo" +
       "&limit=1";
 
     const response = await fetch(query, {
@@ -262,21 +274,7 @@ export const verifyHistorico = createServerFn({ method: "GET" })
       );
     }
 
-    const rows = (await response.json()) as Array<{
-      codigo: string;
-      nome: string;
-      cpf: string | null;
-      curso: string | null;
-      nivel: string | null;
-      ano_conclusao: number | null;
-      instituicao: string | null;
-      estado: string | null;
-      cidade: string | null;
-      registro: string | null;
-      data_emissao: string;
-      ativo: boolean;
-    }>;
-
+    const rows = (await response.json()) as CertificadoPublico[];
     const row = rows[0];
 
     if (!row || !row.ativo) {
@@ -299,7 +297,7 @@ export const verifyHistorico = createServerFn({ method: "GET" })
       numero_registro: row.registro,
       issued_at: row.data_emissao,
       hash: "",
-      nivel: row.nivel ?? "certificado",
+      nivel: "certificado",
       universidade: null,
     };
   });

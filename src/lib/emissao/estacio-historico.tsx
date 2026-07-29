@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react";
 import type { EmissaoState } from "./types";
 import { QrBlock } from "./qr-block";
-import { EstacioLogo } from "./estacio-templates";
+import estacioLogo from "@/assets/estacio-logo.png.asset.json";
 
 type Props = { state: EmissaoState; page?: number; totalPages?: number };
 

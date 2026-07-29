@@ -7,6 +7,8 @@ type Props = {
   target: Exclude<DocOverlayTarget, "both">;
   editable?: boolean;
   onChange?: (id: string, patch: Partial<DocOverlay>) => void;
+  pageWidthMm?: number;
+  pageHeightMm?: number;
 };
 
 /**
@@ -15,7 +17,14 @@ type Props = {
  * cobrindo a folha inteira (297mm). Arrastável no preview; posição/rotação
  * gravadas em `state.overlays` são preservadas na impressão.
  */
-export function OverlayLayer({ overlays, target, editable = false, onChange }: Props) {
+export function OverlayLayer({
+  overlays,
+  target,
+  editable = false,
+  onChange,
+  pageWidthMm = 210,
+  pageHeightMm = 297,
+}: Props) {
   const visible = overlays.filter((o) => o.target === target || o.target === "both");
   if (visible.length === 0) return null;
 
@@ -26,8 +35,8 @@ export function OverlayLayer({ overlays, target, editable = false, onChange }: P
         position: "absolute",
         top: 0,
         left: 0,
-        width: "210mm",
-        height: "297mm",
+        width: `${pageWidthMm}mm`,
+        height: `${pageHeightMm}mm`,
         pointerEvents: "none",
         zIndex: 30,
       }}
@@ -48,7 +57,7 @@ function OverlayItem({
   editable?: boolean;
   onChange?: (id: string, patch: Partial<DocOverlay>) => void;
 }) {
-  const nodeRef = useRef<HTMLDivElement>(null!);
+  const nodeRef = useRef<HTMLDivElement>(null);
 
   const inner = (
     <img

@@ -4,8 +4,6 @@ import { UF_LIST, ufNome } from "./uf";
 const GOLD = rgb(0.76, 0.60, 0.33);
 const GOLD_DARK = rgb(0.55, 0.42, 0.18);
 const BLACK = rgb(0, 0, 0);
-const MEC_BLUE = rgb(0.114, 0.208, 0.341); // #1D3557
-const INK_BLUE = rgb(0.10, 0.18, 0.55);
 
 async function fetchPng(url: string): Promise<ArrayBuffer | null> {
   try {
@@ -190,10 +188,8 @@ function formatFullDate(d: Date): string {
 
 async function drawFooter(
   page: PDFPage,
-  pdfDoc: PDFDocument,
   bold: PDFFont,
   font: PDFFont,
-  brasao: ArrayBuffer | null,
   studentName: string,
   directorName: string | undefined,
 ) {
@@ -213,38 +209,13 @@ async function drawFooter(
   const dataLocal = `HORTOLÂNDIA, ${formatFullDate(new Date())}.`;
   drawCenteredText(page, dataLocal, centerCx, footerTop, 8.5, bold, BLACK);
 
-  drawCenteredText(page, "MEC", centerCx, footerTop - 24, 26, bold, MEC_BLUE);
-
-  const mecLines = [
-    "Autorizado pelo Ministério da Educação",
-    "SEB 738329 / 1998",
-    "Autorizado pela Secretaria de Educação",
-    "SEE 98483 / 1998",
-  ];
-  let my = footerTop - 44;
-  for (const ln of mecLines) {
-    drawCenteredText(page, ln, centerCx, my, 7.5, bold, MEC_BLUE);
-    my -= 11;
-  }
-
-  /* ===== COLUNA ESQUERDA: assinatura Secretaria ===== */
-  // Assinatura simulada (traço azul manuscrito)
-  const sigY = colY + 8;
-  page.drawSvgPath(
-    "M 0 10 C 15 -5, 30 20, 45 5 S 75 15, 90 0 S 120 12, 140 4",
-    {
-      x: leftCx - 70, y: sigY + 12,
-      borderColor: INK_BLUE, borderWidth: 1.2,
-    },
-  );
-  // Linha
   page.drawLine({
     start: { x: leftCx - 90, y: colY },
     end: { x: leftCx + 90, y: colY },
     thickness: 0.8, color: BLACK,
   });
-  drawCenteredText(page, "FLORÊNCIA MARIA ALVES", leftCx, colY - 12, 8.5, bold, BLACK);
-  drawCenteredText(page, "SECRETÁRIO(A) - Nº RG: 41.114.200", leftCx, colY - 23, 7.5, font, BLACK);
+  drawCenteredText(page, directorName || "DIRETOR(A) ESCOLAR", leftCx, colY - 12, 8.5, bold, BLACK);
+  drawCenteredText(page, "DIRETOR(A) ESCOLAR", leftCx, colY - 23, 7.5, font, BLACK);
 
   /* ===== COLUNA DIREITA: dados do concluinte ===== */
   page.drawLine({
@@ -260,9 +231,6 @@ async function drawFooter(
   drawCenteredText(page, "CONCLUINTE", rightCx, colY - 23, 8.5, bold, BLACK);
 
   // Diretor Escolar (opcional, discreto acima)
-  if (directorName) {
-    drawCenteredText(page, `Diretor(a) Escolar: ${directorName}`, centerCx, 42, 7, font, BLACK);
-  }
 }
 
 /* ============================================================
@@ -335,7 +303,7 @@ export async function generateCertificatePdf(input: CertificateInput): Promise<U
   page.drawText(emissao, { x: (width - emW) / 2, y, size: 11, font: italic, color: BLACK });
 
   // Rodapé 3 colunas (sem QR Code)
-  await drawFooter(page, pdfDoc, bold, font, brasao, input.studentName, input.directorName);
+  await drawFooter(page, bold, font, input.studentName, input.directorName);
 
   return await pdfDoc.save();
 }

@@ -1,26 +1,41 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+
+/* ============================================================
+ * Validação dos dados recebidos
+ * ============================================================ */
 
 const saveSchema = z.object({
   verification_uuid: z.string().uuid(),
+
   nivel: z.string().default("superior"),
+  nivel_label: z.string().nullish(),
+
   universidade: z.string().nullish(),
+  instituicao: z.string().nullish(),
+
   nome_aluno: z.string().min(1),
   cpf: z.string().nullish(),
-  curso: z.string().nullish(),
-  instituicao: z.string().nullish(),
-  data_conclusao: z.string().nullish(),
-  carga_horaria: z.string().nullish(),
-  numero_registro: z.string().nullish(),
   data_nascimento: z.string().nullish(),
+
+  curso: z.string().nullish(),
+  data_conclusao: z.string().nullish(),
   ano_conclusao: z.union([z.string(), z.number()]).nullish(),
+  carga_horaria: z.string().nullish(),
+
+  numero_registro: z.string().nullish(),
+
   estado: z.string().nullish(),
   cidade: z.string().nullish(),
   endereco: z.string().nullish(),
-  nivel_label: z.string().nullish(),
 });
+
+/* ============================================================
+ * Tipos
+ * ============================================================ */
 
 type SupabaseErrorLike = {
   message: string;
@@ -29,33 +44,26 @@ type SupabaseErrorLike = {
   hint?: string | null;
 };
 
-type CertificadoRegistro = {
-  id?: string;
+type CertificadoPublico = {
   codigo: string;
-  nome: string | null;
+  nome: string;
   cpf: string | null;
+  data_nascimento: string | null;
   curso: string | null;
   nivel: string | null;
   ano_conclusao: number | null;
   instituicao: string | null;
   estado: string | null;
   cidade: string | null;
-  registro: string | null;
-};
-
-type CertificadoPublico = {
-  codigo: string;
-  nome: string;
-  cpf: string | null;
-  curso: string | null;
-  ano_conclusao: number | null;
-  instituicao: string | null;
-  estado: string | null;
-  cidade: string | null;
+  endereco: string | null;
   registro: string | null;
   data_emissao: string;
   ativo: boolean;
 };
+
+/* ============================================================
+ * Funções auxiliares
+ * ============================================================ */
 
 async function sha256(text: string): Promise<string> {
   const bytes = new TextEncoder().encode(text);
@@ -67,7 +75,9 @@ async function sha256(text: string): Promise<string> {
 }
 
 function maskCpf(cpf: string | null): string | null {
-  if (!cpf) return null;
+  if (!cpf) {
+    return null;
+  }
 
   const digits = cpf.replace(/\D/g, "");
 
@@ -107,45 +117,81 @@ function getAnoConclusao(
   return new Date().getFullYear();
 }
 
-function textoOuNull(value: string | null | undefined): string | null {
+function textoOuNull(
+  value: string | null | undefined,
+): string | null {
   const text = value?.trim();
+
   return text ? text : null;
 }
 
-export const saveHistorico = createServerFn({ method: "POST" })
+/* ============================================================
+ * Salvar histórico e certificado público
+ * ============================================================ */
+
+export const saveHistorico = createServerFn({
+  method: "POST",
+})
   .middleware([requireSupabaseAuth])
   .inputValidator((raw: unknown) => saveSchema.parse(raw))
   .handler(async ({ data, context }) => {
-    // O cast evita erro de tipagem caso os tipos gerados do Supabase
-    // ainda não contenham a tabela certificados_registros.
-    const supabase = context.supabase as unknown as SupabaseClient;
+    /*
+     * O Supabase recebido pelo middleware deve conter a sessão
+     * do usuário autenticado.
+     */
+    const supabase =
+      context.supabase as unknown as SupabaseClient;
+
+    const nomeAluno = data.nome_aluno.trim();
+
+    const instituicao =
+      textoOuNull(data.instituicao) ??
+      textoOuNull(data.universidade);
+
+    const anoConclusao = getAnoConclusao(
+      data.ano_conclusao,
+      data.data_conclusao,
+    );
+
+    const nivelLabel =
+      textoOuNull(data.nivel_label) ??
+      (data.nivel === "medio"
+        ? "Ensino Médio"
+        : "Ensino Superior");
 
     const hash = await sha256(
       [
         data.verification_uuid,
-        data.nome_aluno,
+        nomeAluno,
         data.cpf ?? "",
         data.curso ?? "",
-        data.instituicao ?? "",
+        instituicao ?? "",
       ].join("|"),
     );
 
-    // 1. Salva o histórico privado do usuário autenticado.
+    /* --------------------------------------------------------
+     * 1. Salvar o histórico privado
+     * -------------------------------------------------------- */
+
     const { error: historicoError } = await supabase
       .from("historicos")
       .upsert(
         {
           verification_uuid: data.verification_uuid,
           owner_id: context.userId,
+
           nivel: data.nivel,
           universidade: data.universidade ?? null,
-          nome_aluno: data.nome_aluno,
-          cpf: data.cpf ?? null,
-          curso: data.curso ?? null,
-          instituicao: data.instituicao ?? null,
-          data_conclusao: data.data_conclusao ?? null,
-          carga_horaria: data.carga_horaria ?? null,
-          numero_registro: data.numero_registro ?? null,
+
+          nome_aluno: nomeAluno,
+          cpf: textoOuNull(data.cpf),
+          curso: textoOuNull(data.curso),
+          instituicao,
+
+          data_conclusao: textoOuNull(data.data_conclusao),
+          carga_horaria: textoOuNull(data.carga_horaria),
+          numero_registro: textoOuNull(data.numero_registro),
+
           hash,
           verified: true,
         },
@@ -155,7 +201,10 @@ export const saveHistorico = createServerFn({ method: "POST" })
       );
 
     if (historicoError) {
-      console.error("[historicos upsert]", historicoError);
+      console.error(
+        "[historicos upsert]",
+        historicoError,
+      );
 
       throw new Error(
         `Não foi possível salvar o histórico:\n${formatSupabaseError(
@@ -164,111 +213,112 @@ export const saveHistorico = createServerFn({ method: "POST" })
       );
     }
 
-    const anoConclusao = getAnoConclusao(
-      data.ano_conclusao,
-      data.data_conclusao,
-    );
+    /* --------------------------------------------------------
+     * 2. Montar o registro público
+     *
+     * codigo recebe exatamente o verification_uuid usado pelo QR.
+     * -------------------------------------------------------- */
 
-    const nivelLabel =
-      textoOuNull(data.nivel_label) ??
-      (data.nivel === "medio" ? "Ensino Médio" : "Ensino Superior");
-
-    // Somente colunas confirmadas na tabela real public.certificados_registros.
-    const certificadoPayload: CertificadoRegistro = {
+    const certificadoPayload: CertificadoPublico = {
       codigo: data.verification_uuid,
-      nome: textoOuNull(data.nome_aluno),
+
+      nome: nomeAluno,
       cpf: textoOuNull(data.cpf),
+      data_nascimento: textoOuNull(data.data_nascimento),
+
       curso: textoOuNull(data.curso),
       nivel: nivelLabel,
       ano_conclusao: anoConclusao,
-      instituicao:
-        textoOuNull(data.instituicao) ?? textoOuNull(data.universidade),
-      estado: textoOuNull(data.estado)?.toUpperCase() ?? null,
+
+      instituicao,
+
+      estado:
+        textoOuNull(data.estado)?.toUpperCase() ?? null,
+
       cidade: textoOuNull(data.cidade),
+      endereco: textoOuNull(data.endereco),
+
       registro: textoOuNull(data.numero_registro),
+
+      data_emissao: new Date().toISOString(),
+      ativo: true,
     };
 
-    // 2. Procura o certificado público pelo código.
-    const { data: existenteRaw, error: buscaError } = await supabase
-      .from("certificados_registros")
-      .select("id")
-      .eq("codigo", certificadoPayload.codigo)
-      .limit(1)
-      .maybeSingle();
+    /* --------------------------------------------------------
+     * 3. Salvar diretamente em public.certificados
+     *
+     * Não utiliza mais certificados_registros.
+     * -------------------------------------------------------- */
 
-    if (buscaError) {
-      console.error("[certificados_registros select]", buscaError);
+    const {
+      data: certificadoSalvoRaw,
+      error: certificadoError,
+    } = await supabase
+      .from("certificados")
+      .upsert(certificadoPayload, {
+        onConflict: "codigo",
+        ignoreDuplicates: false,
+      })
+      .select(
+        [
+          "codigo",
+          "nome",
+          "cpf",
+          "data_nascimento",
+          "curso",
+          "nivel",
+          "ano_conclusao",
+          "instituicao",
+          "estado",
+          "cidade",
+          "endereco",
+          "registro",
+          "data_emissao",
+          "ativo",
+        ].join(","),
+      )
+      .single();
+
+    if (certificadoError) {
+      console.error(
+        "[certificados upsert]",
+        certificadoError,
+      );
 
       throw new Error(
-        `Não foi possível consultar o certificado público:\n${formatSupabaseError(
-          buscaError,
+        `Não foi possível salvar o certificado para consulta pública:\n${formatSupabaseError(
+          certificadoError,
         )}`,
       );
     }
 
-    const existente = existenteRaw as { id: string } | null;
-    let certificadoSalvo: CertificadoRegistro | null = null;
-
-    // 3. Atualiza quando já existe ou insere quando ainda não existe.
-    if (existente?.id) {
-      const { data: atualizado, error: atualizacaoError } = await supabase
-        .from("certificados_registros")
-        .update(certificadoPayload)
-        .eq("id", existente.id)
-        .select(
-          "id,codigo,nome,cpf,curso,nivel,ano_conclusao,instituicao,estado,cidade,registro",
-        )
-        .single();
-
-      if (atualizacaoError) {
-        console.error("[certificados_registros update]", atualizacaoError);
-
-        throw new Error(
-          `Não foi possível atualizar o certificado público:\n${formatSupabaseError(
-            atualizacaoError,
-          )}`,
-        );
-      }
-
-      certificadoSalvo = atualizado as CertificadoRegistro;
-    } else {
-      const { data: inserido, error: insercaoError } = await supabase
-        .from("certificados_registros")
-        .insert(certificadoPayload)
-        .select(
-          "id,codigo,nome,cpf,curso,nivel,ano_conclusao,instituicao,estado,cidade,registro",
-        )
-        .single();
-
-      if (insercaoError) {
-        console.error("[certificados_registros insert]", insercaoError);
-
-        throw new Error(
-          `Não foi possível inserir o certificado público:\n${formatSupabaseError(
-            insercaoError,
-          )}`,
-        );
-      }
-
-      certificadoSalvo = inserido as CertificadoRegistro;
-    }
+    const certificadoSalvo =
+      certificadoSalvoRaw as CertificadoPublico | null;
 
     if (!certificadoSalvo) {
       throw new Error(
-        "O banco não retornou os dados do certificado público salvo.",
+        "O banco não retornou os dados do certificado salvo.",
       );
     }
 
     return {
       ok: true,
       hash,
+
       verification_uuid: data.verification_uuid,
       nivel: nivelLabel,
+
       certificado: certificadoSalvo,
     };
   });
 
-export const verifyHistorico = createServerFn({ method: "GET" })
+/* ============================================================
+ * Consultar certificado público
+ * ============================================================ */
+
+export const verifyHistorico = createServerFn({
+  method: "GET",
+})
   .inputValidator((raw: unknown) =>
     z
       .object({
@@ -278,7 +328,8 @@ export const verifyHistorico = createServerFn({ method: "GET" })
   )
   .handler(async ({ data }) => {
     const supabaseUrl =
-      process.env.SUPABASE_URL ?? process.env.VITE_SUPABASE_URL;
+      process.env.SUPABASE_URL ??
+      process.env.VITE_SUPABASE_URL;
 
     const publicKey =
       process.env.SUPABASE_PUBLISHABLE_KEY ??
@@ -290,17 +341,41 @@ export const verifyHistorico = createServerFn({ method: "GET" })
       );
     }
 
-    // A leitura pública continua usando a VIEW public.certificados.
+    const normalizedSupabaseUrl =
+      supabaseUrl.replace(/\/+$/, "");
+
+    /*
+     * Consulta pública diretamente em public.certificados
+     * usando certificados.codigo = verification_uuid.
+     */
     const query =
-      `${supabaseUrl}/rest/v1/certificados` +
+      `${normalizedSupabaseUrl}/rest/v1/certificados` +
       `?codigo=eq.${encodeURIComponent(data.uuid)}` +
-      "&select=codigo,nome,cpf,curso,ano_conclusao,instituicao,estado,cidade,registro,data_emissao,ativo" +
+      "&select=" +
+      [
+        "codigo",
+        "nome",
+        "cpf",
+        "data_nascimento",
+        "curso",
+        "nivel",
+        "ano_conclusao",
+        "instituicao",
+        "estado",
+        "cidade",
+        "endereco",
+        "registro",
+        "data_emissao",
+        "ativo",
+      ].join(",") +
       "&limit=1";
 
     const response = await fetch(query, {
+      method: "GET",
       headers: {
         apikey: publicKey,
         Authorization: `Bearer ${publicKey}`,
+        Accept: "application/json",
       },
     });
 
@@ -312,7 +387,9 @@ export const verifyHistorico = createServerFn({ method: "GET" })
       );
     }
 
-    const rows = (await response.json()) as CertificadoPublico[];
+    const rows =
+      (await response.json()) as CertificadoPublico[];
+
     const row = rows[0];
 
     if (!row || !row.ativo) {
@@ -323,19 +400,35 @@ export const verifyHistorico = createServerFn({ method: "GET" })
 
     return {
       found: true as const,
+
       verification_uuid: row.codigo,
+
       nome_aluno: row.nome,
       cpf: maskCpf(row.cpf),
+      data_nascimento: row.data_nascimento,
+
       curso: row.curso,
+      nivel: row.nivel ?? "certificado",
+
       instituicao: row.instituicao,
-      data_conclusao: row.ano_conclusao
-        ? String(row.ano_conclusao)
-        : null,
+      universidade: row.instituicao,
+
+      data_conclusao:
+        row.ano_conclusao !== null
+          ? String(row.ano_conclusao)
+          : null,
+
+      ano_conclusao: row.ano_conclusao,
       carga_horaria: null,
+
       numero_registro: row.registro,
+
+      estado: row.estado,
+      cidade: row.cidade,
+      endereco: row.endereco,
+
       issued_at: row.data_emissao,
+
       hash: "",
-      nivel: "certificado",
-      universidade: null,
     };
   });

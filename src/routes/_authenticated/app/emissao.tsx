@@ -54,14 +54,20 @@ function EmissaoLivePage() {
     return uuid;
   };
 
-  const persistirHistorico = async (uuid: string) => {
+  const persistirHistorico = async (uuid: string): Promise<boolean> => {
     try {
       const { saveHistorico } = await import("@/lib/historicos.functions");
-      await saveHistorico({
+
+      const resultado = await saveHistorico({
         data: {
           verification_uuid: uuid,
           nivel: s.nivel,
-          universidade: s.nivel === "superior" ? (s.templateSuperior.startsWith("unip") ? "UNIP" : "ESTACIO") : null,
+          universidade:
+            s.nivel === "superior"
+              ? s.templateSuperior.startsWith("unip")
+                ? "UNIP"
+                : "ESTACIO"
+              : null,
           nome_aluno: s.nomeAluno || "—",
           cpf: s.cpf || null,
           curso: s.nivel === "superior" ? s.cursoSuperior : null,
@@ -74,25 +80,45 @@ function EmissaoLivePage() {
           estado: s.estadoNasc || null,
           cidade: s.cidadeEmissao || s.cidadeNasc || null,
           endereco: s.enderecoPolo || null,
-          nivel_label: s.nivel === "medio" ? "Ensino Médio" : "Ensino Superior",
+          nivel_label:
+            s.nivel === "medio" ? "Ensino Médio" : "Ensino Superior",
         },
       });
-    } catch (err) {
-      console.error(err);
-      toast.error("Não foi possível registrar o histórico para verificação pública.");
+
+      console.log("Documento salvo:", resultado);
+      return true;
+    } catch (error) {
+      console.error("Erro ao registrar documento:", error);
+
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Não foi possível registrar o documento.",
+      );
+
+      return false;
     }
   };
 
-
   const salvarEEmitir = async () => {
     const uuid = s.codigoUnico || gerarCodigo();
-    await persistirHistorico(uuid);
-    toast.success("Histórico registrado. QR pronto para verificação pública.");
+    const salvo = await persistirHistorico(uuid);
+
+    if (!salvo) {
+      return;
+    }
+
+    toast.success("Documento registrado. QR pronto para verificação pública.");
   };
 
   const imprimir = async () => {
     const uuid = s.codigoUnico || gerarCodigo();
-    await persistirHistorico(uuid);
+    const salvo = await persistirHistorico(uuid);
+
+    if (!salvo) {
+      return;
+    }
+
     setTimeout(() => window.print(), 200);
   };
 

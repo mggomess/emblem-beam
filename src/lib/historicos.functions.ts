@@ -59,6 +59,30 @@ function maskCpf(cpf: string | null): string | null {
   return `***.${digits.slice(3, 6)}.${digits.slice(6, 9)}-**`;
 }
 
+function formatSupabaseError(error: unknown): string {
+  if (!error) {
+    return "Erro desconhecido.";
+  }
+
+  if (error instanceof Error) {
+    return JSON.stringify(
+      {
+        name: error.name,
+        message: error.message,
+        stack: error.stack,
+      },
+      null,
+      2,
+    );
+  }
+
+  try {
+    return JSON.stringify(error, null, 2);
+  } catch {
+    return String(error);
+  }
+}
+
 export const saveHistorico = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((raw: unknown) => saveSchema.parse(raw))
@@ -97,10 +121,14 @@ export const saveHistorico = createServerFn({ method: "POST" })
       );
 
     if (historicoError) {
-      console.error("[historicos upsert]", historicoError);
+      const detalhes = formatSupabaseError(historicoError);
+
+      console.error("===== ERRO HISTORICOS =====");
+      console.error(historicoError);
+      console.error("============================");
 
       throw new Error(
-        `Não foi possível salvar o histórico: ${historicoError.message}`,
+        `Não foi possível salvar o histórico.\n${detalhes}`,
       );
     }
 
@@ -117,7 +145,9 @@ export const saveHistorico = createServerFn({ method: "POST" })
 
     const nivelLabel =
       data.nivel_label ??
-      (data.nivel === "medio" ? "Ensino Médio" : "Ensino Superior");
+      (data.nivel === "medio"
+        ? "Ensino Médio"
+        : "Ensino Superior");
 
     const certificado = {
       codigo: data.verification_uuid,
@@ -127,43 +157,74 @@ export const saveHistorico = createServerFn({ method: "POST" })
       curso: data.curso ?? "",
       nivel: nivelLabel,
       ano_conclusao: anoConclusao,
-      instituicao: data.instituicao ?? data.universidade ?? "",
+      instituicao:
+        data.instituicao ??
+        data.universidade ??
+        "",
       estado: data.estado ?? "",
       cidade: data.cidade ?? "",
       endereco: data.endereco ?? "",
       registro: data.numero_registro ?? "",
-      data_emissao: new Date().toISOString().slice(0, 10),
+      data_emissao: new Date()
+        .toISOString()
+        .slice(0, 10),
       ativo: true,
     };
 
-    const { error: certificadoError } = await context.supabase
-      .from("certificados_registros" as never)
-      .upsert(certificado as never, {
-        onConflict: "codigo",
-      });
+    console.log("===== INÍCIO UPSERT CERTIFICADO =====");
+    console.log("Tabela: certificados_registros");
+    console.log("Usuário:", context.userId);
+    console.log("Payload:", certificado);
+    console.log("=====================================");
+
+    const { data: certificadoSalvo, error: certificadoError } =
+      await context.supabase
+        .from("certificados_registros" as never)
+        .upsert(certificado as never, {
+          onConflict: "codigo",
+        })
+        .select("codigo,nome,curso,nivel,ativo")
+        .maybeSingle();
 
     if (certificadoError) {
+      const detalhes = formatSupabaseError(certificadoError);
+
       console.error(
-        "[certificados_registros upsert]",
-        certificadoError,
+        "===== ERRO COMPLETO CERTIFICADOS_REGISTROS =====",
+      );
+      console.error(certificadoError);
+      console.error("Payload enviado:", certificado);
+      console.error("Usuário:", context.userId);
+      console.error(
+        "================================================",
       );
 
       throw new Error(
-        `O histórico foi salvo, mas o certificado público falhou: ${certificadoError.message}`,
+        `ERRO COMPLETO AO SALVAR CERTIFICADO PÚBLICO:\n${detalhes}`,
       );
     }
+
+    console.log(
+      "Certificado público salvo:",
+      certificadoSalvo,
+    );
 
     return {
       ok: true,
       hash,
       verification_uuid: data.verification_uuid,
       nivel: nivelLabel,
+      certificado: certificadoSalvo,
     };
   });
 
 export const verifyHistorico = createServerFn({ method: "GET" })
   .inputValidator((raw: unknown) =>
-    z.object({ uuid: z.string().uuid() }).parse(raw),
+    z
+      .object({
+        uuid: z.string().uuid(),
+      })
+      .parse(raw),
   )
   .handler(async ({ data }) => {
     const supabaseUrl =
@@ -180,23 +241,24 @@ export const verifyHistorico = createServerFn({ method: "GET" })
       );
     }
 
-    const response = await fetch(
-      `${supabaseUrl}/rest/v1/certificados?codigo=eq.${encodeURIComponent(
-        data.uuid,
-      )}&select=codigo,nome,cpf,curso,nivel,ano_conclusao,instituicao,estado,cidade,registro,data_emissao,ativo&limit=1`,
-      {
-        headers: {
-          apikey: publicKey,
-          Authorization: `Bearer ${publicKey}`,
-        },
+    const query =
+      `${supabaseUrl}/rest/v1/certificados` +
+      `?codigo=eq.${encodeURIComponent(data.uuid)}` +
+      "&select=codigo,nome,cpf,curso,nivel,ano_conclusao,instituicao,estado,cidade,registro,data_emissao,ativo" +
+      "&limit=1";
+
+    const response = await fetch(query, {
+      headers: {
+        apikey: publicKey,
+        Authorization: `Bearer ${publicKey}`,
       },
-    );
+    });
 
     if (!response.ok) {
       const message = await response.text();
 
       throw new Error(
-        `Erro ao consultar certificado: ${message}`,
+        `Erro ao consultar certificado público: ${message}`,
       );
     }
 

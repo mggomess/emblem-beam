@@ -36,10 +36,10 @@ function Verificar() {
     enabled: !isUuid(code),
     queryFn: async () =>
       (
-        await supabase
-          .from("certificados")
-          .select( "codigo,nome,cpf,data_nascimento,curso,ano_conclusao,instituicao,estado,cidade,endereco,registro,data_emissao,ativo,qr_url",)
-          .eq("codigo", codigo)
+         await supabase
+          .from("certificates")
+          .select("code, estado, issued_at, status, students(full_name), courses(name, workload)")
+          .eq("code", code)
           .maybeSingle()
       ).data,
   });

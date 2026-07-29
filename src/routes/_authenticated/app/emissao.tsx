@@ -117,6 +117,9 @@ function EmissaoLivePage() {
 
   const isEstacio = s.templateSuperior.startsWith("estacio");
   const isUnipCertidao = s.templateSuperior === "unip-certidao";
+  const certIsLandscape = s.nivel === "medio" || s.templateSuperior === "unip-diploma" || s.templateSuperior === "estacio-diploma";
+  const certPageWidthMm = certIsLandscape ? 297 : 210;
+  const certPageHeightMm = certIsLandscape ? 210 : 297;
 
   // Paginação do histórico superior — quebra em folhas conforme o layout.
   const linhasPorFolha = s.nivel === "superior"
@@ -757,9 +760,16 @@ function EmissaoLivePage() {
           </div>
           <div className="overflow-auto">
             <div className="origin-top-left" style={{ transform: "scale(0.62)", width: "fit-content" }}>
-              <div style={{ position: "relative", width: "210mm" }}>
+              <div style={{ position: "relative", width: `${certPageWidthMm}mm` }}>
                 <CertComponent state={s} onMecChange={(m) => patch({ mec: m })} draggableMec />
-                <OverlayLayer overlays={s.overlays} target="cert" editable onChange={updateOverlay} />
+                <OverlayLayer
+                  overlays={s.overlays}
+                  target="cert"
+                  editable
+                  onChange={updateOverlay}
+                  pageWidthMm={certPageWidthMm}
+                  pageHeightMm={certPageHeightMm}
+                />
               </div>
             </div>
           </div>
@@ -784,9 +794,14 @@ function EmissaoLivePage() {
 
       {/* Somente para impressão */}
       <div className="print-root">
-        <div style={{ position: "relative", width: "210mm" }}>
+        <div style={{ position: "relative", width: `${certPageWidthMm}mm` }}>
           <CertComponent state={s} onMecChange={() => {}} draggableMec={false} />
-          <OverlayLayer overlays={s.overlays} target="cert" />
+          <OverlayLayer
+            overlays={s.overlays}
+            target="cert"
+            pageWidthMm={certPageWidthMm}
+            pageHeightMm={certPageHeightMm}
+          />
         </div>
         {Array.from({ length: totalFolhasHist }, (_, i) => (
           <div key={`hist-print-${i}`} style={{ position: "relative", width: "210mm" }}>

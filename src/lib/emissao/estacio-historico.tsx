@@ -5,7 +5,7 @@ import estacioLogo from "@/assets/estacio-logo.png.asset.json";
 
 type Props = { state: EmissaoState; page?: number; totalPages?: number };
 
-export const HISTORICO_ESTACIO_LINHAS_POR_FOLHA = 32;
+export const HISTORICO_ESTACIO_LINHAS_POR_FOLHA = 28;
 
 const GRAY_BAR = "#d6d6d6";
 const HEAD_BAR = "#e8ecf5";
@@ -203,7 +203,7 @@ export function EstacioHistoricoSuperior({ state, page = 0, totalPages }: Props)
       )}
 
       {/* Rodapé */}
-      <div style={{ position: "absolute", bottom: "8mm", left: "8mm", right: "8mm", display: "grid", gridTemplateColumns: "60mm 1fr 30mm", gap: "3mm", alignItems: "end" }}>
+      <div style={{ marginTop: "3mm", display: "grid", gridTemplateColumns: "60mm 1fr 30mm", gap: "3mm", alignItems: "end" }}>
         <div style={{ border: `1px solid ${BORDER}`, padding: "2mm", textAlign: "center", fontSize: "2.2mm", fontWeight: 700 }}>
           FACULDADE ESTÁCIO<br />
           {(state.cidadeEmissao || "BELO HORIZONTE").toUpperCase()} - {state.uf}

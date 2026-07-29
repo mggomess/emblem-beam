@@ -26,6 +26,8 @@ export const Route = createFileRoute("/_authenticated/app/ensino-medio")({
 function EnsinoMedioPage() {
   const [s, setS] = useState<EmissaoState>({ ...defaultState, nivel: "medio" });
   const patch = (p: Partial<EmissaoState>) => setS((prev) => ({ ...prev, ...p }));
+  const certPageWidthMm = 297;
+  const certPageHeightMm = 210;
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [pendingKind, setPendingKind] = useState<DocOverlayKind>("assinatura");
@@ -238,9 +240,16 @@ function EnsinoMedioPage() {
           <div className="mb-2 text-xs uppercase tracking-wider text-muted-foreground">Folha 1 — Certificado</div>
           <div className="overflow-auto">
             <div className="origin-top-left" style={{ transform: "scale(0.62)", width: "fit-content" }}>
-              <div style={{ position: "relative", width: "210mm" }}>
+              <div style={{ position: "relative", width: `${certPageWidthMm}mm` }}>
                 <CertificadoMedio state={s} onMecChange={() => {}} draggableMec={false} />
-                <OverlayLayer overlays={s.overlays} target="cert" editable onChange={updateOverlay} />
+                <OverlayLayer
+                  overlays={s.overlays}
+                  target="cert"
+                  editable
+                  onChange={updateOverlay}
+                  pageWidthMm={certPageWidthMm}
+                  pageHeightMm={certPageHeightMm}
+                />
               </div>
             </div>
           </div>
@@ -257,9 +266,14 @@ function EnsinoMedioPage() {
       </div>
 
       <div className="print-root">
-        <div style={{ position: "relative", width: "210mm" }}>
+        <div style={{ position: "relative", width: `${certPageWidthMm}mm` }}>
           <CertificadoMedio state={s} onMecChange={() => {}} draggableMec={false} />
-          <OverlayLayer overlays={s.overlays} target="cert" />
+          <OverlayLayer
+            overlays={s.overlays}
+            target="cert"
+            pageWidthMm={certPageWidthMm}
+            pageHeightMm={certPageHeightMm}
+          />
         </div>
         <div style={{ position: "relative", width: "210mm" }}>
           <HistoricoMedio state={s} />

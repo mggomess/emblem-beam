@@ -98,6 +98,7 @@ export const saveHistorico = createServerFn({ method: "POST" })
 
     if (historicoError) {
       console.error("[historicos upsert]", historicoError);
+
       throw new Error(
         `Não foi possível salvar o histórico: ${historicoError.message}`,
       );
@@ -124,6 +125,7 @@ export const saveHistorico = createServerFn({ method: "POST" })
       cpf: data.cpf ?? "",
       data_nascimento: dataNascimento,
       curso: data.curso ?? "",
+      nivel: nivelLabel,
       ano_conclusao: anoConclusao,
       instituicao: data.instituicao ?? data.universidade ?? "",
       estado: data.estado ?? "",
@@ -135,13 +137,17 @@ export const saveHistorico = createServerFn({ method: "POST" })
     };
 
     const { error: certificadoError } = await context.supabase
-      .from("certificados")
-      .upsert(certificado, {
+      .from("certificados_registros" as never)
+      .upsert(certificado as never, {
         onConflict: "codigo",
       });
 
     if (certificadoError) {
-      console.error("[certificados upsert]", certificadoError);
+      console.error(
+        "[certificados_registros upsert]",
+        certificadoError,
+      );
+
       throw new Error(
         `O histórico foi salvo, mas o certificado público falhou: ${certificadoError.message}`,
       );
@@ -161,7 +167,8 @@ export const verifyHistorico = createServerFn({ method: "GET" })
   )
   .handler(async ({ data }) => {
     const supabaseUrl =
-      process.env.SUPABASE_URL ?? process.env.VITE_SUPABASE_URL;
+      process.env.SUPABASE_URL ??
+      process.env.VITE_SUPABASE_URL;
 
     const publicKey =
       process.env.SUPABASE_PUBLISHABLE_KEY ??
@@ -176,7 +183,7 @@ export const verifyHistorico = createServerFn({ method: "GET" })
     const response = await fetch(
       `${supabaseUrl}/rest/v1/certificados?codigo=eq.${encodeURIComponent(
         data.uuid,
-      )}&select=codigo,nome,cpf,curso,ano_conclusao,instituicao,estado,cidade,registro,data_emissao,ativo&limit=1`,
+      )}&select=codigo,nome,cpf,curso,nivel,ano_conclusao,instituicao,estado,cidade,registro,data_emissao,ativo&limit=1`,
       {
         headers: {
           apikey: publicKey,
@@ -187,7 +194,10 @@ export const verifyHistorico = createServerFn({ method: "GET" })
 
     if (!response.ok) {
       const message = await response.text();
-      throw new Error(`Erro ao consultar certificado: ${message}`);
+
+      throw new Error(
+        `Erro ao consultar certificado: ${message}`,
+      );
     }
 
     const rows = (await response.json()) as Array<{
@@ -195,6 +205,7 @@ export const verifyHistorico = createServerFn({ method: "GET" })
       nome: string;
       cpf: string | null;
       curso: string | null;
+      nivel: string | null;
       ano_conclusao: number | null;
       instituicao: string | null;
       estado: string | null;
@@ -226,7 +237,7 @@ export const verifyHistorico = createServerFn({ method: "GET" })
       numero_registro: row.registro,
       issued_at: row.data_emissao,
       hash: "",
-      nivel: "certificado",
+      nivel: row.nivel ?? "certificado",
       universidade: null,
     };
   });

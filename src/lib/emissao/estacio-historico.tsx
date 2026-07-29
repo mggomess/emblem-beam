@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import type { EmissaoState } from "./types";
 import { QrBlock } from "./qr-block";
+import { EstacioLogo } from "./estacio-templates";
 
 type Props = { state: EmissaoState; page?: number; totalPages?: number };
 
@@ -58,13 +59,17 @@ export function EstacioHistoricoSuperior({ state, page = 0, totalPages }: Props)
           userSelect: "none",
         }}
       >
-        <EstacioLogo className="" />
+        <div style={{ width: "150mm" }}>
+          <EstacioLogo className="w-full h-auto" />
+        </div>
       </div>
 
       {/* Header */}
       <div style={{ display: "grid", gridTemplateColumns: "45mm 1fr 35mm", alignItems: "start" }}>
         <div style={{ display: "flex", alignItems: "center" }}>
-          <EstacioLogo className="" />
+          <div style={{ width: "42mm" }}>
+            <EstacioLogo className="w-full h-auto" />
+          </div>
         </div>
 
         <div style={{ textAlign: "center", fontSize: "2.6mm", fontWeight: 700, paddingTop: "2mm" }}>

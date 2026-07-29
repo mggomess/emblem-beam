@@ -38,7 +38,7 @@ function Verificar() {
       (
         await supabase
           .from("certificados")
-          .select( "codigo,nome,cpf,data_nascimento,curso,nivel,ano_conclusao,instituicao,estado,cidade,endereco,registro,data_emissao,ativo",)
+          .select( "codigo,nome,cpf,data_nascimento,curso,ano_conclusao,instituicao,estado,cidade,endereco,registro,data_emissao,ativo,qr_url",)
           .eq("codigo", codigo)
           .maybeSingle()
       ).data,

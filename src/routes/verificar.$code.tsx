@@ -37,8 +37,8 @@ function Verificar() {
     queryFn: async () =>
       (
         await supabase
-          .from("certificates")
-          .select("code, estado, issued_at, status, students(full_name), courses(name, workload)")
+          .from("certificados")
+          .select("codigo, estado, issued_at, status, students(full_name), courses(name, workload)")
           .eq("code", code)
           .maybeSingle()
       ).data,

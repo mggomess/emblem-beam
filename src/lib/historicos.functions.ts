@@ -293,8 +293,10 @@ export const saveHistorico = createServerFn({
 
     const certificadoSalvo: CertificadoPublico = {
       ...certificadoPayload,
+      data_nascimento: dataNascimento,
       cpf: maskCpf(certificadoPayload.cpf),
     };
+
 
 
     return {

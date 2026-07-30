@@ -125,6 +125,22 @@ function textoOuNull(
   return text ? text : null;
 }
 
+/** Normaliza datas (dd/mm/aaaa ou ISO) para o formato aceito pelo banco. */
+function toIsoDate(
+  value: string | null | undefined,
+): string | null {
+  const text = textoOuNull(value);
+  if (!text) return null;
+
+  const br = text.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  if (br) return `${br[3]}-${br[2]}-${br[1]}`;
+
+  if (/^\d{4}-\d{2}-\d{2}/.test(text)) return text.slice(0, 10);
+
+  return null;
+}
+
+
 /* ============================================================
  * Salvar histórico e certificado público
  * ============================================================ */
@@ -219,12 +235,12 @@ export const saveHistorico = createServerFn({
      * codigo recebe exatamente o verification_uuid usado pelo QR.
      * -------------------------------------------------------- */
 
-    const certificadoPayload: CertificadoPublico = {
+    const certificadoPayload = {
       codigo: data.verification_uuid,
 
       nome: nomeAluno,
       cpf: textoOuNull(data.cpf),
-      data_nascimento: textoOuNull(data.data_nascimento),
+      data_nascimento: toIsoDate(data.data_nascimento),
 
       curso: textoOuNull(data.curso),
       nivel: nivelLabel,
@@ -240,44 +256,24 @@ export const saveHistorico = createServerFn({
 
       registro: textoOuNull(data.numero_registro),
 
-      data_emissao: new Date().toISOString(),
+      data_emissao: new Date().toISOString().slice(0, 10),
       ativo: true,
+      owner_id: context.userId,
     };
 
     /* --------------------------------------------------------
-     * 3. Salvar diretamente em public.certificados
+     * 3. Salvar em public.certificados_registros
      *
-     * Não utiliza mais certificados_registros.
+     * A view pública public.certificados lê desta tabela
+     * mascarando o CPF.
      * -------------------------------------------------------- */
 
-    const {
-      data: certificadoSalvoRaw,
-      error: certificadoError,
-    } = await supabase
-      .from("certificados")
+    const { error: certificadoError } = await supabase
+      .from("certificados_registros")
       .upsert(certificadoPayload, {
         onConflict: "codigo",
         ignoreDuplicates: false,
-      })
-      .select(
-        [
-          "codigo",
-          "nome",
-          "cpf",
-          "data_nascimento",
-          "curso",
-          "nivel",
-          "ano_conclusao",
-          "instituicao",
-          "estado",
-          "cidade",
-          "endereco",
-          "registro",
-          "data_emissao",
-          "ativo",
-        ].join(","),
-      )
-      .single();
+      });
 
     if (certificadoError) {
       console.error(
@@ -292,14 +288,11 @@ export const saveHistorico = createServerFn({
       );
     }
 
-    const certificadoSalvo =
-      certificadoSalvoRaw as CertificadoPublico | null;
+    const certificadoSalvo: CertificadoPublico = {
+      ...certificadoPayload,
+      cpf: maskCpf(certificadoPayload.cpf),
+    };
 
-    if (!certificadoSalvo) {
-      throw new Error(
-        "O banco não retornou os dados do certificado salvo.",
-      );
-    }
 
     return {
       ok: true,

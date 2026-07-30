@@ -235,31 +235,34 @@ export const saveHistorico = createServerFn({
      * codigo recebe exatamente o verification_uuid usado pelo QR.
      * -------------------------------------------------------- */
 
+    const dataNascimento = toIsoDate(data.data_nascimento);
+
     const certificadoPayload = {
       codigo: data.verification_uuid,
 
       nome: nomeAluno,
-      cpf: textoOuNull(data.cpf),
-      data_nascimento: toIsoDate(data.data_nascimento),
+      cpf: textoOuNull(data.cpf) ?? "",
+      ...(dataNascimento ? { data_nascimento: dataNascimento } : {}),
 
-      curso: textoOuNull(data.curso),
+      curso: textoOuNull(data.curso) ?? "",
       nivel: nivelLabel,
       ano_conclusao: anoConclusao,
 
-      instituicao,
+      instituicao: instituicao ?? "",
 
       estado:
-        textoOuNull(data.estado)?.toUpperCase() ?? null,
+        textoOuNull(data.estado)?.toUpperCase() ?? "",
 
-      cidade: textoOuNull(data.cidade),
-      endereco: textoOuNull(data.endereco),
+      cidade: textoOuNull(data.cidade) ?? "",
+      endereco: textoOuNull(data.endereco) ?? "",
 
-      registro: textoOuNull(data.numero_registro),
+      registro: textoOuNull(data.numero_registro) ?? "",
 
       data_emissao: new Date().toISOString().slice(0, 10),
       ativo: true,
       owner_id: context.userId,
     };
+
 
     /* --------------------------------------------------------
      * 3. Salvar em public.certificados_registros

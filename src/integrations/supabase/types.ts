@@ -48,61 +48,61 @@ export type Database = {
         Row: {
           ano_conclusao: number
           ativo: boolean
-          cidade: string
+          cidade: string | null
           codigo: string
-          cpf: string
+          cpf: string | null
           created_at: string
-          curso: string
+          curso: string | null
           data_emissao: string
-          data_nascimento: string
-          endereco: string
-          estado: string
+          data_nascimento: string | null
+          endereco: string | null
+          estado: string | null
           id: string
-          instituicao: string
+          instituicao: string | null
           nivel: string
-          nome: string
+          nome: string | null
           owner_id: string | null
-          registro: string
+          registro: string | null
           updated_at: string
         }
         Insert: {
           ano_conclusao?: number
           ativo?: boolean
-          cidade?: string
+          cidade?: string | null
           codigo: string
-          cpf?: string
+          cpf?: string | null
           created_at?: string
-          curso?: string
+          curso?: string | null
           data_emissao?: string
-          data_nascimento?: string
-          endereco?: string
-          estado?: string
+          data_nascimento?: string | null
+          endereco?: string | null
+          estado?: string | null
           id?: string
-          instituicao?: string
+          instituicao?: string | null
           nivel?: string
-          nome?: string
+          nome?: string | null
           owner_id?: string | null
-          registro?: string
+          registro?: string | null
           updated_at?: string
         }
         Update: {
           ano_conclusao?: number
           ativo?: boolean
-          cidade?: string
+          cidade?: string | null
           codigo?: string
-          cpf?: string
+          cpf?: string | null
           created_at?: string
-          curso?: string
+          curso?: string | null
           data_emissao?: string
-          data_nascimento?: string
-          endereco?: string
-          estado?: string
+          data_nascimento?: string | null
+          endereco?: string | null
+          estado?: string | null
           id?: string
-          instituicao?: string
+          instituicao?: string | null
           nivel?: string
-          nome?: string
+          nome?: string | null
           owner_id?: string | null
-          registro?: string
+          registro?: string | null
           updated_at?: string
         }
         Relationships: []

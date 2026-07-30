@@ -615,6 +615,8 @@ export type Database = {
           cpf: string | null
           curso: string | null
           data_emissao: string | null
+          data_nascimento: string | null
+          endereco: string | null
           estado: string | null
           instituicao: string | null
           nivel: string | null
@@ -629,6 +631,8 @@ export type Database = {
           cpf?: never
           curso?: string | null
           data_emissao?: string | null
+          data_nascimento?: string | null
+          endereco?: string | null
           estado?: string | null
           instituicao?: string | null
           nivel?: string | null
@@ -643,6 +647,8 @@ export type Database = {
           cpf?: never
           curso?: string | null
           data_emissao?: string | null
+          data_nascimento?: string | null
+          endereco?: string | null
           estado?: string | null
           instituicao?: string | null
           nivel?: string | null

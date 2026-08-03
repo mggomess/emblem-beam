@@ -26,6 +26,7 @@ import { Route as AuthenticatedAppConfiguracoesRouteImport } from './routes/_aut
 import { Route as AuthenticatedAppCertificadosRouteImport } from './routes/_authenticated/app/certificados'
 import { Route as AuthenticatedAppCarteirinhasRouteImport } from './routes/_authenticated/app/carteirinhas'
 import { Route as AuthenticatedAppAlunosRouteImport } from './routes/_authenticated/app/alunos'
+import { Route as ApiPublicCertificadosCodigoRouteImport } from './routes/api/public/certificados.$codigo'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -118,6 +119,12 @@ const AuthenticatedAppAlunosRoute = AuthenticatedAppAlunosRouteImport.update({
   path: '/app/alunos',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiPublicCertificadosCodigoRoute =
+  ApiPublicCertificadosCodigoRouteImport.update({
+    id: '/api/public/certificados/$codigo',
+    path: '/api/public/certificados/$codigo',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -136,6 +143,7 @@ export interface FileRoutesByFullPath {
   '/app/logs': typeof AuthenticatedAppLogsRoute
   '/app/usuarios': typeof AuthenticatedAppUsuariosRoute
   '/app/': typeof AuthenticatedAppIndexRoute
+  '/api/public/certificados/$codigo': typeof ApiPublicCertificadosCodigoRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -154,6 +162,7 @@ export interface FileRoutesByTo {
   '/app/logs': typeof AuthenticatedAppLogsRoute
   '/app/usuarios': typeof AuthenticatedAppUsuariosRoute
   '/app': typeof AuthenticatedAppIndexRoute
+  '/api/public/certificados/$codigo': typeof ApiPublicCertificadosCodigoRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -174,6 +183,7 @@ export interface FileRoutesById {
   '/_authenticated/app/logs': typeof AuthenticatedAppLogsRoute
   '/_authenticated/app/usuarios': typeof AuthenticatedAppUsuariosRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
+  '/api/public/certificados/$codigo': typeof ApiPublicCertificadosCodigoRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -194,6 +204,7 @@ export interface FileRouteTypes {
     | '/app/logs'
     | '/app/usuarios'
     | '/app/'
+    | '/api/public/certificados/$codigo'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -212,6 +223,7 @@ export interface FileRouteTypes {
     | '/app/logs'
     | '/app/usuarios'
     | '/app'
+    | '/api/public/certificados/$codigo'
   id:
     | '__root__'
     | '/'
@@ -231,6 +243,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/logs'
     | '/_authenticated/app/usuarios'
     | '/_authenticated/app/'
+    | '/api/public/certificados/$codigo'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -239,6 +252,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   VerificarCodeRoute: typeof VerificarCodeRoute
+  ApiPublicCertificadosCodigoRoute: typeof ApiPublicCertificadosCodigoRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -362,6 +376,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppAlunosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/certificados/$codigo': {
+      id: '/api/public/certificados/$codigo'
+      path: '/api/public/certificados/$codigo'
+      fullPath: '/api/public/certificados/$codigo'
+      preLoaderRoute: typeof ApiPublicCertificadosCodigoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -404,17 +425,8 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   VerificarCodeRoute: VerificarCodeRoute,
+  ApiPublicCertificadosCodigoRoute: ApiPublicCertificadosCodigoRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

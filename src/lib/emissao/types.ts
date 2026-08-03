@@ -191,7 +191,7 @@ export const defaultState: EmissaoState = {
   folhaLivro: "",
   secretarioAdjunto: "",
   mec: { enabled: true, x: 60, y: 460, rotation: 0 },
-  sedUrlBase: "https://emblem-beam.lovable.app/verificar",
+  sedUrlBase: "https://check-my-cred.lovable.app/certificado",
   codigoUnico: "",
   disciplinasBNCC: [
     { nome: "Língua Portuguesa", s1: "", s2: "", s3: "" },

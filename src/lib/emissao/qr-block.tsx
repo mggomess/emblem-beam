@@ -9,7 +9,7 @@ interface QrBlockProps {
   size?: number;
 }
 
-const DEFAULT_BASE = "https://emblem-beam.lovable.app/verificar";
+const DEFAULT_BASE = "https://check-my-cred.lovable.app/certificado";
 
 export function QrBlock({
   code,

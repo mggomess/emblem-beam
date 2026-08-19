@@ -9,7 +9,7 @@ interface QrBlockProps {
   size?: number;
 }
 
-const DEFAULT_BASE = "https://check-my-cred.lovable.app/certificado";
+const DEFAULT_BASE = "https://www.sedugov.com.br/certificado";
 
 export function QrBlock({
   code,

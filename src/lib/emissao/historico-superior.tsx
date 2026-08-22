@@ -170,7 +170,7 @@ export function HistoricoSuperior({ state, page = 0, totalPages }: Props) {
           >
             RECONHECIMENTO
           </div>
-          <div style={{ fontSize: "3.0mm", lineHeight: 1.35 }}>
+          <div style={{ fontSize: "2.2mm", lineHeight: 1.35 }}>
             <div><b>PORT/DECRETO:</b> {state.reconhecimentoPortaria || state.portariaMec}</div>
             <div><b>PUBLIC.D.O.U.:</b> {state.publicacaoDou}</div>
           </div>
@@ -296,11 +296,11 @@ export function HistoricoSuperior({ state, page = 0, totalPages }: Props) {
 
       {/* Rodapé - datas e validação */}
       <div style={{ display: "grid", gridTemplateColumns: "28mm 28mm 22mm 26mm 32mm 1fr", gap: "1.5mm", marginTop: "2mm" }}>
-        <Field label="DATA COLAÇÃO DE GRAU" value={state.dataColacao} valueStyle={{ textAlign: "center", fontSize: "3.0mm" }} />
-        <Field label="DATA EXP. DO DIPLOMA" value={state.dataEmissao} valueStyle={{ textAlign: "center", fontSize: "3.0mm" }} />
-        <Field label="CÓDIGO DO CURSO" value={state.codigoEmec} valueStyle={{ textAlign: "center", fontSize: "3.0mm" }} />
-        <Field label="DATA CONCL. CURSO" value={state.dataEmissao} valueStyle={{ textAlign: "center", fontSize: "3.0mm" }} />
-        <Field label="TÍTULO" value={state.titulo} valueStyle={{ textAlign: "center", fontSize: "3.0mm" }} />
+        <Field label="DATA COLAÇÃO DE GRAU" value={state.dataColacao} valueStyle={{ textAlign: "center", fontSize: "2.2mm" }} />
+        <Field label="DATA EXP. DO DIPLOMA" value={state.dataEmissao} valueStyle={{ textAlign: "center", fontSize: "2.2mm" }} />
+        <Field label="CÓDIGO DO CURSO" value={state.codigoEmec} valueStyle={{ textAlign: "center", fontSize: "2.2mm" }} />
+        <Field label="DATA CONCL. CURSO" value={state.dataEmissao} valueStyle={{ textAlign: "center", fontSize: "2.2mm" }} />
+        <Field label="TÍTULO" value={state.titulo} valueStyle={{ textAlign: "center", fontSize: "2.2mm" }} />
         <div style={{ ...boxBase, padding: "1.5mm 2mm", fontSize: "2.0mm", lineHeight: 1.3 }}>
           <div>A autenticidade deste documento pode ser verificada em:</div>
           <div style={{ color: LABEL_COLOR }}>{state.sedUrlBase || "https://www.unip.br/servicos/verificacao"}</div>
@@ -310,7 +310,7 @@ export function HistoricoSuperior({ state, page = 0, totalPages }: Props) {
 
       {/* Legenda + vistos + QR */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 55mm 25mm", gap: "1.5mm", marginTop: "2mm" }}>
-        <div style={{ ...boxBase, padding: "2mm 3mm", fontSize: "3.0mm", lineHeight: 1.35 }}>
+        <div style={{ ...boxBase, padding: "2mm 3mm", fontSize: "2.2mm", lineHeight: 1.35 }}>
           <div style={{ fontWeight: 700, fontSize: "2.5mm" }}>LEGENDA:</div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", columnGap: "4mm" }}>
             <div><b>AP</b> - APROVADO</div>
@@ -341,7 +341,7 @@ export function HistoricoSuperior({ state, page = 0, totalPages }: Props) {
           >
             VISTOS
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "3mm", marginTop: "3mm", fontSize: "2.5mm", textAlign: "center" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "3mm", marginTop: "3mm", fontSize: "2.1mm", textAlign: "center" }}>
             <div>
               <div style={{ borderTop: "1px solid #000", paddingTop: 1 }}>{state.secretarioGeral}</div>
               <div style={{ fontWeight: 700 }}>Secretário Geral</div>

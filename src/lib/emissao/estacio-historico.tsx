@@ -197,18 +197,18 @@ export function EstacioHistoricoSuperior({ state, page = 0, totalPages }: Props)
 
       {/* Observações */}
       {state.observacoesHistorico && (
-        <div style={{ marginTop: "2mm", border: `1px solid ${BORDER}`, padding: "1.5mm", fontSize: "3.0mm", minHeight: "10mm", whiteSpace: "pre-wrap" }}>
+        <div style={{ marginTop: "2mm", border: `1px solid ${BORDER}`, padding: "1.5mm", fontSize: "2.2mm", minHeight: "10mm", whiteSpace: "pre-wrap" }}>
           <b>Observações: </b>{state.observacoesHistorico}
         </div>
       )}
 
       {/* Rodapé */}
       <div style={{ marginTop: "3mm", display: "grid", gridTemplateColumns: "60mm 1fr 30mm", gap: "3mm", alignItems: "end" }}>
-        <div style={{ border: `1px solid ${BORDER}`, padding: "2mm", textAlign: "center", fontSize: "3.0mm", fontWeight: 700 }}>
+        <div style={{ border: `1px solid ${BORDER}`, padding: "2mm", textAlign: "center", fontSize: "2.6mm", fontWeight: 700 }}>
           FACULDADE ESTÁCIO<br />
           {(state.cidadeEmissao || "BELO HORIZONTE").toUpperCase()} - {state.uf}
         </div>
-        <div style={{ textAlign: "center", fontSize: "2.5mm", lineHeight: 1.4 }}>
+        <div style={{ textAlign: "center", fontSize: "2.1mm", lineHeight: 1.4 }}>
           <div>Autenticidade: {state.sedUrlBase || "https://validar.sedu.gov.br"}/verificar/{state.codigoUnico || "—"}</div>
           <div>Nº do documento: <b>{state.codigoUnico || "—"}</b></div>
           <div style={{ marginTop: "3mm", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6mm" }}>

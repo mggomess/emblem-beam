@@ -81,11 +81,16 @@ function maskCpf(cpf: string | null): string | null {
 
   const digits = cpf.replace(/\D/g, "");
 
-  if (digits.length !== 11) {
-    return cpf;
+  if (digits.length >= 11) {
+    const d = digits.slice(-11);
+    return `***.${d.slice(3, 6)}.${d.slice(6, 9)}-**`;
   }
 
-  return `***.${digits.slice(3, 6)}.${digits.slice(6, 9)}-**`;
+  if (digits.length >= 5) {
+    return `***.${digits.slice(3, 6)}.***-**`;
+  }
+
+  return cpf;
 }
 
 function formatSupabaseError(error: SupabaseErrorLike): string {

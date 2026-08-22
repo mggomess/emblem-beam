@@ -4,7 +4,7 @@ import { QrBlock } from "./qr-block";
 
 type Props = { state: EmissaoState; page?: number; totalPages?: number };
 
-export const HISTORICO_UNIP_LINHAS_POR_FOLHA = 24;
+export const HISTORICO_UNIP_LINHAS_POR_FOLHA = 21;
 
 const BLUE = "#0d6fbf";
 const LABEL_BG = "#e6f2fb";
@@ -41,7 +41,7 @@ function Field({
           background: LABEL_BG,
           color: LABEL_COLOR,
           padding: "0 3px",
-          fontSize: "1.9mm",
+          fontSize: "2.3mm",
           fontWeight: 700,
           letterSpacing: 0.2,
           textAlign: labelAlign,
@@ -53,7 +53,7 @@ function Field({
       </div>
       <div
         style={{
-          fontSize: "2.1mm",
+          fontSize: "2.5mm",
           color: "#000",
           fontWeight: 500,
           minHeight: "3mm",
@@ -108,7 +108,7 @@ export function HistoricoSuperior({ state, page = 0, totalPages }: Props) {
               UNIP
             </div>
           </div>
-          <div style={{ background: "#c60c1e", color: "#fff", fontSize: "1.9mm", padding: "0.4mm 3mm", fontWeight: 700, letterSpacing: 1, marginTop: 1 }}>
+          <div style={{ background: "#c60c1e", color: "#fff", fontSize: "2.3mm", padding: "0.4mm 3mm", fontWeight: 700, letterSpacing: 1, marginTop: 1 }}>
             UNIVERSIDADE PAULISTA
           </div>
         </div>
@@ -163,14 +163,14 @@ export function HistoricoSuperior({ state, page = 0, totalPages }: Props) {
               background: LABEL_BG,
               color: LABEL_COLOR,
               padding: "0 3px",
-              fontSize: "1.9mm",
+              fontSize: "2.3mm",
               fontWeight: 700,
               textTransform: "uppercase",
             }}
           >
             RECONHECIMENTO
           </div>
-          <div style={{ fontSize: "1.8mm", lineHeight: 1.35 }}>
+          <div style={{ fontSize: "3.0mm", lineHeight: 1.35 }}>
             <div><b>PORT/DECRETO:</b> {state.reconhecimentoPortaria || state.portariaMec}</div>
             <div><b>PUBLIC.D.O.U.:</b> {state.publicacaoDou}</div>
           </div>
@@ -184,14 +184,14 @@ export function HistoricoSuperior({ state, page = 0, totalPages }: Props) {
               background: LABEL_BG,
               color: LABEL_COLOR,
               padding: "0 3px",
-              fontSize: "1.9mm",
+              fontSize: "2.3mm",
               fontWeight: 700,
               textTransform: "uppercase",
             }}
           >
             CARGA HORÁRIA
           </div>
-          <div style={{ fontSize: "1.9mm", lineHeight: 1.4 }}>
+          <div style={{ fontSize: "2.3mm", lineHeight: 1.4 }}>
             <div><b>EXIGIDA:</b> {state.chExigida ? `${state.chExigida}h` : ""}</div>
             <div><b>CUMPRIDA:</b> {chCumprida ? `${chCumprida}h` : ""}</div>
           </div>
@@ -203,7 +203,7 @@ export function HistoricoSuperior({ state, page = 0, totalPages }: Props) {
         <div
           style={{
             textAlign: "center",
-            fontSize: "3mm",
+            fontSize: "3.4mm",
             letterSpacing: "2mm",
             padding: "1mm",
             borderBottom: `1.2px solid ${BLUE}`,
@@ -218,7 +218,7 @@ export function HistoricoSuperior({ state, page = 0, totalPages }: Props) {
           style={{
             width: "100%",
             borderCollapse: "collapse",
-            fontSize: "1.85mm",
+            fontSize: "2.25mm",
             tableLayout: "fixed",
           }}
         >
@@ -240,7 +240,7 @@ export function HistoricoSuperior({ state, page = 0, totalPages }: Props) {
                     borderRight: i < 6 ? `1px solid ${BLUE}` : undefined,
                     borderBottom: `1px solid ${BLUE}`,
                     padding: "0.8mm 1mm",
-                    fontSize: "1.9mm",
+                    fontSize: "2.3mm",
                     background: "#fff",
                   }}
                 >
@@ -251,7 +251,7 @@ export function HistoricoSuperior({ state, page = 0, totalPages }: Props) {
           </thead>
           <tbody>
             {disciplinas.map((d, i) => (
-              <tr key={`d-${offset + i}`} style={{ height: "4.4mm" }}>
+              <tr key={`d-${offset + i}`} style={{ height: "5.1mm" }}>
                 <td style={cellStyle("center")}>{d.periodo}</td>
                 <td style={cellStyle("center")}>{d.codigo}</td>
                 <td style={cellStyle("left")}>{d.descricao}</td>
@@ -262,7 +262,7 @@ export function HistoricoSuperior({ state, page = 0, totalPages }: Props) {
               </tr>
             ))}
             {Array.from({ length: linhasVazias }).map((_, i) => (
-              <tr key={`e-${i}`} style={{ height: "4.4mm" }}>
+              <tr key={`e-${i}`} style={{ height: "5.1mm" }}>
                 {Array.from({ length: 7 }).map((_, j) => (
                   <td key={j} style={cellStyle("center")}>&nbsp;</td>
                 ))}
@@ -282,26 +282,26 @@ export function HistoricoSuperior({ state, page = 0, totalPages }: Props) {
             background: LABEL_BG,
             color: LABEL_COLOR,
             padding: "0 3px",
-            fontSize: "1.9mm",
+            fontSize: "2.3mm",
             fontWeight: 700,
             textTransform: "uppercase",
           }}
         >
           OBSERVAÇÕES
         </div>
-        <div style={{ fontSize: "1.85mm", whiteSpace: "pre-wrap", lineHeight: 1.3 }}>
+        <div style={{ fontSize: "2.25mm", whiteSpace: "pre-wrap", lineHeight: 1.3 }}>
           {state.observacoesHistorico}
         </div>
       </div>
 
       {/* Rodapé - datas e validação */}
       <div style={{ display: "grid", gridTemplateColumns: "28mm 28mm 22mm 26mm 32mm 1fr", gap: "1.5mm", marginTop: "2mm" }}>
-        <Field label="DATA COLAÇÃO DE GRAU" value={state.dataColacao} valueStyle={{ textAlign: "center", fontSize: "1.8mm" }} />
-        <Field label="DATA EXP. DO DIPLOMA" value={state.dataEmissao} valueStyle={{ textAlign: "center", fontSize: "1.8mm" }} />
-        <Field label="CÓDIGO DO CURSO" value={state.codigoEmec} valueStyle={{ textAlign: "center", fontSize: "1.8mm" }} />
-        <Field label="DATA CONCL. CURSO" value={state.dataEmissao} valueStyle={{ textAlign: "center", fontSize: "1.8mm" }} />
-        <Field label="TÍTULO" value={state.titulo} valueStyle={{ textAlign: "center", fontSize: "1.8mm" }} />
-        <div style={{ ...boxBase, padding: "1.5mm 2mm", fontSize: "1.6mm", lineHeight: 1.3 }}>
+        <Field label="DATA COLAÇÃO DE GRAU" value={state.dataColacao} valueStyle={{ textAlign: "center", fontSize: "3.0mm" }} />
+        <Field label="DATA EXP. DO DIPLOMA" value={state.dataEmissao} valueStyle={{ textAlign: "center", fontSize: "3.0mm" }} />
+        <Field label="CÓDIGO DO CURSO" value={state.codigoEmec} valueStyle={{ textAlign: "center", fontSize: "3.0mm" }} />
+        <Field label="DATA CONCL. CURSO" value={state.dataEmissao} valueStyle={{ textAlign: "center", fontSize: "3.0mm" }} />
+        <Field label="TÍTULO" value={state.titulo} valueStyle={{ textAlign: "center", fontSize: "3.0mm" }} />
+        <div style={{ ...boxBase, padding: "1.5mm 2mm", fontSize: "2.0mm", lineHeight: 1.3 }}>
           <div>A autenticidade deste documento pode ser verificada em:</div>
           <div style={{ color: LABEL_COLOR }}>{state.sedUrlBase || "https://www.unip.br/servicos/verificacao"}</div>
           <div>Número do documento: <b>{state.codigoUnico || "—"}</b></div>
@@ -310,8 +310,8 @@ export function HistoricoSuperior({ state, page = 0, totalPages }: Props) {
 
       {/* Legenda + vistos + QR */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 55mm 25mm", gap: "1.5mm", marginTop: "2mm" }}>
-        <div style={{ ...boxBase, padding: "2mm 3mm", fontSize: "1.8mm", lineHeight: 1.35 }}>
-          <div style={{ fontWeight: 700, fontSize: "2.1mm" }}>LEGENDA:</div>
+        <div style={{ ...boxBase, padding: "2mm 3mm", fontSize: "3.0mm", lineHeight: 1.35 }}>
+          <div style={{ fontWeight: 700, fontSize: "2.5mm" }}>LEGENDA:</div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", columnGap: "4mm" }}>
             <div><b>AP</b> - APROVADO</div>
             <div><b>RM</b> - REPROVADO POR MÉDIA</div>
@@ -334,14 +334,14 @@ export function HistoricoSuperior({ state, page = 0, totalPages }: Props) {
               background: LABEL_BG,
               color: LABEL_COLOR,
               padding: "0 3px",
-              fontSize: "1.9mm",
+              fontSize: "2.3mm",
               fontWeight: 700,
               textTransform: "uppercase",
             }}
           >
             VISTOS
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "3mm", marginTop: "3mm", fontSize: "1.7mm", textAlign: "center" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "3mm", marginTop: "3mm", fontSize: "2.5mm", textAlign: "center" }}>
             <div>
               <div style={{ borderTop: "1px solid #000", paddingTop: 1 }}>{state.secretarioGeral}</div>
               <div style={{ fontWeight: 700 }}>Secretário Geral</div>

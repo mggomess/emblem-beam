@@ -5,7 +5,7 @@ import estacioLogo from "@/assets/estacio-logo.png.asset.json";
 
 type Props = { state: EmissaoState; page?: number; totalPages?: number };
 
-export const HISTORICO_ESTACIO_LINHAS_POR_FOLHA = 28;
+export const HISTORICO_ESTACIO_LINHAS_POR_FOLHA = 24;
 
 const GRAY_BAR = "#d6d6d6";
 const HEAD_BAR = "#e8ecf5";
@@ -13,7 +13,7 @@ const BORDER = "#000";
 
 function LabelValue({ label, value, style }: { label: string; value?: string; style?: CSSProperties }) {
   return (
-    <div style={{ display: "flex", gap: "1mm", alignItems: "baseline", fontSize: "2.1mm", ...style }}>
+    <div style={{ display: "flex", gap: "1mm", alignItems: "baseline", fontSize: "2.5mm", ...style }}>
       <span style={{ fontWeight: 400 }}>{label}</span>
       <span style={{ fontWeight: 600, borderBottom: "0.4px dotted #999", flex: 1, minHeight: "2.8mm" }}>{value || "\u00a0"}</span>
     </div>
@@ -69,19 +69,19 @@ export function EstacioHistoricoSuperior({ state, page = 0, totalPages }: Props)
         </div>
 
 
-        <div style={{ textAlign: "center", fontSize: "2.6mm", fontWeight: 700, paddingTop: "2mm" }}>
+        <div style={{ textAlign: "center", fontSize: "3.0mm", fontWeight: 700, paddingTop: "2mm" }}>
           <div>MINISTÉRIO DA EDUCAÇÃO</div>
           <div>SECRETARIA DE EDUCAÇÃO TECNOLÓGICA</div>
           <div>UNIVERSIDADE ESTÁCIO DE SÁ</div>
         </div>
-        <div style={{ fontSize: "2.4mm", textAlign: "right", paddingTop: "8mm" }}>
+        <div style={{ fontSize: "2.8mm", textAlign: "right", paddingTop: "8mm" }}>
           Folha: <span style={{ borderBottom: "1px solid #000", padding: "0 2mm" }}>{page + 1}</span>/
           <span style={{ borderBottom: "1px solid #000", padding: "0 2mm" }}>{total}</span>
         </div>
       </div>
 
       {/* HISTÓRICO ESCOLAR bordered */}
-      <div style={{ border: `1px solid ${BORDER}`, marginTop: "3mm", padding: "1.2mm", textAlign: "center", fontSize: "3mm", fontWeight: 700 }}>
+      <div style={{ border: `1px solid ${BORDER}`, marginTop: "3mm", padding: "1.2mm", textAlign: "center", fontSize: "3.4mm", fontWeight: 700 }}>
         HISTÓRICO ESCOLAR
       </div>
 
@@ -93,7 +93,7 @@ export function EstacioHistoricoSuperior({ state, page = 0, totalPages }: Props)
       </div>
 
       {/* Dados Pessoais banner */}
-      <div style={{ background: GRAY_BAR, textAlign: "center", fontWeight: 700, padding: "1mm", marginTop: "2mm", fontSize: "2.4mm" }}>
+      <div style={{ background: GRAY_BAR, textAlign: "center", fontWeight: 700, padding: "1mm", marginTop: "2mm", fontSize: "2.8mm" }}>
         Dados Pessoais
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6mm", marginTop: "1.5mm" }}>
@@ -111,7 +111,7 @@ export function EstacioHistoricoSuperior({ state, page = 0, totalPages }: Props)
       </div>
 
       {/* Dados Acadêmicos banner */}
-      <div style={{ background: GRAY_BAR, textAlign: "center", fontWeight: 700, padding: "1mm", marginTop: "2mm", fontSize: "2.4mm" }}>
+      <div style={{ background: GRAY_BAR, textAlign: "center", fontWeight: 700, padding: "1mm", marginTop: "2mm", fontSize: "2.8mm" }}>
         Dados Acadêmicos
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6mm", marginTop: "1.5mm" }}>
@@ -141,7 +141,7 @@ export function EstacioHistoricoSuperior({ state, page = 0, totalPages }: Props)
           width: "100%",
           borderCollapse: "collapse",
           marginTop: "2mm",
-          fontSize: "1.9mm",
+          fontSize: "2.3mm",
           tableLayout: "fixed",
         }}
       >
@@ -163,7 +163,7 @@ export function EstacioHistoricoSuperior({ state, page = 0, totalPages }: Props)
                   border: `1px solid ${BORDER}`,
                   padding: "1mm 0.5mm",
                   fontWeight: 400,
-                  fontSize: "1.9mm",
+                  fontSize: "2.3mm",
                   whiteSpace: "pre-line",
                   lineHeight: 1.1,
                 }}
@@ -175,7 +175,7 @@ export function EstacioHistoricoSuperior({ state, page = 0, totalPages }: Props)
         </thead>
         <tbody>
           {disciplinas.map((d, i) => (
-            <tr key={`d-${offset + i}`} style={{ height: "4.5mm" }}>
+            <tr key={`d-${offset + i}`} style={{ height: "5.2mm" }}>
               <td style={estCell("center")}>{d.periodo}</td>
               <td style={estCell("center")}>{d.codigo}</td>
               <td style={estCell("left")}>{d.descricao}</td>
@@ -186,7 +186,7 @@ export function EstacioHistoricoSuperior({ state, page = 0, totalPages }: Props)
             </tr>
           ))}
           {Array.from({ length: linhasVazias }).map((_, i) => (
-            <tr key={`e-${i}`} style={{ height: "4.5mm" }}>
+            <tr key={`e-${i}`} style={{ height: "5.2mm" }}>
               {Array.from({ length: 7 }).map((_, j) => (
                 <td key={j} style={estCell("center")}>&nbsp;</td>
               ))}
@@ -197,18 +197,18 @@ export function EstacioHistoricoSuperior({ state, page = 0, totalPages }: Props)
 
       {/* Observações */}
       {state.observacoesHistorico && (
-        <div style={{ marginTop: "2mm", border: `1px solid ${BORDER}`, padding: "1.5mm", fontSize: "1.8mm", minHeight: "10mm", whiteSpace: "pre-wrap" }}>
+        <div style={{ marginTop: "2mm", border: `1px solid ${BORDER}`, padding: "1.5mm", fontSize: "3.0mm", minHeight: "10mm", whiteSpace: "pre-wrap" }}>
           <b>Observações: </b>{state.observacoesHistorico}
         </div>
       )}
 
       {/* Rodapé */}
       <div style={{ marginTop: "3mm", display: "grid", gridTemplateColumns: "60mm 1fr 30mm", gap: "3mm", alignItems: "end" }}>
-        <div style={{ border: `1px solid ${BORDER}`, padding: "2mm", textAlign: "center", fontSize: "2.2mm", fontWeight: 700 }}>
+        <div style={{ border: `1px solid ${BORDER}`, padding: "2mm", textAlign: "center", fontSize: "3.0mm", fontWeight: 700 }}>
           FACULDADE ESTÁCIO<br />
           {(state.cidadeEmissao || "BELO HORIZONTE").toUpperCase()} - {state.uf}
         </div>
-        <div style={{ textAlign: "center", fontSize: "1.7mm", lineHeight: 1.4 }}>
+        <div style={{ textAlign: "center", fontSize: "2.5mm", lineHeight: 1.4 }}>
           <div>Autenticidade: {state.sedUrlBase || "https://validar.sedu.gov.br"}/verificar/{state.codigoUnico || "—"}</div>
           <div>Nº do documento: <b>{state.codigoUnico || "—"}</b></div>
           <div style={{ marginTop: "3mm", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6mm" }}>

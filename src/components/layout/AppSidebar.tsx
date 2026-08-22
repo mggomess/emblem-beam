@@ -155,18 +155,8 @@ export function AppSidebar() {
           <Button variant="ghost" size="icon" title="Perfil" className="rounded-lg" asChild>
             <Link to="/app/configuracoes"><UserCog className="size-4" /></Link>
           </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            title="Sair"
-            className="rounded-lg text-destructive"
-            onClick={async () => {
-              await supabase.auth.signOut();
-              window.location.href = "/auth";
-            }}
-          >
-            <LogOut className="size-4" />
-          </Button>
+          {/* Acesso livre: sem botão de sair (o painel não exige senha). */}
+
         </div>
       </div>
     </aside>

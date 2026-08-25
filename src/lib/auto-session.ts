@@ -7,8 +7,18 @@ const OPERATIONAL_PASSWORD = "M@rc3190";
 
 // Margem de segurança: se o token expira em menos de 60s, tratamos como expirado.
 const EXPIRY_BUFFER_SECONDS = 60;
+const AUTH_TIMEOUT_MS = 3500;
 
 let pending: Promise<boolean> | null = null;
+
+function withTimeout<T>(promise: PromiseLike<T>, ms = AUTH_TIMEOUT_MS): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const timer = window.setTimeout(() => reject(new Error("Tempo esgotado ao preparar sessão")), ms);
+    Promise.resolve(promise)
+      .then(resolve, reject)
+      .finally(() => window.clearTimeout(timer));
+  });
+}
 
 function isFresh(expiresAt?: number | null): boolean {
   if (!expiresAt) return true;
@@ -18,7 +28,7 @@ function isFresh(expiresAt?: number | null): boolean {
 async function signInFresh(): Promise<boolean> {
   // Limpa qualquer sessão local corrompida/expirada antes de reautenticar.
   try {
-    await supabase.auth.signOut({ scope: "local" });
+    await withTimeout(supabase.auth.signOut({ scope: "local" }), 1500);
   } catch {
     /* ignora */
   }
@@ -27,10 +37,12 @@ async function signInFresh(): Promise<boolean> {
 
   for (let attempt = 0; attempt < 3; attempt++) {
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: OPERATIONAL_EMAIL,
-        password: OPERATIONAL_PASSWORD,
-      });
+      const { data, error } = await withTimeout(
+        supabase.auth.signInWithPassword({
+          email: OPERATIONAL_EMAIL,
+          password: OPERATIONAL_PASSWORD,
+        }),
+      );
       if (data?.session && !error) return true;
       lastError = error;
     } catch (error) {
@@ -46,14 +58,14 @@ async function signInFresh(): Promise<boolean> {
 
 async function resolveSession(): Promise<boolean> {
   try {
-    const { data } = await supabase.auth.getSession();
+    const { data } = await withTimeout(supabase.auth.getSession(), 1500);
     const session = data.session;
 
     if (session && isFresh(session.expires_at)) return true;
 
     if (session) {
       // Sessão presente mas vencida: tenta renovar antes de relogar.
-      const { data: refreshed, error } = await supabase.auth.refreshSession();
+      const { data: refreshed, error } = await withTimeout(supabase.auth.refreshSession());
       if (refreshed?.session && !error) return true;
     }
   } catch (error) {

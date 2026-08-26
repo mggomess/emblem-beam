@@ -11,7 +11,24 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { Toaster } from "@/components/ui/sonner";
+import { Button } from "@/components/ui/button";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+
+const RECOVERY_KEY = "certifica:module-recovery";
+
+function isModuleLoadError(error: unknown): boolean {
+  const message = error instanceof Error ? error.message : String(error ?? "");
+  return /chunk|dynamically imported|importing a module|preload|failed to fetch/i.test(message);
+}
+
+function recoverFromStaleModule(): boolean {
+  if (typeof window === "undefined") return false;
+  const lastRecovery = Number(window.sessionStorage.getItem(RECOVERY_KEY) ?? 0);
+  if (Date.now() - lastRecovery < 30_000) return false;
+  window.sessionStorage.setItem(RECOVERY_KEY, String(Date.now()));
+  window.location.reload();
+  return true;
+}
 
 function NotFoundComponent() {
   return (
@@ -40,33 +57,30 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   const router = useRouter();
   useEffect(() => {
     reportLovableError(error, { boundary: "tanstack_root_error_component" });
+    if (isModuleLoadError(error)) recoverFromStaleModule();
   }, [error]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <h1 className="text-xl font-semibold tracking-tight text-foreground">
-          This page didn't load
+          Esta página não carregou
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Something went wrong on our end. You can try refreshing or head back home.
+          O painel encontrou uma falha temporária. Tente novamente para continuar de onde parou.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
-          <button
+          <Button
             onClick={() => {
               router.invalidate();
               reset();
             }}
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
-            Try again
-          </button>
-          <a
-            href="/"
-            className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
-          >
-            Go home
-          </a>
+            Tentar novamente
+          </Button>
+          <Button variant="outline" asChild>
+            <Link to="/app">Ir para o painel</Link>
+          </Button>
         </div>
       </div>
     </div>
@@ -129,6 +143,15 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+
+  useEffect(() => {
+    const handlePreloadError = (event: Event) => {
+      event.preventDefault();
+      recoverFromStaleModule();
+    };
+    window.addEventListener("vite:preloadError", handlePreloadError);
+    return () => window.removeEventListener("vite:preloadError", handlePreloadError);
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
